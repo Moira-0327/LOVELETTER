@@ -49,8 +49,18 @@ function getAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+
+// Mobile requires AudioContext init from user gesture
+function initAudioOnGesture() {
+  getAudioContext();
+  document.removeEventListener('touchstart', initAudioOnGesture);
+  document.removeEventListener('click', initAudioOnGesture);
+}
+document.addEventListener('touchstart', initAudioOnGesture, { once: true });
+document.addEventListener('click', initAudioOnGesture, { once: true });
 
 function playTypeClick() {
   try {
@@ -473,11 +483,33 @@ function drawImageCover(ctx, img, x, y, w, h) {
   ctx.restore();
 }
 
-function downloadCanvas(canvas, filename) {
+async function downloadCanvas(canvas, filename) {
+  // Convert to blob for better mobile compatibility
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+
+  // Try native share on mobile (most reliable way to "save" on iOS)
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], filename, { type: 'image/png' });
+    const data = { files: [file] };
+    if (navigator.canShare(data)) {
+      try {
+        await navigator.share(data);
+        return;
+      } catch (_) {
+        // User cancelled — fall through to link download
+      }
+    }
+  }
+
+  // Fallback: blob URL download
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.download = filename;
-  link.href = canvas.toDataURL('image/png');
+  link.href = url;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 // ============ SAVE TO IMAGE ============
@@ -493,24 +525,24 @@ document.getElementById('save-letter').addEventListener('click', async (e) => {
   if (state.hasPhotos) {
     const boothCanvas = await renderPhotoboothCanvas();
     const composite = createCompositeImage(letterCanvas, boothCanvas);
-    downloadCanvas(composite, 'lover-letter.png');
+    await downloadCanvas(composite, 'lover-letter.png');
   } else {
-    downloadCanvas(letterCanvas, 'love-letter.png');
+    await downloadCanvas(letterCanvas, 'love-letter.png');
   }
 });
 
 // Save in expanded letter
-document.getElementById('expand-save-letter').addEventListener('click', (e) => {
+document.getElementById('expand-save-letter').addEventListener('click', async (e) => {
   e.stopPropagation();
   const canvas = renderLetterCanvas();
-  downloadCanvas(canvas, 'love-letter.png');
+  await downloadCanvas(canvas, 'love-letter.png');
 });
 
 // Save in expanded photobooth
 document.getElementById('expand-save-photobooth').addEventListener('click', async (e) => {
   e.stopPropagation();
   const canvas = await renderPhotoboothCanvas();
-  downloadCanvas(canvas, 'photobooth.png');
+  await downloadCanvas(canvas, 'photobooth.png');
 });
 
 function renderLetterCanvas() {
