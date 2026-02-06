@@ -53,14 +53,21 @@ function getAudioContext() {
   return audioCtx;
 }
 
-// Mobile requires AudioContext init from user gesture
-function initAudioOnGesture() {
-  getAudioContext();
-  document.removeEventListener('touchstart', initAudioOnGesture);
-  document.removeEventListener('click', initAudioOnGesture);
+// Mobile: unlock AudioContext by playing a silent buffer on first user gesture
+function unlockAudio() {
+  const ctx = getAudioContext();
+  const buffer = ctx.createBuffer(1, 1, 22050);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+  source.start(0);
+  document.removeEventListener('touchstart', unlockAudio);
+  document.removeEventListener('touchend', unlockAudio);
+  document.removeEventListener('click', unlockAudio);
 }
-document.addEventListener('touchstart', initAudioOnGesture, { once: true });
-document.addEventListener('click', initAudioOnGesture, { once: true });
+document.addEventListener('touchstart', unlockAudio, { passive: true });
+document.addEventListener('touchend', unlockAudio, { passive: true });
+document.addEventListener('click', unlockAudio);
 
 function playTypeClick() {
   try {
@@ -484,24 +491,24 @@ function drawImageCover(ctx, img, x, y, w, h) {
 }
 
 async function downloadCanvas(canvas, filename) {
-  // Convert to blob for better mobile compatibility
   const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const toast = document.getElementById('share-toast');
 
-  // Try native share on mobile (most reliable way to "save" on iOS)
+  // 1) Try native share (works on mobile with HTTPS)
   if (navigator.share && navigator.canShare) {
-    const file = new File([blob], filename, { type: 'image/png' });
-    const data = { files: [file] };
-    if (navigator.canShare(data)) {
-      try {
+    try {
+      const file = new File([blob], filename, { type: 'image/png' });
+      const data = { files: [file] };
+      if (navigator.canShare(data)) {
         await navigator.share(data);
         return;
-      } catch (_) {
-        // User cancelled — fall through to link download
       }
+    } catch (_) {
+      // User cancelled or failed — try next method
     }
   }
 
-  // Fallback: blob URL download
+  // 2) Try <a download> (works on desktop, Android Chrome)
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.download = filename;
@@ -509,7 +516,17 @@ async function downloadCanvas(canvas, filename) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+  // 3) Also open in new tab as ultimate fallback (iOS Safari ignores <a download>)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    window.open(url, '_blank');
+    toast.textContent = 'Long press image to save';
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 3000);
+  } else {
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
 }
 
 // ============ SAVE TO IMAGE ============
