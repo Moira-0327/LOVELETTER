@@ -1,5 +1,5 @@
 /* ============================================
-   LOVE LETTER — Main Application Logic
+   LOVE LETTER — Main Application
    Flat-lay layout with tap-to-expand interaction
    ============================================ */
 
@@ -679,10 +679,11 @@ async function renderPhotoboothCanvas() {
   ctx.fillRect(0, 0, STRIP_W, STRIP_H);
 
   // Header
-  ctx.font = '12px "Special Elite", monospace';
+  ctx.font = '400 10px "DM Sans", "Helvetica Neue", sans-serif';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
+  ctx.letterSpacing = '3px';
   ctx.fillText('P H O T O   B O O T H', STRIP_W / 2, 24);
 
   // Photos (4 photos, B&W)
@@ -711,7 +712,7 @@ async function renderPhotoboothCanvas() {
 
   // Footer: names + logo
   const footerY = y + 10;
-  ctx.font = '16px "Special Elite", monospace';
+  ctx.font = '300 14px "DM Sans", "Helvetica Neue", sans-serif';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'center';
   const caption = (state.partnerName && state.senderName)
@@ -720,13 +721,13 @@ async function renderPhotoboothCanvas() {
   ctx.fillText(caption, STRIP_W / 2, footerY);
 
   // Logo
-  ctx.font = 'italic 20px "Cormorant Garamond", Georgia, serif';
+  ctx.font = 'italic 22px "Instrument Serif", Georgia, serif';
   ctx.fillStyle = INK;
   ctx.fillText('Love Letter', STRIP_W / 2, footerY + 30);
 
   // Days
   const daysSince = calculateDaysTogether(state.togetherDate);
-  ctx.font = '10px "Special Elite", monospace';
+  ctx.font = '300 10px "DM Sans", "Helvetica Neue", sans-serif';
   ctx.fillStyle = MUTED;
   ctx.fillText(`${daysSince} days of love`, STRIP_W / 2, footerY + 58);
 

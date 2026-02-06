@@ -19,7 +19,8 @@
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
-  --font-sans: 'Noto Serif SC', serif;
+  --font-heading: 'Instrument Serif', Georgia, serif;
+  --font-ui: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
 
   --page-width: min(100vw, 430px);
   --page-height: 100dvh;
@@ -80,32 +81,33 @@ html, body {
 
 .star {
   position: absolute;
-  color: var(--text-muted);
-  opacity: 0.5;
+  color: var(--maroon);
+  opacity: 0.25;
 }
-.star-1 { width: 40px; top: 0; left: 0; transform: rotate(-15deg); }
-.star-2 { width: 28px; top: 30px; left: 35px; transform: rotate(10deg); }
-.star-3 { width: 22px; top: 5px; left: 50px; transform: rotate(-5deg); }
+.star-1 { width: 16px; top: 0; left: 0; transform: rotate(0deg); }
+.star-2 { width: 10px; top: 28px; left: 38px; transform: rotate(45deg); }
+.star-3 { width: 12px; top: 4px; left: 52px; transform: rotate(0deg); }
 
 .setup-title {
-  font-family: var(--font-serif);
-  font-size: 42px;
-  font-weight: 300;
+  font-family: var(--font-heading);
+  font-size: 46px;
+  font-weight: 400;
   font-style: italic;
   color: var(--maroon);
   text-align: center;
   margin-top: 30px;
-  letter-spacing: 1px;
+  letter-spacing: -0.5px;
 }
 
 .setup-subtitle {
-  font-family: var(--font-typewriter);
-  font-size: 12px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 300;
   color: var(--text-muted);
   text-align: center;
-  letter-spacing: 4px;
-  text-transform: lowercase;
-  margin-top: 6px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 8px;
   margin-bottom: 40px;
 }
 
@@ -122,15 +124,19 @@ html, body {
 }
 
 .form-group label {
-  font-family: var(--font-typewriter);
-  font-size: 13px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
   color: var(--text-muted);
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .label-optional {
   display: inline-block;
-  font-size: 10px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 300;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -142,8 +148,9 @@ html, body {
 }
 
 .label-hint {
-  font-family: var(--font-typewriter);
+  font-family: var(--font-ui);
   font-size: 11px;
+  font-weight: 300;
   color: var(--text-muted);
   opacity: 0.6;
   margin-top: -4px;
@@ -248,14 +255,15 @@ html, body {
 
 /* Submit button */
 .submit-btn {
-  font-family: var(--font-typewriter);
-  font-size: 13px;
-  letter-spacing: 3px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 4px;
   text-transform: uppercase;
   color: var(--cream);
   background: var(--maroon);
   border: none;
-  padding: 16px 40px;
+  padding: 16px 48px;
   margin-top: 10px;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
@@ -288,16 +296,31 @@ html, body {
 /* Decorative stars */
 .deco-star {
   position: absolute;
-  color: var(--text-muted);
-  opacity: 0.35;
+  color: var(--maroon);
+  opacity: 0.25;
   z-index: 2;
   animation: floatStar 4s ease-in-out infinite;
   will-change: transform;
 }
-.deco-star-1 { width: 50px; top: 15%; left: 8%; --rot: -15deg; animation-delay: 0s; }
-.deco-star-2 { width: 35px; top: 22%; left: 22%; --rot: 12deg; animation-delay: 1s; }
-.deco-star-3 { width: 28px; top: 30%; right: 10%; --rot: -8deg; animation-delay: 2s; }
-.deco-star-4 { width: 22px; top: 18%; right: 18%; --rot: 20deg; animation-delay: 3s; }
+.deco-star-1 { width: 18px; top: 12%; left: 10%; --rot: 0deg; animation-delay: 0s; }
+.deco-star-2 { width: 12px; top: 20%; left: 24%; --rot: 45deg; animation-delay: 1s; }
+.deco-star-3 { width: 14px; top: 8%; right: 12%; --rot: 0deg; animation-delay: 2s; }
+.deco-star-4 { width: 10px; top: 16%; right: 22%; --rot: 45deg; animation-delay: 3s; }
+.deco-star-5 { width: 8px; bottom: 22%; left: 14%; --rot: 0deg; animation-delay: 0.5s; }
+.deco-star-6 { width: 11px; bottom: 28%; right: 8%; --rot: 45deg; animation-delay: 2.5s; }
+
+/* Cherub illustration */
+.cherub-deco {
+  position: absolute;
+  width: 80px;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-4deg);
+  color: var(--maroon);
+  opacity: 0.35;
+  z-index: 2;
+  animation: fadeInUp 1s ease 0.3s both;
+}
 
 /* Dark red card behind paper */
 .letter-card-shadow {
@@ -490,8 +513,9 @@ html, body {
 }
 
 .strip-header {
-  font-family: var(--font-typewriter);
+  font-family: var(--font-ui);
   font-size: 6px;
+  font-weight: 400;
   letter-spacing: 3px;
   color: var(--text-muted);
   margin-bottom: 6px;
@@ -521,10 +545,12 @@ html, body {
 }
 
 .strip-caption {
-  font-family: var(--font-typewriter);
-  font-size: 8px;
+  font-family: var(--font-ui);
+  font-size: 7px;
+  font-weight: 300;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 /* ============ FLAT-LAY ACTION BUTTONS ============ */
@@ -546,13 +572,15 @@ html, body {
 }
 
 .save-btn {
-  font-family: var(--font-typewriter);
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
   color: var(--text-dark);
-  background: rgba(255, 248, 240, 0.9);
+  background: rgba(255, 248, 240, 0.92);
   border: 1px solid var(--kraft-light);
-  padding: 8px 22px;
+  padding: 10px 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -573,9 +601,11 @@ html, body {
   transform: translate(-50%, -50%);
   background: var(--maroon);
   color: var(--cream);
-  font-family: var(--font-typewriter);
-  font-size: 12px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 400;
   letter-spacing: 2px;
+  text-transform: uppercase;
   padding: 12px 28px;
   z-index: 200;
   opacity: 0;
@@ -702,7 +732,8 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-caption {
-  font-size: 12px;
+  font-size: 11px;
+  letter-spacing: 2px;
 }
 
 .expand-photobooth-strip .strip-footer {
