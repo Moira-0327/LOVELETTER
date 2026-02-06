@@ -44,35 +44,50 @@ const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel')
 // ============ TYPEWRITER SOUND (Web Audio API) ============
 
 let audioCtx = null;
+let audioUnlocked = false;
 
-function getAudioContext() {
+function ensureAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
 
-// Mobile: unlock AudioContext by playing a silent buffer on first user gesture
-function unlockAudio() {
-  const ctx = getAudioContext();
-  const buffer = ctx.createBuffer(1, 1, 22050);
-  const source = ctx.createBufferSource();
-  source.buffer = buffer;
-  source.connect(ctx.destination);
-  source.start(0);
-  document.removeEventListener('touchstart', unlockAudio);
-  document.removeEventListener('touchend', unlockAudio);
-  document.removeEventListener('click', unlockAudio);
+// iOS requires AudioContext resume + a sound played within a user gesture.
+// Keep trying on every touch/click until it works.
+function tryUnlockAudio() {
+  if (audioUnlocked) return;
+  try {
+    const ctx = ensureAudioContext();
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => {
+        // Play a silent buffer to fully unlock on iOS
+        const buf = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+        audioUnlocked = true;
+      });
+    } else {
+      audioUnlocked = true;
+    }
+  } catch (_) {}
 }
-document.addEventListener('touchstart', unlockAudio, { passive: true });
-document.addEventListener('touchend', unlockAudio, { passive: true });
-document.addEventListener('click', unlockAudio);
+
+// Listen on ALL user gesture events — don't remove, iOS can re-suspend
+document.addEventListener('touchstart', tryUnlockAudio, { passive: true });
+document.addEventListener('touchend', tryUnlockAudio, { passive: true });
+document.addEventListener('mousedown', tryUnlockAudio);
+document.addEventListener('keydown', tryUnlockAudio);
 
 function playTypeClick() {
   try {
-    const ctx = getAudioContext();
-    if (ctx.state === 'suspended') ctx.resume();
+    const ctx = ensureAudioContext();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+      return; // skip this click, will work next time
+    }
 
     const t = ctx.currentTime;
 
@@ -80,6 +95,7 @@ function playTypeClick() {
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
 
+    // Percussive click
     osc.type = 'square';
     osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
     osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
@@ -88,7 +104,8 @@ function playTypeClick() {
     filter.frequency.setValueAtTime(2000, t);
     filter.Q.setValueAtTime(0.8, t);
 
-    gain.gain.setValueAtTime(0.03 + Math.random() * 0.015, t);
+    // Higher volume for mobile speakers
+    gain.gain.setValueAtTime(0.12 + Math.random() * 0.04, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
     osc.connect(filter);
