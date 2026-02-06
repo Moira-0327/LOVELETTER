@@ -280,6 +280,17 @@ expandBackdrop.addEventListener('click', () => {
   collapsePanel();
 });
 
+// Click expanded panel itself → collapse (but not save buttons inside)
+expandLetterPanel.addEventListener('click', (e) => {
+  if (e.target.closest('.save-btn')) return;
+  collapsePanel();
+});
+
+expandPhotoboothPanel.addEventListener('click', (e) => {
+  if (e.target.closest('.save-btn')) return;
+  collapsePanel();
+});
+
 // Escape key → collapse
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -689,22 +700,16 @@ async function shareAll() {
     }
   }
 
-  // Fallback: download image + copy link
-  const link = document.createElement('a');
-  link.download = 'lover-letter.png';
-  link.href = composite.toDataURL('image/png');
-  link.click();
-
+  // Fallback: copy link only
   try {
     await navigator.clipboard.writeText(shareUrl);
-    toast.textContent = 'Image saved & link copied';
+    toast.textContent = 'Link copied';
   } catch (_) {
-    toast.textContent = 'Image saved';
+    toast.textContent = 'Share link ready';
   }
   toast.classList.add('visible');
   setTimeout(() => {
     toast.classList.remove('visible');
-    toast.textContent = 'Link copied';
   }, 2200);
 }
 
