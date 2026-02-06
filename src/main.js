@@ -4,8 +4,6 @@
    optional photobooth, save-to-image
    ============================================ */
 
-import html2canvas from 'html2canvas';
-
 const MONTHS_EN = [
   'january', 'february', 'march', 'april', 'may', 'june',
   'july', 'august', 'september', 'october', 'november', 'december'
@@ -89,78 +87,76 @@ function playTypeClick() {
 
 generatePaperGrain();
 
-// ============ PAPER GRAIN TEXTURE (woven cotton canvas) ============
+// ============ PAPER GRAIN TEXTURE (aged vintage paper) ============
 
 function generatePaperGrain() {
   const canvas = document.createElement('canvas');
-  const size = 300;
+  const size = 400;
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  // Base: warm off-white with subtle variation
+  // Base: warm aged pixel noise
   const imageData = ctx.createImageData(size, size);
   for (let i = 0; i < imageData.data.length; i += 4) {
-    const v = 200 + Math.random() * 30;
+    const v = 190 + Math.random() * 40;
     imageData.data[i] = v;
-    imageData.data[i + 1] = v * 0.97;
-    imageData.data[i + 2] = v * 0.92;
-    imageData.data[i + 3] = 12;
+    imageData.data[i + 1] = v * 0.93;
+    imageData.data[i + 2] = v * 0.82;
+    imageData.data[i + 3] = 15;
   }
   ctx.putImageData(imageData, 0, 0);
 
-  // Woven horizontal thread lines
-  ctx.strokeStyle = 'rgba(180, 160, 130, 0.06)';
-  for (let y = 0; y < size; y += 3) {
-    ctx.lineWidth = 0.5 + Math.random() * 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, y + Math.random() * 0.5);
-    for (let x = 0; x < size; x += 8) {
-      ctx.lineTo(x + 8, y + (Math.random() - 0.5) * 0.8);
-    }
-    ctx.stroke();
-  }
-
-  // Woven vertical thread lines
-  ctx.strokeStyle = 'rgba(170, 150, 120, 0.05)';
-  for (let x = 0; x < size; x += 3) {
+  // Subtle fiber lines (horizontal)
+  ctx.strokeStyle = 'rgba(170, 140, 90, 0.04)';
+  for (let y = 0; y < size; y += 4) {
     ctx.lineWidth = 0.4 + Math.random() * 0.4;
     ctx.beginPath();
-    ctx.moveTo(x + Math.random() * 0.5, 0);
-    for (let y = 0; y < size; y += 8) {
-      ctx.lineTo(x + (Math.random() - 0.5) * 0.8, y + 8);
+    ctx.moveTo(0, y);
+    for (let x = 0; x < size; x += 10) {
+      ctx.lineTo(x + 10, y + (Math.random() - 0.5) * 0.6);
     }
     ctx.stroke();
   }
 
-  // Speckles — tiny dark spots like cotton paper inclusions
-  for (let s = 0; s < 60; s++) {
+  // Foxing spots — larger age marks
+  for (let s = 0; s < 30; s++) {
     const sx = Math.random() * size;
     const sy = Math.random() * size;
-    const sr = 0.3 + Math.random() * 0.8;
-    ctx.fillStyle = `rgba(${100 + Math.random() * 40}, ${85 + Math.random() * 30}, ${60 + Math.random() * 30}, ${0.08 + Math.random() * 0.1})`;
+    const sr = 1 + Math.random() * 3;
+    const alpha = 0.03 + Math.random() * 0.06;
+    ctx.fillStyle = `rgba(${140 + Math.random() * 40}, ${110 + Math.random() * 30}, ${60 + Math.random() * 30}, ${alpha})`;
     ctx.beginPath();
     ctx.arc(sx, sy, sr, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Fiber strands — thin wavy lines like visible cotton fibers
-  for (let f = 0; f < 12; f++) {
+  // Tiny dark speckles
+  for (let s = 0; s < 80; s++) {
+    const sx = Math.random() * size;
+    const sy = Math.random() * size;
+    const sr = 0.2 + Math.random() * 0.5;
+    ctx.fillStyle = `rgba(${90 + Math.random() * 40}, ${70 + Math.random() * 30}, ${40 + Math.random() * 20}, ${0.06 + Math.random() * 0.08})`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Fiber strands
+  for (let f = 0; f < 8; f++) {
     const fx = Math.random() * size;
     const fy = Math.random() * size;
     const angle = Math.random() * Math.PI;
-    const len = 8 + Math.random() * 20;
-    ctx.strokeStyle = `rgba(${160 + Math.random() * 40}, ${140 + Math.random() * 30}, ${100 + Math.random() * 30}, ${0.06 + Math.random() * 0.06})`;
+    const len = 10 + Math.random() * 25;
+    ctx.strokeStyle = `rgba(${150 + Math.random() * 40}, ${120 + Math.random() * 30}, ${70 + Math.random() * 30}, ${0.04 + Math.random() * 0.04})`;
     ctx.lineWidth = 0.3 + Math.random() * 0.3;
     ctx.beginPath();
     ctx.moveTo(fx, fy);
-    const cp1x = fx + Math.cos(angle) * len * 0.3 + (Math.random() - 0.5) * 4;
-    const cp1y = fy + Math.sin(angle) * len * 0.3 + (Math.random() - 0.5) * 4;
-    const cp2x = fx + Math.cos(angle) * len * 0.7 + (Math.random() - 0.5) * 4;
-    const cp2y = fy + Math.sin(angle) * len * 0.7 + (Math.random() - 0.5) * 4;
     const ex = fx + Math.cos(angle) * len;
     const ey = fy + Math.sin(angle) * len;
-    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, ex, ey);
+    const cpx = (fx + ex) / 2 + (Math.random() - 0.5) * 6;
+    const cpy = (fy + ey) / 2 + (Math.random() - 0.5) * 6;
+    ctx.quadraticCurveTo(cpx, cpy, ex, ey);
     ctx.stroke();
   }
 
@@ -378,176 +374,348 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ============ SAVE TO IMAGE ============
+// ============ IMAGE HELPERS ============
 
-// US Letter: 8.5 x 11 inches. At 300 DPI: 2550 x 3300 px.
-// We render at a scaled-down size for html2canvas, then scale up.
-const LETTER_W = 850;
-const LETTER_H = 1100;
+const PAPER_COLOR = '#E8D4A8';
+const CREAM = '#FFF8F0';
+const INK = '#5C1018';
+const MUTED = '#8C7B70';
 
-document.getElementById('save-letter').addEventListener('click', () => {
-  saveLetterAsImage();
-});
-
-document.getElementById('save-photobooth').addEventListener('click', () => {
-  savePhotoboothAsImage();
-});
-
-async function saveLetterAsImage() {
-  // Build an off-screen clone at US Letter proportions — no clip-path
-  const container = document.createElement('div');
-  container.style.cssText = `
-    position: fixed; left: -9999px; top: 0;
-    width: ${LETTER_W}px; height: ${LETTER_H}px;
-    background: #EAE2D3;
-    font-family: 'Special Elite', 'Courier New', monospace;
-    color: #5C1018;
-    display: flex; flex-direction: column;
-    padding: 80px 72px 60px;
-    overflow: hidden;
-  `;
-
-  // Paper grain overlay
-  const grain = document.createElement('div');
-  const grainSrc = document.querySelector('.paper-grain');
-  if (grainSrc && grainSrc.style.backgroundImage) {
-    grain.style.cssText = `
-      position: absolute; inset: 0; pointer-events: none;
-      opacity: 0.5; mix-blend-mode: multiply;
-      background-image: ${grainSrc.style.backgroundImage};
-      background-size: 300px 300px;
-    `;
-  }
-  container.appendChild(grain);
-
-  // Fiber overlay (same as ::after)
-  const fibers = document.createElement('div');
-  fibers.style.cssText = `
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse at 20% 30%, rgba(196,168,130,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 75% 70%, rgba(196,168,130,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 10%, rgba(196,168,130,0.05) 0%, transparent 40%);
-  `;
-  container.appendChild(fibers);
-
-  // Content wrapper
-  const content = document.createElement('div');
-  content.style.cssText = `
-    position: relative; z-index: 2;
-    display: flex; flex-direction: column; gap: 28px;
-    flex: 1;
-  `;
-
-  // Date line
-  const dateLine = document.createElement('div');
-  dateLine.style.cssText = `display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;`;
-  const dayEl = document.createElement('span');
-  dayEl.style.cssText = `font-family: 'Cormorant Garamond', Georgia, serif; font-size: 72px; font-weight: 300; color: #5C1018; line-height: 1;`;
-  dayEl.textContent = document.getElementById('letter-day').textContent;
-  const monthEl = document.createElement('span');
-  monthEl.style.cssText = `font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 300; color: #8C7B70; letter-spacing: 4px;`;
-  monthEl.textContent = document.getElementById('letter-month').textContent;
-  dateLine.appendChild(dayEl);
-  dateLine.appendChild(monthEl);
-  content.appendChild(dateLine);
-
-  // Greeting
-  const greeting = document.createElement('div');
-  greeting.style.cssText = `font-size: 28px; line-height: 1.4;`;
-  greeting.textContent = document.getElementById('letter-greeting').textContent;
-  content.appendChild(greeting);
-
-  // Body
-  const body = document.createElement('div');
-  body.style.cssText = `font-size: 22px; line-height: 2.2; white-space: pre-wrap; flex: 1;`;
-  body.textContent = document.getElementById('letter-body').textContent;
-  content.appendChild(body);
-
-  // Days counter
-  const days = document.createElement('div');
-  days.style.cssText = `font-size: 16px; color: #8C7B70; letter-spacing: 3px; text-align: right; margin-top: auto; padding-top: 20px;`;
-  days.textContent = document.getElementById('letter-days').textContent;
-  content.appendChild(days);
-
-  container.appendChild(content);
-  document.body.appendChild(container);
-
-  try {
-    const canvas = await html2canvas(container, {
-      backgroundColor: '#EAE2D3',
-      scale: 3,
-      useCORS: true,
-      logging: false,
-      width: LETTER_W,
-      height: LETTER_H,
-    });
-
-    const link = document.createElement('a');
-    link.download = 'love-letter.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch (err) {
-    console.error('Save letter failed:', err);
-  } finally {
-    document.body.removeChild(container);
-  }
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
 }
 
-async function savePhotoboothAsImage() {
-  const strip = document.getElementById('photobooth-strip-el');
+function drawImageCover(ctx, img, x, y, w, h) {
+  const ratio = Math.max(w / img.width, h / img.height);
+  const nw = img.width * ratio;
+  const nh = img.height * ratio;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.drawImage(img, x + (w - nw) / 2, y + (h - nh) / 2, nw, nh);
+  ctx.restore();
+}
 
-  // Clone the strip into a clean off-screen container without transform
-  const container = document.createElement('div');
-  container.style.cssText = `position: fixed; left: -9999px; top: 0;`;
+function downloadCanvas(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
 
-  const clone = strip.cloneNode(true);
-  clone.style.cssText = `
-    width: 440px;
-    background: #FFF8F0;
-    padding: 28px 20px 36px;
-    display: flex; flex-direction: column; align-items: center;
-    transform: none;
-    box-shadow: none;
-    font-family: 'Special Elite', 'Courier New', monospace;
-  `;
+// ============ SAVE TO IMAGE ============
 
-  // Fix photo background images in clone
-  const origPhotos = strip.querySelectorAll('.strip-photo');
-  const clonePhotos = clone.querySelectorAll('.strip-photo');
-  origPhotos.forEach((orig, i) => {
-    const bg = orig.style.backgroundImage || orig.style.background;
-    if (bg) {
-      clonePhotos[i].style.backgroundImage = orig.style.backgroundImage;
-      clonePhotos[i].style.background = orig.style.background;
+// US Letter proportions
+const LETTER_W = 850;
+const LETTER_H = 1100;
+const SCALE = 3;
+
+document.getElementById('save-letter').addEventListener('click', () => {
+  const canvas = renderLetterCanvas();
+  downloadCanvas(canvas, 'love-letter.png');
+});
+
+document.getElementById('save-photobooth').addEventListener('click', async () => {
+  const canvas = await renderPhotoboothCanvas();
+  downloadCanvas(canvas, 'photobooth.png');
+});
+
+function renderLetterCanvas() {
+  const canvas = document.createElement('canvas');
+  canvas.width = LETTER_W * SCALE;
+  canvas.height = LETTER_H * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // Paper background
+  ctx.fillStyle = PAPER_COLOR;
+  ctx.fillRect(0, 0, LETTER_W, LETTER_H);
+
+  // Subtle age vignette
+  const vg = ctx.createRadialGradient(
+    LETTER_W / 2, LETTER_H / 2, LETTER_W * 0.3,
+    LETTER_W / 2, LETTER_H / 2, LETTER_W * 0.7
+  );
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(140,110,60,0.08)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, LETTER_W, LETTER_H);
+
+  // Foxing spots
+  for (let i = 0; i < 15; i++) {
+    const fx = Math.random() * LETTER_W;
+    const fy = Math.random() * LETTER_H;
+    const fr = 2 + Math.random() * 8;
+    ctx.fillStyle = `rgba(160,130,70,${0.02 + Math.random() * 0.04})`;
+    ctx.beginPath();
+    ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const pad = 80;
+  let y = pad;
+
+  // Date
+  ctx.font = '300 72px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = INK;
+  ctx.textBaseline = 'top';
+  ctx.fillText(document.getElementById('letter-day').textContent, pad, y);
+  const dayWidth = ctx.measureText(document.getElementById('letter-day').textContent).width;
+
+  ctx.font = '300 22px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = MUTED;
+  ctx.fillText(document.getElementById('letter-month').textContent, pad + dayWidth + 12, y + 42);
+  y += 100;
+
+  // Greeting
+  ctx.font = '28px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = INK;
+  ctx.fillText(document.getElementById('letter-greeting').textContent, pad, y);
+  y += 50;
+
+  // Body — word wrap
+  ctx.font = '22px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = INK;
+  const maxWidth = LETTER_W - pad * 2;
+  const lineHeight = 44;
+  const bodyText = document.getElementById('letter-body').textContent;
+  const paragraphs = bodyText.split('\n');
+
+  for (const para of paragraphs) {
+    const words = para.split(' ');
+    let line = '';
+    for (const word of words) {
+      const test = line + (line ? ' ' : '') + word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        ctx.fillText(line, pad, y);
+        y += lineHeight;
+        line = word;
+      } else {
+        line = test;
+      }
     }
-    clonePhotos[i].style.backgroundSize = 'cover';
-    clonePhotos[i].style.backgroundPosition = 'center';
-    clonePhotos[i].style.width = '100%';
-    clonePhotos[i].style.aspectRatio = '4/3';
-    clonePhotos[i].style.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
-  });
+    if (line) {
+      ctx.fillText(line, pad, y);
+      y += lineHeight;
+    }
+    y += 8; // paragraph gap
+  }
 
-  container.appendChild(clone);
-  document.body.appendChild(container);
+  // Days counter — bottom right
+  ctx.font = '16px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'right';
+  const daysText = document.getElementById('letter-days').textContent;
+  ctx.fillText(daysText, LETTER_W - pad, LETTER_H - pad);
+  ctx.textAlign = 'left';
+
+  return canvas;
+}
+
+async function renderPhotoboothCanvas() {
+  const W = 440;
+  const PAD = 24;
+  const PHOTO_W = W - PAD * 2;
+  const PHOTO_H = Math.round(PHOTO_W * 3 / 4);
+  const GAP = 6;
+  const HEADER_Y = 32;
+  const PHOTOS_TOP = 52;
+  const H = PHOTOS_TOP + (PHOTO_H + GAP) * 4 - GAP + 50;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * SCALE;
+  canvas.height = H * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // Background
+  ctx.fillStyle = CREAM;
+  ctx.fillRect(0, 0, W, H);
+
+  // Header
+  ctx.font = '9px "Special Elite", monospace';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('P H O T O   B O O T H', W / 2, 16);
+
+  // Photos
+  let y = PHOTOS_TOP;
+  for (let i = 0; i < 4; i++) {
+    if (state.photos[i]) {
+      try {
+        const img = await loadImage(state.photos[i]);
+
+        // Draw grayscale by drawing to temp canvas with filter
+        const tmp = document.createElement('canvas');
+        tmp.width = PHOTO_W * SCALE;
+        tmp.height = PHOTO_H * SCALE;
+        const tc = tmp.getContext('2d');
+        tc.scale(SCALE, SCALE);
+        tc.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
+        drawImageCover(tc, img, 0, 0, PHOTO_W, PHOTO_H);
+
+        ctx.drawImage(tmp, PAD * SCALE, y * SCALE, PHOTO_W * SCALE, PHOTO_H * SCALE,
+          PAD, y, PHOTO_W, PHOTO_H);
+      } catch (_) {
+        ctx.fillStyle = '#F5EDE0';
+        ctx.fillRect(PAD, y, PHOTO_W, PHOTO_H);
+      }
+    } else {
+      ctx.fillStyle = '#F5EDE0';
+      ctx.fillRect(PAD, y, PHOTO_W, PHOTO_H);
+    }
+    y += PHOTO_H + GAP;
+  }
+
+  // Caption
+  ctx.font = '12px "Special Elite", monospace';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'center';
+  const caption = state.partnerName ? `${state.partnerName} & me` : 'you & me';
+  ctx.fillText(caption, W / 2, y + 16);
+
+  return canvas;
+}
+
+// ============ SHARE — composite image ============
+
+document.getElementById('share-letter').addEventListener('click', shareAll);
+
+async function shareAll() {
+  const toast = document.getElementById('share-toast');
+
+  // Generate letter canvas
+  const letterCanvas = renderLetterCanvas();
+
+  // Generate photobooth canvas if photos exist
+  let boothCanvas = null;
+  if (state.hasPhotos) {
+    boothCanvas = await renderPhotoboothCanvas();
+  }
+
+  // Composite: maroon background, letter + booth side by side or stacked
+  const composite = createCompositeImage(letterCanvas, boothCanvas);
+  const blob = await new Promise(r => composite.toBlob(r, 'image/png'));
+
+  // Build share URL
+  const shareData = {
+    n: state.partnerName,
+    d: document.getElementById('together-date').value,
+    l: state.letterContent,
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
+  const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
+
+  // Try native Web Share API (mobile)
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], 'lover-letter.png', { type: 'image/png' });
+    const data = { files: [file], title: 'Lover Letter', url: shareUrl };
+
+    if (navigator.canShare(data)) {
+      try {
+        await navigator.share(data);
+        return; // shared successfully
+      } catch (_) {
+        // User cancelled or share failed — fall through to download
+      }
+    }
+  }
+
+  // Fallback: download image + copy link
+  const link = document.createElement('a');
+  link.download = 'lover-letter.png';
+  link.href = composite.toDataURL('image/png');
+  link.click();
 
   try {
-    const canvas = await html2canvas(clone, {
-      backgroundColor: '#FFF8F0',
-      scale: 3,
-      useCORS: true,
-      logging: false,
-    });
-
-    const link = document.createElement('a');
-    link.download = 'photobooth.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch (err) {
-    console.error('Save photobooth failed:', err);
-  } finally {
-    document.body.removeChild(container);
+    await navigator.clipboard.writeText(shareUrl);
+    toast.textContent = 'Image saved & link copied';
+  } catch (_) {
+    toast.textContent = 'Image saved';
   }
+  toast.classList.add('visible');
+  setTimeout(() => {
+    toast.classList.remove('visible');
+    toast.textContent = 'Link copied';
+  }, 2200);
+}
+
+function createCompositeImage(letterCanvas, boothCanvas) {
+  const MARGIN = 40;
+  const composite = document.createElement('canvas');
+
+  if (!boothCanvas) {
+    // Just letter with maroon border
+    const w = letterCanvas.width / SCALE + MARGIN * 2;
+    const h = letterCanvas.height / SCALE + MARGIN * 2;
+    composite.width = w * SCALE;
+    composite.height = h * SCALE;
+    const ctx = composite.getContext('2d');
+    ctx.scale(SCALE, SCALE);
+    ctx.fillStyle = '#6B1525';
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(letterCanvas, 0, 0, letterCanvas.width, letterCanvas.height,
+      MARGIN, MARGIN, letterCanvas.width / SCALE, letterCanvas.height / SCALE);
+    return composite;
+  }
+
+  // Letter + photobooth — flat lay composition
+  const lw = letterCanvas.width / SCALE;
+  const lh = letterCanvas.height / SCALE;
+  const bw = boothCanvas.width / SCALE;
+  const bh = boothCanvas.height / SCALE;
+
+  // Scale booth to fit beside letter
+  const boothScale = Math.min(lh * 0.7 / bh, (lw * 0.5) / bw);
+  const sbw = bw * boothScale;
+  const sbh = bh * boothScale;
+
+  const totalW = lw + sbw + MARGIN * 3;
+  const totalH = Math.max(lh, sbh) + MARGIN * 2;
+
+  composite.width = totalW * SCALE;
+  composite.height = totalH * SCALE;
+  const ctx = composite.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // Maroon background
+  ctx.fillStyle = '#6B1525';
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  // Letter — left side, slight rotation
+  ctx.save();
+  ctx.translate(MARGIN + lw / 2, MARGIN + lh / 2);
+  ctx.rotate(-0.01);
+  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.shadowBlur = 15;
+  ctx.shadowOffsetX = 4;
+  ctx.shadowOffsetY = 4;
+  ctx.drawImage(letterCanvas, 0, 0, letterCanvas.width, letterCanvas.height,
+    -lw / 2, -lh / 2, lw, lh);
+  ctx.restore();
+
+  // Booth strip — right side, slight rotation
+  ctx.save();
+  const bx = MARGIN * 2 + lw + sbw / 2;
+  const by = totalH / 2;
+  ctx.translate(bx, by);
+  ctx.rotate(0.03);
+  ctx.shadowColor = 'rgba(0,0,0,0.3)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetX = 5;
+  ctx.shadowOffsetY = 5;
+  ctx.drawImage(boothCanvas, 0, 0, boothCanvas.width, boothCanvas.height,
+    -sbw / 2, -sbh / 2, sbw, sbh);
+  ctx.restore();
+
+  return composite;
 }
 
 // ============ NAVIGATION ============
@@ -643,16 +811,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ============ SHARE LINK ============
-
-function encodeShareData() {
-  const data = {
-    n: state.partnerName,
-    d: document.getElementById('together-date').value,
-    l: state.letterContent,
-  };
-  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-}
+// ============ LOAD FROM SHARE LINK ============
 
 function decodeShareData(hash) {
   try {
@@ -662,30 +821,6 @@ function decodeShareData(hash) {
     return null;
   }
 }
-
-document.getElementById('share-letter').addEventListener('click', async () => {
-  const encoded = encodeShareData();
-  const url = `${window.location.origin}${window.location.pathname}#${encoded}`;
-
-  try {
-    await navigator.clipboard.writeText(url);
-  } catch (_) {
-    // Fallback for older browsers
-    const input = document.createElement('input');
-    input.value = url;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-  }
-
-  // Show toast
-  const toast = document.getElementById('share-toast');
-  toast.classList.add('visible');
-  setTimeout(() => toast.classList.remove('visible'), 1800);
-});
-
-// ============ LOAD FROM SHARE LINK ============
 
 (function checkShareLink() {
   const hash = window.location.hash.slice(1);

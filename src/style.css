@@ -16,7 +16,7 @@
   --ink-light: #8B3040;
   --text-dark: #2C1810;
   --text-muted: #8C7B70;
-  --paper: #EAE2D3;
+  --paper: #E8D4A8;
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
@@ -319,59 +319,46 @@ html, body {
 .deco-star-3 { width: 28px; top: 30%; right: 10%; transform: rotate(-8deg); }
 .deco-star-4 { width: 22px; top: 18%; right: 18%; transform: rotate(20deg); }
 
-/* Dark red card behind torn paper */
+/* Dark red card behind paper */
 .letter-card-shadow {
   position: absolute;
-  width: 78%;
-  height: 52%;
+  width: 90%;
+  height: 72%;
   background: var(--maroon);
-  border-radius: 3px;
-  transform: rotate(-1.5deg);
-  box-shadow: 0 8px 30px rgba(74, 14, 26, 0.25);
+  border-radius: 2px;
+  transform: rotate(-1.2deg);
+  box-shadow: 0 8px 30px rgba(74, 14, 26, 0.3);
   z-index: 1;
 }
 
-/* Torn paper — now cotton paper texture */
+/* Aged letter paper — vintage 1930s stationery feel */
 .letter-paper {
   position: relative;
   z-index: 3;
-  width: 75%;
-  min-height: 45%;
+  width: 86%;
+  min-height: 68%;
   background-color: var(--paper);
-  padding: 0; /* inner handles padding */
-  transform: rotate(0.8deg);
+  padding: 0;
+  transform: rotate(0.5deg);
   display: flex;
   flex-direction: column;
-
-  /* Torn edge via clip-path */
-  clip-path: polygon(
-    0% 2%, 3% 0%, 7% 2.5%, 11% 0.5%, 15% 3%, 19% 1%, 23% 2.8%,
-    27% 0.3%, 31% 2%, 35% 0.8%, 39% 3.2%, 43% 1.2%, 47% 2.5%,
-    51% 0%, 55% 2.8%, 59% 0.5%, 63% 3%, 67% 1%, 71% 2.2%,
-    75% 0.5%, 79% 3%, 83% 1.5%, 87% 2.8%, 91% 0.8%, 95% 2.5%,
-    98% 0.5%, 100% 2%,
-    100% 97%, 97% 99%, 93% 97.5%, 89% 100%, 85% 97.2%, 81% 99.5%,
-    77% 97%, 73% 99.8%, 69% 97.5%, 65% 100%, 61% 97.8%, 57% 99.2%,
-    53% 97%, 49% 100%, 45% 97.5%, 41% 99%, 37% 97.2%, 33% 99.8%,
-    29% 97%, 25% 99.5%, 21% 97.5%, 17% 100%, 13% 97.8%, 9% 99.5%,
-    5% 97%, 2% 99.5%, 0% 97.5%
-  );
+  box-shadow: 2px 3px 15px rgba(0,0,0,0.12);
 
   animation: fadeInUp 0.8s ease 0.2s both;
 }
 
-/* Cotton paper grain overlay */
+/* Paper grain overlay — aged cotton texture */
 .paper-grain {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.6;
   mix-blend-mode: multiply;
   /* background-image set by JS */
 }
 
-/* Cotton paper color variation + fiber lines */
+/* Aged paper patina — foxing spots, edge darkening, color variation */
 .letter-paper::after {
   content: '';
   position: absolute;
@@ -379,11 +366,18 @@ html, body {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 30%, rgba(196, 168, 130, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 75% 70%, rgba(196, 168, 130, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 10%, rgba(196, 168, 130, 0.05) 0%, transparent 40%),
-    repeating-linear-gradient(78deg, transparent 0px, transparent 20px, rgba(180,160,130,0.015) 20px, rgba(180,160,130,0.015) 21px),
-    repeating-linear-gradient(162deg, transparent 0px, transparent 35px, rgba(180,160,130,0.01) 35px, rgba(180,160,130,0.01) 36px);
+    /* Edge darkening / vignette — like aged paper */
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(160, 130, 80, 0.12) 100%),
+    /* Foxing spots — random age marks */
+    radial-gradient(circle at 15% 20%, rgba(170, 140, 80, 0.12) 0%, transparent 8%),
+    radial-gradient(circle at 78% 15%, rgba(160, 130, 70, 0.08) 0%, transparent 6%),
+    radial-gradient(circle at 85% 75%, rgba(170, 140, 80, 0.1) 0%, transparent 10%),
+    radial-gradient(circle at 25% 80%, rgba(160, 130, 70, 0.07) 0%, transparent 7%),
+    radial-gradient(circle at 60% 45%, rgba(170, 140, 80, 0.06) 0%, transparent 12%),
+    radial-gradient(circle at 40% 65%, rgba(155, 125, 70, 0.05) 0%, transparent 8%),
+    /* Subtle color unevenness */
+    radial-gradient(ellipse at 30% 30%, rgba(180, 150, 90, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(180, 150, 90, 0.05) 0%, transparent 45%);
 }
 
 .letter-inner {
@@ -637,6 +631,10 @@ html, body {
 }
 
 .save-photobooth {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
   color: var(--cream);
   background: rgba(74, 14, 26, 0.5);
   border-color: rgba(255, 248, 240, 0.3);
@@ -645,13 +643,6 @@ html, body {
 .save-photobooth:hover {
   background: rgba(74, 14, 26, 0.7);
   border-color: rgba(255, 248, 240, 0.6);
-}
-
-.save-photobooth {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .save-photobooth svg { stroke: var(--cream); }
@@ -756,7 +747,7 @@ html, body {
 /* ============ RESPONSIVE ============ */
 
 @media (max-width: 380px) {
-  .letter-paper { width: 82%; }
+  .letter-paper { width: 90%; }
   .letter-inner { padding: 28px 24px 22px; }
   .letter-day { font-size: 36px; }
   .letter-body { font-size: 14px; }
