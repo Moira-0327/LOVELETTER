@@ -1,7 +1,7 @@
 /* ============================================
    LOVER LETTER — Unified Visual Design
-   Color palette: maroon, cream, kraft
-   Typography: Cormorant Garamond + Dancing Script
+   Based on original 3-page layout
+   + typewriter font, cotton paper, save buttons
    ============================================ */
 
 :root {
@@ -16,20 +16,17 @@
   --ink-light: #8B3040;
   --text-dark: #2C1810;
   --text-muted: #8C7B70;
+  --paper: #EDE5D8;
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
-  --font-script: 'Dancing Script', cursive;
+  --font-typewriter: 'Special Elite', 'Courier New', monospace;
   --font-sans: 'Noto Serif SC', serif;
 
   --page-width: min(100vw, 430px);
   --page-height: 100dvh;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
   width: 100%;
@@ -40,6 +37,8 @@ html, body {
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
 }
+
+.hidden { display: none !important; }
 
 /* ============ SCREENS ============ */
 
@@ -67,7 +66,10 @@ html, body {
   overflow-y: auto;
   padding: 40px 28px 60px;
   position: relative;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.setup-container::-webkit-scrollbar { display: none; }
 
 .setup-stars {
   position: absolute;
@@ -87,9 +89,10 @@ html, body {
 .star-3 { width: 22px; top: 5px; left: 50px; transform: rotate(-5deg); }
 
 .setup-title {
-  font-family: var(--font-script);
+  font-family: var(--font-serif);
   font-size: 42px;
-  font-weight: 400;
+  font-weight: 300;
+  font-style: italic;
   color: var(--maroon);
   text-align: center;
   margin-top: 30px;
@@ -97,9 +100,8 @@ html, body {
 }
 
 .setup-subtitle {
-  font-family: var(--font-serif);
-  font-size: 14px;
-  font-weight: 300;
+  font-family: var(--font-typewriter);
+  font-size: 12px;
   color: var(--text-muted);
   text-align: center;
   letter-spacing: 4px;
@@ -121,23 +123,38 @@ html, body {
 }
 
 .form-group label {
-  font-family: var(--font-sans);
+  font-family: var(--font-typewriter);
   font-size: 13px;
-  font-weight: 400;
   color: var(--text-muted);
   letter-spacing: 1px;
 }
 
+.label-optional {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--kraft);
+  border: 1px solid var(--kraft-light);
+  padding: 1px 6px;
+  border-radius: 2px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .label-hint {
+  font-family: var(--font-typewriter);
   font-size: 11px;
+  color: var(--text-muted);
   opacity: 0.6;
+  margin-top: -4px;
 }
 
 .form-group input[type="text"],
 .form-group input[type="date"],
 .form-group textarea {
-  font-family: var(--font-serif);
-  font-size: 16px;
+  font-family: var(--font-typewriter);
+  font-size: 15px;
   color: var(--text-dark);
   background: transparent;
   border: none;
@@ -217,12 +234,6 @@ html, body {
   line-height: 1;
 }
 
-.slot-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-}
-
 .photo-preview {
   position: absolute;
   inset: 0;
@@ -233,20 +244,15 @@ html, body {
   filter: grayscale(100%) contrast(1.1);
 }
 
-.photo-upload-slot.has-photo .photo-placeholder {
-  display: none;
-}
-
-.photo-upload-slot.has-photo .photo-preview {
-  display: block;
-}
+.photo-upload-slot.has-photo .photo-placeholder { display: none; }
+.photo-upload-slot.has-photo .photo-preview { display: block; }
 
 /* Submit button */
 .submit-btn {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 400;
+  font-family: var(--font-typewriter);
+  font-size: 13px;
   letter-spacing: 3px;
+  text-transform: uppercase;
   color: var(--cream);
   background: var(--maroon);
   border: none;
@@ -257,19 +263,12 @@ html, body {
   align-self: center;
 }
 
-.submit-btn:hover {
-  background: var(--maroon-deep);
-}
-
-.submit-btn:active {
-  transform: scale(0.98);
-}
+.submit-btn:hover { background: var(--maroon-deep); }
+.submit-btn:active { transform: scale(0.98); }
 
 /* ============ RESULT SCREEN ============ */
 
-#result-screen {
-  flex-direction: column;
-}
+#result-screen { flex-direction: column; }
 
 /* Page system (swipeable) */
 .page {
@@ -332,20 +331,19 @@ html, body {
   z-index: 1;
 }
 
-/* Torn paper effect */
+/* Torn paper — now cotton paper texture */
 .letter-paper {
   position: relative;
   z-index: 3;
   width: 75%;
   min-height: 45%;
-  background: var(--cream-dark);
-  padding: 36px 32px 28px;
+  background-color: var(--paper);
+  padding: 0; /* inner handles padding */
   transform: rotate(0.8deg);
   display: flex;
   flex-direction: column;
-  gap: 16px;
 
-  /* Torn edge simulation via clip-path */
+  /* Torn edge via clip-path */
   clip-path: polygon(
     0% 2%, 3% 0%, 7% 2.5%, 11% 0.5%, 15% 3%, 19% 1%, 23% 2.8%,
     27% 0.3%, 31% 2%, 35% 0.8%, 39% 3.2%, 43% 1.2%, 47% 2.5%,
@@ -359,10 +357,43 @@ html, body {
     5% 97%, 2% 99.5%, 0% 97.5%
   );
 
-  /* Subtle paper texture via gradient noise */
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(196, 168, 130, 0.1) 0%, transparent 70%),
-    radial-gradient(ellipse at 80% 30%, rgba(196, 168, 130, 0.08) 0%, transparent 60%);
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+/* Cotton paper grain overlay */
+.paper-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  /* background-image set by JS */
+}
+
+/* Cotton paper color variation + fiber lines */
+.letter-paper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(196, 168, 130, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 75% 70%, rgba(196, 168, 130, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 10%, rgba(196, 168, 130, 0.05) 0%, transparent 40%),
+    repeating-linear-gradient(78deg, transparent 0px, transparent 20px, rgba(180,160,130,0.015) 20px, rgba(180,160,130,0.015) 21px),
+    repeating-linear-gradient(162deg, transparent 0px, transparent 35px, rgba(180,160,130,0.01) 35px, rgba(180,160,130,0.01) 36px);
+}
+
+.letter-inner {
+  position: relative;
+  z-index: 2;
+  padding: 36px 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100%;
 }
 
 .letter-date-line {
@@ -392,28 +423,50 @@ html, body {
 }
 
 .letter-greeting {
-  font-family: var(--font-script);
-  font-size: 22px;
+  font-family: var(--font-typewriter);
+  font-size: 18px;
   color: var(--ink);
   line-height: 1.4;
+  min-height: 1.4em;
 }
 
 .letter-body {
-  font-family: var(--font-script);
-  font-size: 17px;
+  font-family: var(--font-typewriter);
+  font-size: 15px;
   color: var(--ink);
-  line-height: 1.8;
+  line-height: 2;
   white-space: pre-wrap;
+  min-height: 60px;
+}
+
+/* Typewriter cursor */
+.typing-cursor::after {
+  content: '|';
+  font-weight: 400;
+  animation: blinkCursor 0.7s step-end infinite;
+  color: var(--ink);
+  margin-left: 1px;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .letter-days {
-  font-family: var(--font-serif);
-  font-size: 12px;
+  font-family: var(--font-typewriter);
+  font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 2px;
   margin-top: auto;
   padding-top: 12px;
   text-align: right;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.letter-days.visible {
+  opacity: 1;
 }
 
 /* ============ PAGE 2: PHOTO BOOTH ============ */
@@ -429,7 +482,6 @@ html, body {
   overflow: hidden;
 }
 
-/* Envelope decorations */
 .envelope {
   position: absolute;
   border-radius: 2px;
@@ -458,7 +510,6 @@ html, body {
   box-shadow: -2px 2px 15px rgba(0,0,0,0.15);
 }
 
-/* Photo booth strip */
 .photobooth-strip {
   position: relative;
   z-index: 5;
@@ -471,12 +522,12 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadeInUp 0.8s ease 0.3s both;
 }
 
 .strip-header {
-  font-family: var(--font-serif);
-  font-size: 10px;
-  font-weight: 400;
+  font-family: var(--font-typewriter);
+  font-size: 9px;
   letter-spacing: 4px;
   color: var(--text-muted);
   margin-bottom: 10px;
@@ -506,20 +557,19 @@ html, body {
 }
 
 .strip-caption {
-  font-family: var(--font-script);
-  font-size: 13px;
+  font-family: var(--font-typewriter);
+  font-size: 12px;
   color: var(--text-muted);
   letter-spacing: 0.5px;
 }
 
-/* Handwritten text floating near envelopes */
 .photobooth-text {
   position: absolute;
   z-index: 4;
   bottom: 16%;
   right: 10%;
-  font-family: var(--font-script);
-  font-size: 15px;
+  font-family: var(--font-typewriter);
+  font-size: 13px;
   color: var(--cream);
   opacity: 0.7;
   transform: rotate(-5deg);
@@ -542,7 +592,6 @@ html, body {
   padding: 0 28px;
 }
 
-/* Date at top */
 .memory-date {
   margin-top: 12%;
   text-align: center;
@@ -571,7 +620,6 @@ html, body {
   text-transform: lowercase;
 }
 
-/* Envelope + note scene */
 .memory-envelope-scene {
   position: relative;
   width: 80%;
@@ -593,9 +641,7 @@ html, body {
 .memory-envelope::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 45%;
   background: linear-gradient(135deg, transparent 48%, var(--kraft) 48%, var(--kraft) 52%, transparent 52%);
   opacity: 0.3;
@@ -611,13 +657,12 @@ html, body {
   transform: rotate(-8deg);
   z-index: 2;
   box-shadow: 2px 3px 12px rgba(0,0,0,0.06);
-  font-family: var(--font-script);
-  font-size: 15px;
+  font-family: var(--font-typewriter);
+  font-size: 14px;
   color: var(--ink);
   line-height: 1.7;
 }
 
-/* Polaroid photo */
 .memory-polaroid {
   position: absolute;
   top: 38%;
@@ -629,6 +674,7 @@ html, body {
   transform: rotate(3deg);
   box-shadow: 2px 4px 15px rgba(0,0,0,0.1);
   z-index: 3;
+  animation: fadeInUp 0.8s ease 0.4s both;
 }
 
 .memory-polaroid-img {
@@ -641,20 +687,18 @@ html, body {
 }
 
 .memory-polaroid-label {
-  font-family: var(--font-script);
-  font-size: 12px;
+  font-family: var(--font-typewriter);
+  font-size: 11px;
   color: var(--text-muted);
   text-align: center;
   margin-top: 8px;
   letter-spacing: 0.5px;
 }
 
-/* Bottom quote */
 .memory-quote {
   position: absolute;
   bottom: 8%;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   text-align: center;
   font-family: var(--font-serif);
   font-size: 13px;
@@ -666,6 +710,46 @@ html, body {
   letter-spacing: 0.3px;
   z-index: 2;
 }
+
+/* ============ SAVE BUTTONS ============ */
+
+.save-btn {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: var(--font-typewriter);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-dark);
+  background: rgba(255, 248, 240, 0.9);
+  border: 1px solid var(--kraft-light);
+  padding: 8px 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.save-btn:hover {
+  border-color: var(--maroon);
+  background: rgba(255, 248, 240, 1);
+}
+
+.save-photobooth {
+  color: var(--cream);
+  background: rgba(74, 14, 26, 0.5);
+  border-color: rgba(255, 248, 240, 0.3);
+}
+
+.save-photobooth:hover {
+  background: rgba(74, 14, 26, 0.7);
+  border-color: rgba(255, 248, 240, 0.6);
+}
+
+.save-photobooth svg { stroke: var(--cream); }
 
 /* ============ NAVIGATION ============ */
 
@@ -695,7 +779,6 @@ html, body {
   border-color: var(--maroon);
 }
 
-/* Back button */
 .back-btn {
   position: fixed;
   top: 20px;
@@ -723,14 +806,8 @@ html, body {
 /* ============ ANIMATIONS ============ */
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes floatStar {
@@ -746,49 +823,17 @@ html, body {
 .deco-star-3 { --rot: -8deg; animation-delay: 2s; }
 .deco-star-4 { --rot: 20deg; animation-delay: 3s; }
 
-.letter-paper {
-  animation: fadeInUp 0.8s ease 0.2s both;
-}
-
-.photobooth-strip {
-  animation: fadeInUp 0.8s ease 0.3s both;
-}
-
-.memory-polaroid {
-  animation: fadeInUp 0.8s ease 0.4s both;
-}
+.letter-paper { animation: fadeInUp 0.8s ease 0.2s both; }
+.photobooth-strip { animation: fadeInUp 0.8s ease 0.3s both; }
+.memory-polaroid { animation: fadeInUp 0.8s ease 0.4s both; }
 
 /* ============ RESPONSIVE ============ */
 
 @media (max-width: 380px) {
-  .letter-paper {
-    width: 82%;
-    padding: 28px 24px 22px;
-  }
-
-  .letter-day {
-    font-size: 36px;
-  }
-
-  .letter-body {
-    font-size: 15px;
-  }
-
-  .photobooth-strip {
-    width: 56%;
-  }
-
-  .memory-day-num {
-    font-size: 52px;
-  }
-}
-
-/* ============ SCROLLBAR HIDE ============ */
-.setup-container::-webkit-scrollbar {
-  display: none;
-}
-
-.setup-container {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  .letter-paper { width: 82%; }
+  .letter-inner { padding: 28px 24px 22px; }
+  .letter-day { font-size: 36px; }
+  .letter-body { font-size: 14px; }
+  .photobooth-strip { width: 56%; }
+  .memory-day-num { font-size: 52px; }
 }

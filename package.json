@@ -4,9 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview"
   },
   "repository": {
     "type": "git",
@@ -17,5 +17,8 @@
   "license": "ISC",
   "devDependencies": {
     "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1"
   }
 }
