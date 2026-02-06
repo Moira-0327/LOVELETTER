@@ -1,15 +1,20 @@
 /* ============================================
-   LOVER LETTER — Main Application Logic v2
-   Typewriter effect, overlays, save-to-image
+   LOVER LETTER — Main Application Logic
+   Original 3-page layout + typewriter effect,
+   optional photobooth, save-to-image
    ============================================ */
 
 import html2canvas from 'html2canvas';
 
-// ============ CONSTANTS ============
+const MONTHS_EN = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december'
+];
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+const QUOTES = [
+  '"No matter how many years pass,\nI will always be by your side,\nmy one and only lover."',
+  '"In all the world, there is no heart for me\nlike yours. In all the world,\nthere is no love for you like mine."',
+  '"I saw that you were perfect,\nand so I loved you.\nThen I saw that you were not perfect\nand I loved you even more."',
 ];
 
 // ============ STATE ============
@@ -20,33 +25,30 @@ const state = {
   letterContent: '',
   photos: [null, null, null, null],
   typingActive: false,
+  hasPhotos: false,
+  activePages: [],   // which page elements are active
 };
 
 // ============ DOM ============
 
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => document.querySelectorAll(sel);
+const setupScreen = document.getElementById('setup-screen');
+const resultScreen = document.getElementById('result-screen');
+const setupForm = document.getElementById('setup-form');
+const photoSlots = document.querySelectorAll('.photo-upload-slot');
+const backBtn = document.getElementById('back-btn');
+const pageNav = document.getElementById('page-nav');
 
-const setupScreen = $('#setup-screen');
-const resultScreen = $('#result-screen');
-const setupForm = $('#setup-form');
-const scene = $('#scene');
+const pageLetter = document.getElementById('page-letter');
+const pagePhotobooth = document.getElementById('page-photobooth');
+const pageMemory = document.getElementById('page-memory');
 
-const envelopeItem = $('#envelope-item');
-const stripItem = $('#strip-item');
-
-const letterOverlay = $('#letter-overlay');
-const photoboothOverlay = $('#photobooth-overlay');
+let currentPage = 0;
+let pages = [];
+let navDots = [];
 
 // ============ INIT ============
 
-document.addEventListener('DOMContentLoaded', () => {
-  generatePaperGrain();
-  setupPhotoUploads();
-  setupFormHandler();
-  setupOverlays();
-  setupBackButton();
-});
+generatePaperGrain();
 
 // ============ PAPER GRAIN TEXTURE ============
 
@@ -59,217 +61,203 @@ function generatePaperGrain() {
 
   const imageData = ctx.createImageData(size, size);
   for (let i = 0; i < imageData.data.length; i += 4) {
-    const v = 120 + Math.random() * 80; // warm gray noise
+    const v = 120 + Math.random() * 80;
     imageData.data[i] = v;
     imageData.data[i + 1] = v * 0.96;
     imageData.data[i + 2] = v * 0.9;
-    imageData.data[i + 3] = 18; // very subtle
+    imageData.data[i + 3] = 18;
   }
   ctx.putImageData(imageData, 0, 0);
 
   const dataUrl = canvas.toDataURL('image/png');
-  $$('.paper-grain').forEach(el => {
+  document.querySelectorAll('.paper-grain').forEach(el => {
     el.style.backgroundImage = `url(${dataUrl})`;
     el.style.backgroundSize = `${size}px ${size}px`;
   });
 }
 
-// ============ PHOTO UPLOADS ============
+// ============ PHOTO UPLOAD ============
 
-function setupPhotoUploads() {
-  $$('.photo-upload-slot').forEach(slot => {
-    const input = slot.querySelector('.photo-input');
-    const preview = slot.querySelector('.photo-preview');
-    const index = parseInt(slot.dataset.index);
+photoSlots.forEach((slot) => {
+  const input = slot.querySelector('.photo-input');
+  const preview = slot.querySelector('.photo-preview');
+  const index = parseInt(slot.dataset.index);
 
-    input.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        state.photos[index] = ev.target.result;
-        preview.src = ev.target.result;
-        slot.classList.add('has-photo');
-      };
-      reader.readAsDataURL(file);
-    });
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      state.photos[index] = ev.target.result;
+      preview.src = ev.target.result;
+      slot.classList.add('has-photo');
+    };
+    reader.readAsDataURL(file);
   });
-}
+});
 
-// ============ FORM ============
+// ============ FORM SUBMISSION ============
 
-function setupFormHandler() {
-  setupForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+setupForm.addEventListener('submit', (e) => {
+  e.preventDefault();
 
-    state.partnerName = $('#partner-name').value.trim();
-    const dateStr = $('#together-date').value;
-    state.togetherDate = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
-    state.letterContent = $('#letter-content').value.trim();
+  state.partnerName = document.getElementById('partner-name').value.trim();
+  const dateStr = document.getElementById('together-date').value;
+  state.togetherDate = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+  state.letterContent = document.getElementById('letter-content').value.trim();
+  state.hasPhotos = state.photos.some(p => p !== null);
 
-    renderScene();
-    showScreen(resultScreen);
-  });
-}
+  renderResult();
+  showScreen(resultScreen);
+});
 
-// ============ SCENE RENDERING ============
+// ============ RENDER RESULT ============
 
-function renderScene() {
-  const hasPhotos = state.photos.some(p => p !== null);
-  const daysTogether = calculateDaysTogether(state.togetherDate);
+function renderResult() {
+  const date = state.togetherDate;
+  const day = date.getDate();
+  const month = MONTHS_EN[date.getMonth()];
+  const year = date.getFullYear();
+  const daysSince = calculateDaysTogether(date);
 
-  // Days badge
-  $('#scene-days').textContent = `${daysTogether} days together`;
+  // --- Page 1: Love Letter (always shown) ---
+  document.getElementById('letter-day').textContent = day;
+  document.getElementById('letter-month').textContent = `\u2014 ${month}`;
 
-  // Show/hide photobooth strip
-  if (hasPhotos) {
-    stripItem.classList.remove('hidden');
-    scene.classList.remove('solo');
+  // Clear text — typewriter will fill these
+  document.getElementById('letter-greeting').textContent = '';
+  document.getElementById('letter-body').textContent = '';
+  document.getElementById('letter-days').textContent = '';
+  document.getElementById('letter-days').classList.remove('visible');
+  document.getElementById('save-letter').classList.add('hidden');
 
-    // Render mini preview photos
+  // --- Page 2: Photo Booth (only if photos uploaded) ---
+  if (state.hasPhotos) {
     state.photos.forEach((photo, i) => {
-      const el = $(`#sp-${i}`);
+      const el = document.getElementById(`strip-photo-${i}`);
       if (photo) {
         el.style.backgroundImage = `url(${photo})`;
+      } else {
+        el.style.background = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
       }
     });
+
+    document.getElementById('strip-caption').textContent =
+      state.partnerName ? `${state.partnerName} & me` : 'you & me';
+
+    document.getElementById('photobooth-text').textContent =
+      `${daysSince} days of love`;
+  }
+
+  // --- Page 3: Polaroid Memory (always shown) ---
+  document.getElementById('memory-day-num').textContent = day;
+  document.getElementById('memory-month-text').textContent = `\u2014 ${month} ${year}`;
+
+  document.getElementById('memory-note').innerHTML = buildNoteHTML();
+
+  const polaroidEl = document.getElementById('memory-polaroid-img');
+  if (state.photos[0]) {
+    polaroidEl.style.backgroundImage = `url(${state.photos[0]})`;
+  }
+  document.getElementById('memory-polaroid-label').textContent =
+    state.partnerName ? `${state.partnerName} & me` : 'us';
+
+  const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  document.getElementById('memory-quote').textContent = quote;
+
+  // --- Build active pages array ---
+  buildActivePages();
+  showPage(0);
+
+  // Start typewriter on first page (letter)
+  startLetterTyping();
+}
+
+function buildNoteHTML() {
+  const name = state.partnerName || 'you';
+  const lines = [];
+  lines.push(`I love you, ${name}.`);
+  lines.push(`I will always love you,`);
+  lines.push(`even with your flaws.`);
+
+  if (state.letterContent) {
+    lines.push('');
+    const preview = state.letterContent.length > 60
+      ? state.letterContent.slice(0, 60) + '...'
+      : state.letterContent;
+    lines.push(preview);
+  }
+
+  return lines.join('<br>');
+}
+
+function calculateDaysTogether(startDate) {
+  const now = new Date();
+  const diffMs = now - startDate;
+  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+// ============ DYNAMIC PAGE MANAGEMENT ============
+
+function buildActivePages() {
+  // Always: letter + memory. Photobooth only if photos uploaded.
+  pages = [pageLetter];
+  if (state.hasPhotos) {
+    pagePhotobooth.style.display = '';
+    pages.push(pagePhotobooth);
   } else {
-    stripItem.classList.add('hidden');
-    scene.classList.add('solo');
+    pagePhotobooth.style.display = 'none';
   }
+  pages.push(pageMemory);
 
-  // Render full photobooth strip (for overlay)
-  state.photos.forEach((photo, i) => {
-    const el = $(`#bp-${i}`);
-    if (photo) {
-      el.style.backgroundImage = `url(${photo})`;
-    }
-  });
-
-  $('#strip-footer').textContent = state.partnerName
-    ? `${state.partnerName} & me`
-    : 'you & me';
-
-  // Prepare letter content (rendered on overlay open)
-  prepareLetter();
-
-  // Trigger entry animations
-  requestAnimationFrame(() => {
-    envelopeItem.classList.add('visible');
-    if (hasPhotos) {
-      stripItem.classList.add('visible');
-    }
-  });
-}
-
-function prepareLetter() {
-  const date = state.togetherDate;
-  const dateStr = `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-  const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
-  const body = state.letterContent || 'Every day with you feels like a page from the most beautiful story ever written.';
-  const daysTogether = calculateDaysTogether(state.togetherDate);
-  const daysStr = `${daysTogether} days together`;
-
-  // Store for typewriter
-  state._letterDate = dateStr;
-  state._letterGreeting = greeting;
-  state._letterBody = body;
-  state._letterDays = daysStr;
-}
-
-// ============ OVERLAYS ============
-
-function setupOverlays() {
-  // Open letter overlay
-  envelopeItem.addEventListener('click', () => {
-    openOverlay(letterOverlay);
-    startLetterTyping();
-  });
-
-  // Open photobooth overlay
-  stripItem.addEventListener('click', () => {
-    openOverlay(photoboothOverlay);
-  });
-
-  // Close buttons
-  $('#letter-close').addEventListener('click', () => {
-    closeOverlay(letterOverlay);
-    state.typingActive = false;
-  });
-
-  $('#photobooth-close').addEventListener('click', () => {
-    closeOverlay(photoboothOverlay);
-  });
-
-  // Close on backdrop click
-  [letterOverlay, photoboothOverlay].forEach(overlay => {
-    overlay.querySelector('.overlay-backdrop').addEventListener('click', () => {
-      closeOverlay(overlay);
-      state.typingActive = false;
+  // Build nav dots
+  pageNav.innerHTML = '';
+  navDots = [];
+  pages.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.dataset.page = i;
+    dot.addEventListener('click', () => {
+      showPage(i);
+      if (i === 0) startLetterTyping();
     });
+    pageNav.appendChild(dot);
+    navDots.push(dot);
   });
-
-  // Save buttons
-  $('#letter-save').addEventListener('click', () => {
-    saveElementAsImage($('#letter-sheet'), 'love-letter.png');
-  });
-
-  $('#photobooth-save').addEventListener('click', () => {
-    saveElementAsImage($('#photobooth-strip'), 'photobooth.png');
-  });
-}
-
-function openOverlay(overlay) {
-  overlay.classList.remove('hidden');
-}
-
-function closeOverlay(overlay) {
-  overlay.classList.add('hidden');
-  // Reset letter typing state
-  if (overlay === letterOverlay) {
-    resetLetterDisplay();
-  }
 }
 
 // ============ TYPEWRITER EFFECT ============
 
-function resetLetterDisplay() {
-  $('#lt-date').textContent = '';
-  $('#lt-greeting').textContent = '';
-  $('#lt-greeting').classList.remove('typing-cursor');
-  $('#lt-body').textContent = '';
-  $('#lt-body').classList.remove('typing-cursor');
-  $('#lt-days').textContent = '';
-  $('#lt-days').classList.remove('visible');
-  $('#letter-save').classList.add('hidden');
-}
-
 async function startLetterTyping() {
   state.typingActive = true;
 
-  const dateEl = $('#lt-date');
-  const greetingEl = $('#lt-greeting');
-  const bodyEl = $('#lt-body');
-  const daysEl = $('#lt-days');
-  const saveBtn = $('#letter-save');
+  const greetingEl = document.getElementById('letter-greeting');
+  const bodyEl = document.getElementById('letter-body');
+  const daysEl = document.getElementById('letter-days');
+  const saveBtn = document.getElementById('save-letter');
+
+  const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
+  const body = state.letterContent || 'You are the most beautiful chapter in my story.';
+  const daysSince = calculateDaysTogether(state.togetherDate);
+  const daysStr = `${daysSince} days together`;
 
   // Reset
-  resetLetterDisplay();
+  greetingEl.textContent = '';
+  greetingEl.classList.remove('typing-cursor');
+  bodyEl.textContent = '';
+  bodyEl.classList.remove('typing-cursor');
+  daysEl.textContent = '';
+  daysEl.classList.remove('visible');
+  saveBtn.classList.add('hidden');
 
-  // Small delay for paper to appear
-  await delay(600);
+  // Wait for paper animation
+  await delay(900);
   if (!state.typingActive) return;
-
-  // Type date
-  await typeText(dateEl, state._letterDate, 35);
-  if (!state.typingActive) return;
-
-  await delay(300);
 
   // Type greeting
   greetingEl.classList.add('typing-cursor');
-  await typeText(greetingEl, state._letterGreeting, 45);
+  await typeText(greetingEl, greeting, 50);
   greetingEl.classList.remove('typing-cursor');
   if (!state.typingActive) return;
 
@@ -277,14 +265,14 @@ async function startLetterTyping() {
 
   // Type body
   bodyEl.classList.add('typing-cursor');
-  await typeText(bodyEl, state._letterBody, 40);
+  await typeText(bodyEl, body, 40);
   bodyEl.classList.remove('typing-cursor');
   if (!state.typingActive) return;
 
   await delay(500);
 
-  // Show days counter (fade in, not typed)
-  daysEl.textContent = state._letterDays;
+  // Show days counter (fade in)
+  daysEl.textContent = daysStr;
   daysEl.classList.add('visible');
 
   // Show save button
@@ -298,7 +286,7 @@ function typeText(element, text, baseSpeed) {
 
     function tick() {
       if (!state.typingActive || i >= text.length) {
-        element.textContent = text; // ensure full text is shown
+        element.textContent = text;
         resolve();
         return;
       }
@@ -306,10 +294,7 @@ function typeText(element, text, baseSpeed) {
       element.textContent += text.charAt(i);
       i++;
 
-      // Vary speed for natural feel
       let nextDelay = baseSpeed + Math.random() * 25 - 12;
-
-      // Pause longer at punctuation
       const char = text.charAt(i - 1);
       if (char === '.' || char === '!' || char === '?') nextDelay += 200;
       else if (char === ',') nextDelay += 100;
@@ -322,7 +307,19 @@ function typeText(element, text, baseSpeed) {
   });
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // ============ SAVE TO IMAGE ============
+
+document.getElementById('save-letter').addEventListener('click', () => {
+  saveElementAsImage(document.querySelector('.letter-paper'), 'love-letter.png');
+});
+
+document.getElementById('save-photobooth').addEventListener('click', () => {
+  saveElementAsImage(document.getElementById('photobooth-strip-el'), 'photobooth.png');
+});
 
 async function saveElementAsImage(element, filename) {
   try {
@@ -339,27 +336,10 @@ async function saveElementAsImage(element, filename) {
     link.click();
   } catch (err) {
     console.error('Save failed:', err);
-    alert('Could not save image. Try taking a screenshot instead.');
   }
 }
 
-// ============ BACK BUTTON ============
-
-function setupBackButton() {
-  $('#back-btn').addEventListener('click', () => {
-    state.typingActive = false;
-    closeOverlay(letterOverlay);
-    closeOverlay(photoboothOverlay);
-
-    // Reset scene animations
-    envelopeItem.classList.remove('visible');
-    stripItem.classList.remove('visible');
-
-    showScreen(setupScreen);
-  });
-}
-
-// ============ SCREEN MANAGEMENT ============
+// ============ NAVIGATION ============
 
 function showScreen(screen) {
   setupScreen.classList.remove('active');
@@ -367,28 +347,87 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-// ============ UTILITIES ============
+function showPage(index) {
+  const allPages = [pageLetter, pagePhotobooth, pageMemory];
+  allPages.forEach(p => p.classList.remove('active', 'exit-left'));
 
-function calculateDaysTogether(startDate) {
-  const now = new Date();
-  const start = new Date(startDate);
-  const diffMs = now.getTime() - start.getTime();
-  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  pages.forEach((page, i) => {
+    if (i < index) {
+      page.classList.add('exit-left');
+    } else if (i === index) {
+      page.classList.add('active');
+    }
+  });
+
+  navDots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+  });
+
+  currentPage = index;
+
+  // Adjust nav dot color for dark backgrounds (photobooth page)
+  const isDark = pages[index] === pagePhotobooth;
+  navDots.forEach(dot => {
+    dot.style.borderColor = isDark ? 'rgba(255,248,240,0.5)' : '';
+  });
+  navDots.forEach(dot => {
+    if (dot.classList.contains('active')) {
+      dot.style.borderColor = isDark ? 'var(--cream)' : '';
+      dot.style.background = isDark ? 'var(--cream)' : '';
+    }
+  });
+
+  backBtn.style.color = isDark ? 'var(--cream)' : '';
+  backBtn.style.background = isDark ? 'rgba(74, 14, 26, 0.6)' : '';
 }
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+navDots.forEach && pageNav.addEventListener('click', () => {});
+
+backBtn.addEventListener('click', () => {
+  state.typingActive = false;
+  showScreen(setupScreen);
+});
+
+// ============ SWIPE SUPPORT ============
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+resultScreen.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+resultScreen.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+  const diff = touchStartX - touchEndX;
+  const threshold = 50;
+
+  if (diff > threshold && currentPage < pages.length - 1) {
+    state.typingActive = false;
+    showPage(currentPage + 1);
+  } else if (diff < -threshold && currentPage > 0) {
+    showPage(currentPage - 1);
+    if (currentPage === 0) startLetterTyping();
+  }
 }
 
-// ============ KEYBOARD SHORTCUTS ============
+// ============ KEYBOARD NAVIGATION ============
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (!letterOverlay.classList.contains('hidden')) {
-      state.typingActive = false;
-      closeOverlay(letterOverlay);
-    } else if (!photoboothOverlay.classList.contains('hidden')) {
-      closeOverlay(photoboothOverlay);
-    }
+  if (!resultScreen.classList.contains('active')) return;
+
+  if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
+    state.typingActive = false;
+    showPage(currentPage + 1);
+  } else if (e.key === 'ArrowLeft' && currentPage > 0) {
+    showPage(currentPage - 1);
+    if (currentPage === 0) startLetterTyping();
+  } else if (e.key === 'Escape') {
+    state.typingActive = false;
+    showScreen(setupScreen);
   }
 });
