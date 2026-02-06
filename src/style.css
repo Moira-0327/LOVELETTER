@@ -4,16 +4,16 @@
    ============================================ */
 
 :root {
-  --accent: #B83A3A;
-  --accent-deep: #8C2828;
-  --accent-light: #D06060;
-  --accent-muted: #C49090;
+  --accent: #C0392B;
+  --accent-deep: #961C14;
+  --accent-light: #D4544A;
+  --accent-muted: #D4817A;
   --cream: #FDF6F2;
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #3A1E1E;
-  --ink-light: #5C3636;
+  --ink: #C0392B;
+  --ink-light: #D4544A;
   --text-dark: #2A1A1A;
   --text-muted: #8A7A76;
   --paper: #EAE2D3;
@@ -73,23 +73,6 @@ html, body {
   scrollbar-width: none;
 }
 .setup-container::-webkit-scrollbar { display: none; }
-
-.setup-hearts {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 110px;
-  height: 100px;
-}
-
-.heart {
-  position: absolute;
-  color: var(--pink-dark);
-  opacity: 0.55;
-}
-.heart-1 { width: 56px; top: -4px; left: -6px; transform: rotate(-15deg); }
-.heart-2 { width: 34px; top: 50px; left: 60px; transform: rotate(12deg); }
-.heart-3 { width: 44px; top: 4px; left: 66px; transform: rotate(-5deg); }
 
 .setup-title {
   font-family: var(--font-serif);
@@ -320,7 +303,7 @@ html, body {
   background: var(--accent-deep);
   border-radius: 2px;
   transform: rotate(-1.2deg);
-  box-shadow: 0 8px 30px rgba(140, 40, 40, 0.25);
+  box-shadow: 0 8px 30px rgba(150, 28, 20, 0.3);
   z-index: 1;
 }
 
@@ -380,21 +363,21 @@ html, body {
 /* Vintage postmark stamp */
 .postmark {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 52px;
-  height: 52px;
-  color: var(--accent-muted);
-  opacity: 0.55;
+  top: 6px;
+  right: 6px;
+  width: 76px;
+  height: 76px;
+  color: var(--ink);
+  opacity: 0.7;
   z-index: 3;
   transform: rotate(12deg);
 }
 
 .postmark-expanded {
-  width: 72px;
-  height: 72px;
-  top: 14px;
-  right: 14px;
+  width: 100px;
+  height: 100px;
+  top: 12px;
+  right: 12px;
 }
 
 .letter-inner {
@@ -408,31 +391,6 @@ html, body {
   overflow: hidden;
 }
 
-.letter-date-line {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.letter-day {
-  font-family: var(--font-typewriter);
-  font-size: 32px;
-  font-weight: 400;
-  color: var(--ink);
-  line-height: 1;
-}
-
-.letter-month {
-  font-family: var(--font-typewriter);
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text-muted);
-  letter-spacing: 3px;
-  text-transform: lowercase;
-  position: relative;
-  top: -2px;
-}
 
 .letter-greeting {
   font-family: var(--font-typewriter);
@@ -499,20 +457,26 @@ html, body {
   font-size: 11px;
 }
 
+/* Square stamp for days-together */
 .letter-days {
   font-family: var(--font-typewriter);
-  font-size: 10px;
-  color: var(--text-muted);
+  font-size: 8px;
+  color: var(--ink);
   letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
   margin-top: auto;
-  padding-top: 8px;
-  text-align: right;
+  padding: 5px 10px;
+  border: 1.5px solid var(--ink);
+  align-self: flex-end;
+  line-height: 1.6;
+  white-space: pre-line;
   opacity: 0;
   transition: opacity 0.6s ease;
 }
 
 .letter-days.visible {
-  opacity: 1;
+  opacity: 0.7;
 }
 
 /* ============ PHOTOBOOTH STRIP (flat-lay, tilted on top of letter) ============ */
@@ -711,14 +675,6 @@ html, body {
   gap: 16px;
 }
 
-.expand-letter-paper .letter-day {
-  font-size: 40px;
-}
-
-.expand-letter-paper .letter-month {
-  font-size: 13px;
-}
-
 .expand-letter-paper .letter-greeting {
   font-size: 18px;
 }
@@ -730,7 +686,9 @@ html, body {
 }
 
 .expand-letter-paper .letter-days {
-  font-size: 11px;
+  font-size: 10px;
+  padding: 6px 10px;
+  border-width: 2px;
 }
 
 /* ============ EXPANDED PHOTOBOOTH ============ */
@@ -822,12 +780,10 @@ html, body {
 @media (max-width: 380px) {
   .letter-paper { width: 74%; height: 56%; }
   .letter-inner { padding: 22px 18px 16px; }
-  .letter-day { font-size: 28px; }
   .letter-body { font-size: 11px; }
   .photobooth-strip { width: 34%; }
   .expand-letter-paper { width: 92%; }
   .expand-letter-paper .letter-inner { padding: 28px 24px 22px; }
-  .expand-letter-paper .letter-day { font-size: 36px; }
   .expand-letter-paper .letter-body { font-size: 14px; }
   .expand-photobooth-strip { width: 56%; }
 }

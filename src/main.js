@@ -229,19 +229,18 @@ function renderResult() {
   if (stampEl) stampEl.textContent = stampDate;
 
   // --- Flat-lay letter thumbnail (static text, no typewriter) ---
-  document.getElementById('letter-day').textContent = day;
-  document.getElementById('letter-month').textContent = `\u2014 ${month}`;
-
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
   const body = state.letterContent || 'You are the most beautiful chapter in my story.';
 
   document.getElementById('letter-greeting').textContent = greeting;
   document.getElementById('letter-body').textContent = body;
   document.getElementById('letter-sender').textContent = state.senderName ? `Yours, ${state.senderName}` : '';
-  const sealDateStr = `sealed on ${month} ${day}, ${today.getFullYear()}`;
-  document.getElementById('letter-seal-date').textContent = sealDateStr;
+  const hours = String(today.getHours()).padStart(2, '0');
+  const mins = String(today.getMinutes()).padStart(2, '0');
+  const sealTimeStr = `sealed at ${hours}:${mins}`;
+  document.getElementById('letter-seal-date').textContent = sealTimeStr;
   document.getElementById('letter-seal-date').classList.add('visible');
-  document.getElementById('letter-days').textContent = `${daysSince} days together`;
+  document.getElementById('letter-days').innerHTML = `${daysSince}\nDAYS`;
   document.getElementById('letter-days').classList.add('visible');
 
   // --- Photobooth strip ---
@@ -328,8 +327,6 @@ function expandLetter() {
   const body = state.letterContent || 'You are the most beautiful chapter in my story.';
 
   // Fill expand panel
-  document.getElementById('expand-letter-day').textContent = day;
-  document.getElementById('expand-letter-month').textContent = `\u2014 ${month}`;
   const expandStamp = document.getElementById('expand-stamp-date');
   if (expandStamp) expandStamp.textContent = `${month.toUpperCase().slice(0, 3)} ${day}, '${String(today.getFullYear()).slice(2)}`;
 
@@ -339,7 +336,9 @@ function expandLetter() {
   const sealDateEl = document.getElementById('expand-letter-seal-date');
   const daysEl = document.getElementById('expand-letter-days');
   const senderStr = state.senderName ? `Yours, ${state.senderName}` : '';
-  const sealStr = `sealed on ${month} ${day}, ${today.getFullYear()}`;
+  const hours = String(today.getHours()).padStart(2, '0');
+  const mins = String(today.getMinutes()).padStart(2, '0');
+  const sealStr = `sealed at ${hours}:${mins}`;
 
   // Clear for typewriter
   greetingEl.textContent = '';
@@ -355,7 +354,7 @@ function expandLetter() {
   expandLetterPanel.classList.add('active');
 
   // Start typewriter
-  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, `${daysSince} days together`);
+  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, `${daysSince}\nDAYS`);
 }
 
 function expandPhotobooth() {
@@ -428,8 +427,8 @@ async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, day
 
   await delay(400);
 
-  // Show days counter
-  daysEl.textContent = daysStr;
+  // Show days counter (square stamp)
+  daysEl.innerHTML = daysStr;
   daysEl.classList.add('visible');
 
   state.letterTyped = true;
@@ -476,10 +475,11 @@ function delay(ms) {
 
 const PAPER_COLOR = '#EAE2D3';
 const CREAM = '#FFF8F0';
-const INK = '#3A1E1E';
+const INK = '#C0392B';
 const MUTED = '#8A7A76';
-const ACCENT = '#B83A3A';
-const ACCENT_MUTED = '#C49090';
+const ACCENT = '#C0392B';
+const ACCENT_DEEP = '#961C14';
+const ACCENT_MUTED = '#D4817A';
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -607,19 +607,6 @@ function renderLetterCanvas() {
   const pad = 80;
   let y = pad;
 
-  // Date (typewriter font)
-  ctx.font = '400 72px "Special Elite", "Courier New", monospace';
-  ctx.fillStyle = INK;
-  ctx.textBaseline = 'top';
-  const dayText = document.getElementById('letter-day').textContent;
-  ctx.fillText(dayText, pad, y);
-  const dayWidth = ctx.measureText(dayText).width;
-
-  ctx.font = '400 22px "Special Elite", "Courier New", monospace';
-  ctx.fillStyle = MUTED;
-  ctx.fillText(document.getElementById('letter-month').textContent, pad + dayWidth + 12, y + 42);
-  y += 100;
-
   // Greeting
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
   ctx.font = '28px "Special Elite", "Courier New", monospace';
@@ -666,33 +653,46 @@ function renderLetterCanvas() {
     y += 44;
   }
 
-  // Seal date below signature
+  // Seal time below signature (24h format)
   const now2 = new Date();
-  const sealMonth = MONTHS_EN[now2.getMonth()];
-  const sealText = `sealed on ${sealMonth} ${now2.getDate()}, ${now2.getFullYear()}`;
+  const sealHours = String(now2.getHours()).padStart(2, '0');
+  const sealMins = String(now2.getMinutes()).padStart(2, '0');
+  const sealText = `SEALED AT ${sealHours}:${sealMins}`;
   ctx.font = '14px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'right';
-  ctx.fillText(sealText.toUpperCase(), LETTER_W - pad, y);
+  ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter
+  // Days counter — square stamp style
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const daysText = `${daysSince} days together`;
-  ctx.font = '16px "Special Elite", "Courier New", monospace';
-  ctx.fillStyle = MUTED;
-  ctx.textAlign = 'right';
-  ctx.fillText(daysText, LETTER_W - pad, LETTER_H - pad);
+  const stampBoxW = 110;
+  const stampBoxH = 60;
+  const stampBoxX = LETTER_W - pad - stampBoxW;
+  const stampBoxY = LETTER_H - pad - stampBoxH;
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.7;
+  ctx.strokeRect(stampBoxX, stampBoxY, stampBoxW, stampBoxH);
+  ctx.font = '28px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(daysSince), stampBoxX + stampBoxW / 2, stampBoxY + stampBoxH / 2 - 8);
+  ctx.font = '12px "Special Elite", "Courier New", monospace';
+  ctx.fillText('DAYS', stampBoxX + stampBoxW / 2, stampBoxY + stampBoxH / 2 + 16);
   ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.globalAlpha = 1;
 
-  // Postmark stamp (top-right)
-  const stampX = LETTER_W - pad - 50;
-  const stampY = pad + 10;
-  const stampR = 42;
+  // Postmark stamp (top-right, enlarged deep red)
+  const stampX = LETTER_W - pad - 55;
+  const stampY = pad + 15;
+  const stampR = 55;
   ctx.save();
   ctx.translate(stampX, stampY);
   ctx.rotate(0.2);
-  ctx.strokeStyle = ACCENT_MUTED;
+  ctx.strokeStyle = INK;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0, 0, stampR, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 1;
@@ -700,7 +700,7 @@ function renderLetterCanvas() {
   ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(-stampR - 6, 0); ctx.lineTo(-stampR, 0); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(stampR, 0); ctx.lineTo(stampR + 6, 0); ctx.stroke();
-  ctx.fillStyle = ACCENT_MUTED;
+  ctx.fillStyle = INK;
   ctx.font = '400 8px "DM Sans", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -907,7 +907,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
   ctx.scale(SCALE, SCALE);
 
   // Maroon background
-  ctx.fillStyle = '#165dad';
+  ctx.fillStyle = ACCENT_DEEP;
   ctx.fillRect(0, 0, totalW, totalH);
 
   // Letter — left side
