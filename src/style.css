@@ -410,18 +410,37 @@ html, body {
   overflow: hidden;
 }
 
-/* Ink texture — subtle bleed on letter text */
+/* Ink texture — heavier bleed for handwritten feel */
 .letter-greeting,
 .letter-body {
-  text-shadow: 0 0 0.4px currentColor;
+  text-shadow:
+    0 0 0.8px currentColor,
+    0.2px 0.2px 0.3px rgba(192, 57, 43, 0.15);
+  -webkit-text-stroke: 0.15px currentColor;
 }
 
 .letter-sender {
-  text-shadow: 0 0 1.2px currentColor, 0.3px 0.3px 0.6px rgba(192, 57, 43, 0.2);
+  text-shadow:
+    0 0 2px currentColor,
+    0.4px 0.4px 1px rgba(192, 57, 43, 0.25),
+    -0.2px 0.2px 0.8px rgba(192, 57, 43, 0.15);
+  -webkit-text-stroke: 0.3px currentColor;
 }
 
 .setup-title {
-  text-shadow: 0.4px 0.4px 0 currentColor, -0.2px -0.2px 0 currentColor;
+  text-shadow:
+    0.5px 0.5px 0 currentColor,
+    -0.3px -0.3px 0 currentColor,
+    0 0 1.5px rgba(192, 57, 43, 0.2);
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
+.letter-seal-date {
+  text-shadow: 0 0 0.6px currentColor;
+}
+
+.postmark {
+  filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='r'><feTurbulence baseFrequency='0.4' numOctaves='2' seed='3'/><feDisplacementMap in='SourceGraphic' scale='1.5'/></filter></svg>#r");
 }
 
 /* Typewriter cursor */
@@ -471,23 +490,27 @@ html, body {
   font-size: 11px;
 }
 
-/* Postage stamp for days-together */
-.letter-days {
-  --scallop-r: 2.5px;
-  --scallop-s: 8px;
-  position: relative;
-  margin-top: auto;
-  align-self: flex-end;
-  padding: 8px 10px;
-  background: rgba(192, 57, 43, 0.08);
+/* Postage stamp — days of us (flat-lay scene) */
+.days-stamp {
+  --scallop-r: 3px;
+  --scallop-s: 9px;
+  position: absolute;
+  z-index: 12;
+  left: 7%;
+  bottom: 14%;
+  width: 80px;
+  height: 88px;
+  padding: 6px;
+  background: var(--cream);
   color: var(--ink);
-  text-align: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  transform: rotate(-6deg);
+  box-shadow: 1px 2px 8px rgba(0,0,0,0.12);
   opacity: 0;
   transition: opacity 0.6s ease;
+  animation: fadeInUp 0.8s ease 0.7s both;
   -webkit-mask:
     radial-gradient(var(--scallop-r) at 50% var(--scallop-r), #0000 98%, #000) 0 calc(-1 * var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
     radial-gradient(var(--scallop-r) at 50% calc(100% - var(--scallop-r)), #0000 98%, #000) 0 calc(100% + var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
@@ -502,23 +525,38 @@ html, body {
   mask-composite: intersect;
 }
 
-.letter-days.visible {
-  opacity: 0.85;
+.days-stamp.visible {
+  opacity: 1;
+}
+
+.days-stamp-inner {
+  width: 100%;
+  height: 100%;
+  background: rgba(192, 57, 43, 0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
 }
 
 .stamp-heart {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   color: var(--ink);
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .stamp-text {
   font-family: var(--font-typewriter);
-  font-size: 7px;
-  letter-spacing: 1.5px;
+  font-size: 6.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   line-height: 1;
+  color: var(--ink);
+  opacity: 0.7;
+  text-shadow: 0 0 0.5px currentColor;
 }
 
 /* ============ PHOTOBOOTH STRIP (flat-lay, tilted on top of letter) ============ */
@@ -725,21 +763,6 @@ html, body {
   font-size: 15px;
   line-height: 2;
   overflow: visible;
-}
-
-.expand-letter-paper .letter-days {
-  padding: 10px 14px;
-  gap: 3px;
-}
-
-.expand-letter-paper .stamp-heart {
-  width: 26px;
-  height: 26px;
-}
-
-.expand-letter-paper .stamp-text {
-  font-size: 9px;
-  letter-spacing: 2px;
 }
 
 /* ============ EXPANDED PHOTOBOOTH ============ */

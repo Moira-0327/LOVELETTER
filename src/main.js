@@ -240,8 +240,8 @@ function renderResult() {
   const sealTimeStr = `sealed at ${hours}:${mins}`;
   document.getElementById('letter-seal-date').textContent = sealTimeStr;
   document.getElementById('letter-seal-date').classList.add('visible');
-  document.getElementById('letter-days').innerHTML = stampHTML(daysSince);
-  document.getElementById('letter-days').classList.add('visible');
+  document.getElementById('days-stamp').innerHTML = stampHTML(daysSince);
+  document.getElementById('days-stamp').classList.add('visible');
 
   // --- Photobooth strip ---
   if (state.hasPhotos) {
@@ -269,7 +269,7 @@ function renderResult() {
 }
 
 function stampHTML(days) {
-  return `<svg class="stamp-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="stamp-text">${days} days of us</span>`;
+  return `<div class="days-stamp-inner"><svg class="stamp-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="stamp-text">${days} days of us</span></div>`;
 }
 
 function calculateDaysTogether(startDate) {
@@ -338,7 +338,6 @@ function expandLetter() {
   const bodyEl = document.getElementById('expand-letter-body');
   const senderEl = document.getElementById('expand-letter-sender');
   const sealDateEl = document.getElementById('expand-letter-seal-date');
-  const daysEl = document.getElementById('expand-letter-days');
   const senderStr = state.senderName ? `Yours, ${state.senderName}` : '';
   const hours = String(today.getHours()).padStart(2, '0');
   const mins = String(today.getMinutes()).padStart(2, '0');
@@ -350,15 +349,13 @@ function expandLetter() {
   senderEl.textContent = '';
   sealDateEl.textContent = '';
   sealDateEl.classList.remove('visible');
-  daysEl.textContent = '';
-  daysEl.classList.remove('visible');
 
   // Show overlay
   expandBackdrop.classList.add('active');
   expandLetterPanel.classList.add('active');
 
   // Start typewriter
-  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, daysSince);
+  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, greeting, body, senderStr, sealStr);
 }
 
 function expandPhotobooth() {
@@ -393,7 +390,7 @@ function collapsePanel() {
 
 // ============ TYPEWRITER EFFECT (in expanded letter) ============
 
-async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, daysStr) {
+async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, greeting, body, senderStr, sealStr) {
   state.typingActive = true;
 
   // Wait for expand animation
@@ -428,12 +425,6 @@ async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, day
   // Show seal date
   sealDateEl.textContent = sealStr;
   sealDateEl.classList.add('visible');
-
-  await delay(400);
-
-  // Show days counter (postage stamp)
-  daysEl.innerHTML = stampHTML(daysStr);
-  daysEl.classList.add('visible');
 
   state.letterTyped = true;
 }
