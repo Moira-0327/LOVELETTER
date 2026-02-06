@@ -1,0 +1,794 @@
+/* ============================================
+   LOVER LETTER — Unified Visual Design
+   Color palette: maroon, cream, kraft
+   Typography: Cormorant Garamond + Dancing Script
+   ============================================ */
+
+:root {
+  --maroon: #6B1525;
+  --maroon-deep: #4A0E1A;
+  --maroon-light: #8B2035;
+  --cream: #FFF8F0;
+  --cream-dark: #F5EDE0;
+  --kraft: #C4A882;
+  --kraft-light: #D4BFA0;
+  --ink: #5C1018;
+  --ink-light: #8B3040;
+  --text-dark: #2C1810;
+  --text-muted: #8C7B70;
+
+  --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+  --font-script: 'Dancing Script', cursive;
+  --font-sans: 'Noto Serif SC', serif;
+
+  --page-width: min(100vw, 430px);
+  --page-height: 100dvh;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--cream);
+  font-family: var(--font-serif);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ SCREENS ============ */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ============ SETUP SCREEN ============ */
+
+.setup-container {
+  width: var(--page-width);
+  max-height: var(--page-height);
+  overflow-y: auto;
+  padding: 40px 28px 60px;
+  position: relative;
+}
+
+.setup-stars {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 80px;
+  height: 80px;
+}
+
+.star {
+  position: absolute;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.star-1 { width: 40px; top: 0; left: 0; transform: rotate(-15deg); }
+.star-2 { width: 28px; top: 30px; left: 35px; transform: rotate(10deg); }
+.star-3 { width: 22px; top: 5px; left: 50px; transform: rotate(-5deg); }
+
+.setup-title {
+  font-family: var(--font-script);
+  font-size: 42px;
+  font-weight: 400;
+  color: var(--maroon);
+  text-align: center;
+  margin-top: 30px;
+  letter-spacing: 1px;
+}
+
+.setup-subtitle {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 4px;
+  text-transform: lowercase;
+  margin-top: 6px;
+  margin-bottom: 40px;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.label-hint {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group textarea {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--text-dark);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--kraft-light);
+  padding: 10px 0;
+  outline: none;
+  transition: border-color 0.3s;
+  width: 100%;
+  resize: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-bottom-color: var(--maroon);
+}
+
+.form-group textarea {
+  border: 1px solid var(--kraft-light);
+  border-radius: 4px;
+  padding: 12px;
+  line-height: 1.7;
+}
+
+.form-group textarea:focus {
+  border-color: var(--maroon);
+}
+
+/* Photo upload grid */
+.photo-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.photo-upload-slot {
+  position: relative;
+  aspect-ratio: 3/4;
+  border: 1.5px dashed var(--kraft-light);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.photo-upload-slot:hover {
+  border-color: var(--maroon-light);
+  background: rgba(107, 21, 37, 0.03);
+}
+
+.photo-upload-slot.has-photo {
+  border-style: solid;
+  border-color: var(--kraft);
+}
+
+.photo-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.plus-icon {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--kraft);
+  line-height: 1;
+}
+
+.slot-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.photo-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  filter: grayscale(100%) contrast(1.1);
+}
+
+.photo-upload-slot.has-photo .photo-placeholder {
+  display: none;
+}
+
+.photo-upload-slot.has-photo .photo-preview {
+  display: block;
+}
+
+/* Submit button */
+.submit-btn {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  color: var(--cream);
+  background: var(--maroon);
+  border: none;
+  padding: 16px 40px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  align-self: center;
+}
+
+.submit-btn:hover {
+  background: var(--maroon-deep);
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* ============ RESULT SCREEN ============ */
+
+#result-screen {
+  flex-direction: column;
+}
+
+/* Page system (swipeable) */
+.page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+
+.page.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.page.exit-left {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ============ PAGE 1: LOVE LETTER ============ */
+
+.letter-bg {
+  width: var(--page-width);
+  height: var(--page-height);
+  background: var(--cream);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Decorative stars */
+.deco-star {
+  position: absolute;
+  color: var(--text-muted);
+  opacity: 0.35;
+  z-index: 2;
+}
+.deco-star-1 { width: 50px; top: 15%; left: 8%; transform: rotate(-15deg); }
+.deco-star-2 { width: 35px; top: 22%; left: 22%; transform: rotate(12deg); }
+.deco-star-3 { width: 28px; top: 30%; right: 10%; transform: rotate(-8deg); }
+.deco-star-4 { width: 22px; top: 18%; right: 18%; transform: rotate(20deg); }
+
+/* Dark red card behind torn paper */
+.letter-card-shadow {
+  position: absolute;
+  width: 78%;
+  height: 52%;
+  background: var(--maroon);
+  border-radius: 3px;
+  transform: rotate(-1.5deg);
+  box-shadow: 0 8px 30px rgba(74, 14, 26, 0.25);
+  z-index: 1;
+}
+
+/* Torn paper effect */
+.letter-paper {
+  position: relative;
+  z-index: 3;
+  width: 75%;
+  min-height: 45%;
+  background: var(--cream-dark);
+  padding: 36px 32px 28px;
+  transform: rotate(0.8deg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* Torn edge simulation via clip-path */
+  clip-path: polygon(
+    0% 2%, 3% 0%, 7% 2.5%, 11% 0.5%, 15% 3%, 19% 1%, 23% 2.8%,
+    27% 0.3%, 31% 2%, 35% 0.8%, 39% 3.2%, 43% 1.2%, 47% 2.5%,
+    51% 0%, 55% 2.8%, 59% 0.5%, 63% 3%, 67% 1%, 71% 2.2%,
+    75% 0.5%, 79% 3%, 83% 1.5%, 87% 2.8%, 91% 0.8%, 95% 2.5%,
+    98% 0.5%, 100% 2%,
+    100% 97%, 97% 99%, 93% 97.5%, 89% 100%, 85% 97.2%, 81% 99.5%,
+    77% 97%, 73% 99.8%, 69% 97.5%, 65% 100%, 61% 97.8%, 57% 99.2%,
+    53% 97%, 49% 100%, 45% 97.5%, 41% 99%, 37% 97.2%, 33% 99.8%,
+    29% 97%, 25% 99.5%, 21% 97.5%, 17% 100%, 13% 97.8%, 9% 99.5%,
+    5% 97%, 2% 99.5%, 0% 97.5%
+  );
+
+  /* Subtle paper texture via gradient noise */
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(196, 168, 130, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse at 80% 30%, rgba(196, 168, 130, 0.08) 0%, transparent 60%);
+}
+
+.letter-date-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.letter-day {
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.letter-month {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  text-transform: lowercase;
+  position: relative;
+  top: -2px;
+}
+
+.letter-greeting {
+  font-family: var(--font-script);
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.letter-body {
+  font-family: var(--font-script);
+  font-size: 17px;
+  color: var(--ink);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.letter-days {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-top: auto;
+  padding-top: 12px;
+  text-align: right;
+}
+
+/* ============ PAGE 2: PHOTO BOOTH ============ */
+
+.photobooth-bg {
+  width: var(--page-width);
+  height: var(--page-height);
+  background: var(--maroon);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Envelope decorations */
+.envelope {
+  position: absolute;
+  border-radius: 2px;
+}
+
+.envelope-back {
+  width: 55%;
+  height: 30%;
+  background: var(--cream-dark);
+  bottom: 8%;
+  right: -5%;
+  transform: rotate(-12deg);
+  opacity: 0.9;
+  z-index: 1;
+}
+
+.envelope-front {
+  width: 50%;
+  height: 28%;
+  background: var(--cream);
+  bottom: 5%;
+  right: -2%;
+  transform: rotate(-8deg);
+  opacity: 0.95;
+  z-index: 2;
+  box-shadow: -2px 2px 15px rgba(0,0,0,0.15);
+}
+
+/* Photo booth strip */
+.photobooth-strip {
+  position: relative;
+  z-index: 5;
+  width: 52%;
+  max-width: 220px;
+  background: var(--cream);
+  padding: 14px 10px 18px;
+  transform: rotate(-3deg) translateX(-8%);
+  box-shadow: 4px 6px 25px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.strip-header {
+  font-family: var(--font-serif);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.strip-photos {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.strip-photo {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--cream-dark);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%) contrast(1.1) brightness(1.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.strip-footer {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.strip-caption {
+  font-family: var(--font-script);
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* Handwritten text floating near envelopes */
+.photobooth-text {
+  position: absolute;
+  z-index: 4;
+  bottom: 16%;
+  right: 10%;
+  font-family: var(--font-script);
+  font-size: 15px;
+  color: var(--cream);
+  opacity: 0.7;
+  transform: rotate(-5deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 2px;
+}
+
+/* ============ PAGE 3: POLAROID MEMORY ============ */
+
+.memory-bg {
+  width: var(--page-width);
+  height: var(--page-height);
+  background: #FAFAFA;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 28px;
+}
+
+/* Date at top */
+.memory-date {
+  margin-top: 12%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.memory-day-num {
+  font-family: var(--font-serif);
+  font-size: 64px;
+  font-weight: 300;
+  color: var(--text-dark);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.memory-month-text {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 6px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: lowercase;
+}
+
+/* Envelope + note scene */
+.memory-envelope-scene {
+  position: relative;
+  width: 80%;
+  margin-top: 8%;
+  z-index: 2;
+}
+
+.memory-envelope {
+  width: 65%;
+  height: 100px;
+  background: linear-gradient(135deg, var(--kraft-light) 0%, var(--kraft) 100%);
+  border-radius: 2px;
+  transform: rotate(-5deg);
+  position: relative;
+  z-index: 1;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.08);
+}
+
+.memory-envelope::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(135deg, transparent 48%, var(--kraft) 48%, var(--kraft) 52%, transparent 52%);
+  opacity: 0.3;
+}
+
+.memory-note {
+  position: absolute;
+  top: -20px;
+  left: -5%;
+  width: 70%;
+  padding: 20px 18px;
+  background: #FFF5F0;
+  transform: rotate(-8deg);
+  z-index: 2;
+  box-shadow: 2px 3px 12px rgba(0,0,0,0.06);
+  font-family: var(--font-script);
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+/* Polaroid photo */
+.memory-polaroid {
+  position: absolute;
+  top: 38%;
+  right: 6%;
+  width: 48%;
+  max-width: 200px;
+  background: white;
+  padding: 8px 8px 30px;
+  transform: rotate(3deg);
+  box-shadow: 2px 4px 15px rgba(0,0,0,0.1);
+  z-index: 3;
+}
+
+.memory-polaroid-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--cream-dark);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(80%) contrast(1.05) brightness(1.05);
+}
+
+.memory-polaroid-label {
+  font-family: var(--font-script);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* Bottom quote */
+.memory-quote {
+  position: absolute;
+  bottom: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.8;
+  padding: 0 32px;
+  letter-spacing: 0.3px;
+  z-index: 2;
+}
+
+/* ============ NAVIGATION ============ */
+
+.page-nav {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+  padding: 0;
+}
+
+.nav-dot.active {
+  background: var(--maroon);
+  border-color: var(--maroon);
+}
+
+/* Back button */
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  background: rgba(255, 248, 240, 0.85);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-dark);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 248, 240, 1);
+  transform: scale(1.05);
+}
+
+/* ============ ANIMATIONS ============ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatStar {
+  0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-6px) rotate(var(--rot, 0deg)); }
+}
+
+.deco-star {
+  animation: floatStar 4s ease-in-out infinite;
+}
+.deco-star-1 { --rot: -15deg; animation-delay: 0s; }
+.deco-star-2 { --rot: 12deg; animation-delay: 1s; }
+.deco-star-3 { --rot: -8deg; animation-delay: 2s; }
+.deco-star-4 { --rot: 20deg; animation-delay: 3s; }
+
+.letter-paper {
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.photobooth-strip {
+  animation: fadeInUp 0.8s ease 0.3s both;
+}
+
+.memory-polaroid {
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 380px) {
+  .letter-paper {
+    width: 82%;
+    padding: 28px 24px 22px;
+  }
+
+  .letter-day {
+    font-size: 36px;
+  }
+
+  .letter-body {
+    font-size: 15px;
+  }
+
+  .photobooth-strip {
+    width: 56%;
+  }
+
+  .memory-day-num {
+    font-size: 52px;
+  }
+}
+
+/* ============ SCROLLBAR HIDE ============ */
+.setup-container::-webkit-scrollbar {
+  display: none;
+}
+
+.setup-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
