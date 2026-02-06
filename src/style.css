@@ -1,7 +1,6 @@
 /* ============================================
    LOVER LETTER — Unified Visual Design
-   Based on original 3-page layout
-   + typewriter font, cotton paper, save buttons
+   Flat-lay layout with tap-to-expand
    ============================================ */
 
 :root {
@@ -16,7 +15,7 @@
   --ink-light: #8B3040;
   --text-dark: #2C1810;
   --text-muted: #8C7B70;
-  --paper: #E8D4A8;
+  --paper: #EAE2D3;
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
@@ -266,41 +265,20 @@ html, body {
 .submit-btn:hover { background: var(--maroon-deep); }
 .submit-btn:active { transform: scale(0.98); }
 
-/* ============ RESULT SCREEN ============ */
+/* ============ RESULT SCREEN — FLAT-LAY ============ */
 
-#result-screen { flex-direction: column; }
-
-/* Page system (swipeable) */
-.page {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: translateX(30px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  pointer-events: none;
+#result-screen {
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.page.active {
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: all;
-}
+/* ============ FLAT-LAY SCENE ============ */
 
-.page.exit-left {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-/* ============ PAGE 1: LOVE LETTER ============ */
-
-.letter-bg {
+.flatlay-scene {
+  position: relative;
   width: var(--page-width);
   height: var(--page-height);
   background: var(--cream);
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,17 +291,18 @@ html, body {
   color: var(--text-muted);
   opacity: 0.35;
   z-index: 2;
+  animation: floatStar 4s ease-in-out infinite;
 }
-.deco-star-1 { width: 50px; top: 15%; left: 8%; transform: rotate(-15deg); }
-.deco-star-2 { width: 35px; top: 22%; left: 22%; transform: rotate(12deg); }
-.deco-star-3 { width: 28px; top: 30%; right: 10%; transform: rotate(-8deg); }
-.deco-star-4 { width: 22px; top: 18%; right: 18%; transform: rotate(20deg); }
+.deco-star-1 { width: 50px; top: 15%; left: 8%; --rot: -15deg; animation-delay: 0s; }
+.deco-star-2 { width: 35px; top: 22%; left: 22%; --rot: 12deg; animation-delay: 1s; }
+.deco-star-3 { width: 28px; top: 30%; right: 10%; --rot: -8deg; animation-delay: 2s; }
+.deco-star-4 { width: 22px; top: 18%; right: 18%; --rot: 20deg; animation-delay: 3s; }
 
 /* Dark red card behind paper */
 .letter-card-shadow {
   position: absolute;
-  width: 90%;
-  height: 72%;
+  width: 72%;
+  height: 55%;
   background: var(--maroon);
   border-radius: 2px;
   transform: rotate(-1.2deg);
@@ -331,20 +310,27 @@ html, body {
   z-index: 1;
 }
 
-/* Aged letter paper — vintage 1930s stationery feel */
+/* ============ LETTER PAPER (flat-lay thumbnail) ============ */
+
 .letter-paper {
-  position: relative;
+  position: absolute;
   z-index: 3;
-  width: 86%;
-  min-height: 68%;
+  width: 70%;
+  height: 54%;
   background-color: var(--paper);
   padding: 0;
   transform: rotate(0.5deg);
   display: flex;
   flex-direction: column;
   box-shadow: 2px 3px 15px rgba(0,0,0,0.12);
-
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.letter-paper:hover {
+  transform: rotate(0.5deg) scale(1.02);
+  box-shadow: 4px 6px 25px rgba(0,0,0,0.18);
 }
 
 /* Paper grain overlay — aged cotton texture */
@@ -355,27 +341,24 @@ html, body {
   z-index: 1;
   opacity: 0.6;
   mix-blend-mode: multiply;
-  /* background-image set by JS */
 }
 
-/* Aged paper patina — foxing spots, edge darkening, color variation */
-.letter-paper::after {
+/* Aged paper patina */
+.letter-paper::after,
+.expand-letter-paper::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   background:
-    /* Edge darkening / vignette — like aged paper */
     radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(160, 130, 80, 0.12) 100%),
-    /* Foxing spots — random age marks */
     radial-gradient(circle at 15% 20%, rgba(170, 140, 80, 0.12) 0%, transparent 8%),
     radial-gradient(circle at 78% 15%, rgba(160, 130, 70, 0.08) 0%, transparent 6%),
     radial-gradient(circle at 85% 75%, rgba(170, 140, 80, 0.1) 0%, transparent 10%),
     radial-gradient(circle at 25% 80%, rgba(160, 130, 70, 0.07) 0%, transparent 7%),
     radial-gradient(circle at 60% 45%, rgba(170, 140, 80, 0.06) 0%, transparent 12%),
     radial-gradient(circle at 40% 65%, rgba(155, 125, 70, 0.05) 0%, transparent 8%),
-    /* Subtle color unevenness */
     radial-gradient(ellipse at 30% 30%, rgba(180, 150, 90, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 60%, rgba(180, 150, 90, 0.05) 0%, transparent 45%);
 }
@@ -383,11 +366,12 @@ html, body {
 .letter-inner {
   position: relative;
   z-index: 2;
-  padding: 36px 32px 28px;
+  padding: 28px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   min-height: 100%;
+  overflow: hidden;
 }
 
 .letter-date-line {
@@ -399,7 +383,7 @@ html, body {
 
 .letter-day {
   font-family: var(--font-serif);
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 300;
   color: var(--ink);
   line-height: 1;
@@ -407,7 +391,7 @@ html, body {
 
 .letter-month {
   font-family: var(--font-serif);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 300;
   color: var(--text-muted);
   letter-spacing: 3px;
@@ -418,7 +402,7 @@ html, body {
 
 .letter-greeting {
   font-family: var(--font-typewriter);
-  font-size: 18px;
+  font-size: 14px;
   color: var(--ink);
   line-height: 1.4;
   min-height: 1.4em;
@@ -426,11 +410,12 @@ html, body {
 
 .letter-body {
   font-family: var(--font-typewriter);
-  font-size: 15px;
+  font-size: 12px;
   color: var(--ink);
-  line-height: 2;
+  line-height: 1.8;
   white-space: pre-wrap;
-  min-height: 60px;
+  min-height: 40px;
+  overflow: hidden;
 }
 
 /* Typewriter cursor */
@@ -449,11 +434,11 @@ html, body {
 
 .letter-days {
   font-family: var(--font-typewriter);
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   letter-spacing: 2px;
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: 8px;
   text-align: right;
   opacity: 0;
   transition: opacity 0.6s ease;
@@ -463,94 +448,38 @@ html, body {
   opacity: 1;
 }
 
-/* ============ PAGE 2: PHOTO BOOTH ============ */
-
-.photobooth-bg {
-  width: var(--page-width);
-  height: var(--page-height);
-  background: var(--maroon);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Cotton paper cards behind photobooth strip */
-.envelope {
-  position: absolute;
-  border-radius: 2px;
-}
-
-.envelope-back {
-  width: 55%;
-  height: 30%;
-  background: var(--paper);
-  bottom: 8%;
-  right: -5%;
-  transform: rotate(-12deg);
-  opacity: 0.85;
-  z-index: 1;
-  box-shadow: 2px 3px 12px rgba(0,0,0,0.12);
-  /* Torn edge via clip-path */
-  clip-path: polygon(
-    0% 1.5%, 4% 0%, 8% 2%, 12% 0.5%, 16% 2.5%, 20% 0.8%, 24% 2%,
-    28% 0.3%, 32% 1.8%, 36% 0.5%, 40% 2.5%, 44% 1%, 48% 2.2%,
-    52% 0.2%, 56% 2%, 60% 0.8%, 64% 2.5%, 68% 0.5%, 72% 2%,
-    76% 1%, 80% 2.5%, 84% 0.5%, 88% 2%, 92% 1%, 96% 2.2%, 100% 1%,
-    100% 98%, 96% 100%, 92% 98%, 88% 99.5%, 84% 97.5%, 80% 100%,
-    76% 98%, 72% 99.5%, 68% 97.5%, 64% 100%, 60% 98%, 56% 99.5%,
-    52% 97.5%, 48% 100%, 44% 98%, 40% 99.5%, 36% 97.5%, 32% 100%,
-    28% 98%, 24% 99.5%, 20% 97.5%, 16% 100%, 12% 98%, 8% 99.5%,
-    4% 97.5%, 0% 99%
-  );
-}
-
-.envelope-front {
-  width: 50%;
-  height: 28%;
-  background: var(--paper);
-  bottom: 5%;
-  right: -2%;
-  transform: rotate(-8deg);
-  opacity: 0.9;
-  z-index: 2;
-  box-shadow: -2px 2px 15px rgba(0,0,0,0.15);
-  /* Torn edge via clip-path */
-  clip-path: polygon(
-    0% 2%, 3% 0%, 7% 2.5%, 11% 0.5%, 15% 3%, 19% 1%, 23% 2.5%,
-    27% 0.5%, 31% 2%, 35% 1%, 39% 3%, 43% 0.5%, 47% 2.5%,
-    51% 0.5%, 55% 2.5%, 59% 0.5%, 63% 2.8%, 67% 1%, 71% 2.2%,
-    75% 0.5%, 79% 3%, 83% 1.5%, 87% 2.5%, 91% 0.5%, 95% 2%, 100% 1.5%,
-    100% 97.5%, 97% 99.5%, 93% 97.5%, 89% 100%, 85% 97.5%, 81% 99%,
-    77% 97.5%, 73% 99.5%, 69% 97%, 65% 100%, 61% 97.5%, 57% 99.5%,
-    53% 97.5%, 49% 99.5%, 45% 97%, 41% 99.5%, 37% 97.5%, 33% 100%,
-    29% 97.5%, 25% 99.5%, 21% 97%, 17% 100%, 13% 97.5%, 9% 99%,
-    5% 97.5%, 0% 99%
-  );
-}
+/* ============ PHOTOBOOTH STRIP (flat-lay, tilted on top of letter) ============ */
 
 .photobooth-strip {
-  position: relative;
-  z-index: 5;
-  width: 52%;
-  max-width: 220px;
+  position: absolute;
+  z-index: 10;
+  right: 6%;
+  bottom: 18%;
+  width: 30%;
+  max-width: 140px;
   background: var(--cream);
-  padding: 14px 10px 18px;
-  transform: rotate(-3deg) translateX(-8%);
-  box-shadow: 4px 6px 25px rgba(0,0,0,0.3);
+  padding: 10px 7px 14px;
+  transform: rotate(18deg);
+  box-shadow: 4px 6px 25px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fadeInUp 0.8s ease 0.3s both;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 0.8s ease 0.5s both;
+}
+
+.photobooth-strip:hover {
+  transform: rotate(18deg) scale(1.04);
+  box-shadow: 6px 8px 30px rgba(0,0,0,0.3);
 }
 
 .strip-header {
   font-family: var(--font-typewriter);
-  font-size: 9px;
-  letter-spacing: 4px;
+  font-size: 6px;
+  letter-spacing: 3px;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   text-transform: uppercase;
 }
 
@@ -558,7 +487,7 @@ html, body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .strip-photo {
@@ -572,42 +501,33 @@ html, body {
 }
 
 .strip-footer {
-  margin-top: 12px;
+  margin-top: 8px;
   text-align: center;
 }
 
 .strip-caption {
   font-family: var(--font-typewriter);
-  font-size: 12px;
+  font-size: 8px;
   color: var(--text-muted);
   letter-spacing: 0.5px;
 }
 
-.photobooth-text {
-  position: absolute;
-  z-index: 4;
-  bottom: 16%;
-  right: 10%;
-  font-family: var(--font-typewriter);
-  font-size: 13px;
-  color: var(--cream);
-  opacity: 0.7;
-  transform: rotate(-5deg);
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  letter-spacing: 2px;
-}
+/* ============ FLAT-LAY ACTION BUTTONS ============ */
 
-/* ============ SAVE & SHARE BUTTONS ============ */
-
-.letter-actions {
+.flatlay-actions {
   position: absolute;
-  bottom: 60px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
   display: flex;
   gap: 10px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.flatlay-actions.visible {
+  opacity: 1;
 }
 
 .save-btn {
@@ -629,23 +549,6 @@ html, body {
   border-color: var(--maroon);
   background: rgba(255, 248, 240, 1);
 }
-
-.save-photobooth {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--cream);
-  background: rgba(74, 14, 26, 0.5);
-  border-color: rgba(255, 248, 240, 0.3);
-}
-
-.save-photobooth:hover {
-  background: rgba(74, 14, 26, 0.7);
-  border-color: rgba(255, 248, 240, 0.6);
-}
-
-.save-photobooth svg { stroke: var(--cream); }
 
 /* Share copied toast */
 .share-toast {
@@ -669,33 +572,133 @@ html, body {
   opacity: 1;
 }
 
-/* ============ NAVIGATION ============ */
+/* ============ EXPAND OVERLAY ============ */
 
-.page-nav {
+.expand-backdrop {
   position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.expand-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.expand-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.expand-panel.active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: all;
+}
+
+/* ============ EXPANDED LETTER ============ */
+
+.expand-letter-paper {
+  position: relative;
+  width: 86%;
+  max-width: 380px;
+  min-height: 68vh;
+  max-height: 80vh;
+  background-color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 8px 40px rgba(0,0,0,0.25);
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.expand-letter-paper::-webkit-scrollbar { display: none; }
+
+.expand-letter-paper .letter-inner {
+  padding: 36px 32px 28px;
+  gap: 16px;
+}
+
+.expand-letter-paper .letter-day {
+  font-size: 42px;
+}
+
+.expand-letter-paper .letter-month {
+  font-size: 14px;
+}
+
+.expand-letter-paper .letter-greeting {
+  font-size: 18px;
+}
+
+.expand-letter-paper .letter-body {
+  font-size: 15px;
+  line-height: 2;
+  overflow: visible;
+}
+
+.expand-letter-paper .letter-days {
+  font-size: 11px;
+}
+
+/* ============ EXPANDED PHOTOBOOTH ============ */
+
+.expand-photobooth-strip {
+  width: 52%;
+  max-width: 220px;
+  background: var(--cream);
+  padding: 14px 10px 18px;
+  box-shadow: 4px 8px 40px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.expand-photobooth-strip .strip-header {
+  font-size: 9px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+
+.expand-photobooth-strip .strip-photos {
+  gap: 4px;
+}
+
+.expand-photobooth-strip .strip-photo {
+  aspect-ratio: 4/3;
+}
+
+.expand-photobooth-strip .strip-caption {
+  font-size: 12px;
+}
+
+.expand-photobooth-strip .strip-footer {
+  margin-top: 12px;
+}
+
+/* ============ EXPAND ACTIONS ============ */
+
+.expand-actions {
+  margin-top: 16px;
   display: flex;
   gap: 10px;
-  z-index: 100;
 }
 
-.nav-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.5px solid var(--text-muted);
-  background: transparent;
-  cursor: pointer;
-  transition: background 0.3s, border-color 0.3s;
-  padding: 0;
-}
-
-.nav-dot.active {
-  background: var(--maroon);
-  border-color: var(--maroon);
-}
+/* ============ BACK BUTTON ============ */
 
 .back-btn {
   position: fixed;
@@ -733,23 +736,17 @@ html, body {
   50% { transform: translateY(-6px) rotate(var(--rot, 0deg)); }
 }
 
-.deco-star {
-  animation: floatStar 4s ease-in-out infinite;
-}
-.deco-star-1 { --rot: -15deg; animation-delay: 0s; }
-.deco-star-2 { --rot: 12deg; animation-delay: 1s; }
-.deco-star-3 { --rot: -8deg; animation-delay: 2s; }
-.deco-star-4 { --rot: 20deg; animation-delay: 3s; }
-
-.letter-paper { animation: fadeInUp 0.8s ease 0.2s both; }
-.photobooth-strip { animation: fadeInUp 0.8s ease 0.3s both; }
-
 /* ============ RESPONSIVE ============ */
 
 @media (max-width: 380px) {
-  .letter-paper { width: 90%; }
-  .letter-inner { padding: 28px 24px 22px; }
-  .letter-day { font-size: 36px; }
-  .letter-body { font-size: 14px; }
-  .photobooth-strip { width: 56%; }
+  .letter-paper { width: 74%; height: 56%; }
+  .letter-inner { padding: 22px 18px 16px; }
+  .letter-day { font-size: 28px; }
+  .letter-body { font-size: 11px; }
+  .photobooth-strip { width: 34%; }
+  .expand-letter-paper { width: 92%; }
+  .expand-letter-paper .letter-inner { padding: 28px 24px 22px; }
+  .expand-letter-paper .letter-day { font-size: 36px; }
+  .expand-letter-paper .letter-body { font-size: 14px; }
+  .expand-photobooth-strip { width: 56%; }
 }
