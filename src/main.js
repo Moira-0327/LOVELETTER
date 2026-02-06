@@ -622,16 +622,14 @@ const LETTER_W = 850;
 const LETTER_H = 1100;
 const SCALE = 3;
 
-// Save button in flat-lay (saves composite)
-document.getElementById('save-letter').addEventListener('click', async (e) => {
+// SAVE — downloads letter + photobooth as separate files
+document.getElementById('btn-save').addEventListener('click', async (e) => {
   e.stopPropagation();
   const letterCanvas = renderLetterCanvas();
+  await downloadCanvas(letterCanvas, 'love-letter.png');
   if (state.hasPhotos) {
     const boothCanvas = await renderPhotoboothCanvas();
-    const composite = createCompositeImage(letterCanvas, boothCanvas);
-    await downloadCanvas(composite, 'lover-letter.png');
-  } else {
-    await downloadCanvas(letterCanvas, 'love-letter.png');
+    await downloadCanvas(boothCanvas, 'photobooth.png');
   }
 });
 
@@ -832,18 +830,39 @@ async function renderPhotoboothCanvas() {
   return canvas;
 }
 
-// ============ SHARE — composite image ============
+// ============ SHARE — website URL only ============
 
-document.getElementById('share-letter').addEventListener('click', (e) => {
+document.getElementById('btn-share').addEventListener('click', async (e) => {
   e.stopPropagation();
-  shareAll();
+  const toast = document.getElementById('share-toast');
+  const siteUrl = window.location.origin + window.location.pathname;
+
+  // Try native share (mobile)
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Lover Letter', url: siteUrl });
+      return;
+    } catch (_) {}
+  }
+
+  // Fallback: copy URL
+  try {
+    await navigator.clipboard.writeText(siteUrl);
+    toast.textContent = 'Link copied';
+  } catch (_) {
+    toast.textContent = siteUrl;
+  }
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 2200);
 });
 
-async function shareAll() {
+// ============ SEND — composite letter + photobooth to recipient ============
+
+document.getElementById('btn-send').addEventListener('click', async (e) => {
+  e.stopPropagation();
   const toast = document.getElementById('share-toast');
 
   const letterCanvas = renderLetterCanvas();
-
   let boothCanvas = null;
   if (state.hasPhotos) {
     boothCanvas = await renderPhotoboothCanvas();
@@ -852,43 +871,40 @@ async function shareAll() {
   const composite = createCompositeImage(letterCanvas, boothCanvas);
   const blob = await new Promise(r => composite.toBlob(r, 'image/png'));
 
-  // Build share URL
-  const shareData = {
-    n: state.partnerName,
-    s: state.senderName,
-    d: document.getElementById('together-date').value,
-    l: state.letterContent,
-  };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
-  const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
-
-  // Try native Web Share API
+  // Try native share with image (mobile)
   if (navigator.share && navigator.canShare) {
     const file = new File([blob], 'lover-letter.png', { type: 'image/png' });
-    const data = { files: [file], title: 'Lover Letter', url: shareUrl };
-
+    const data = { files: [file], title: 'Lover Letter' };
     if (navigator.canShare(data)) {
       try {
         await navigator.share(data);
         return;
-      } catch (_) {
-        // Fall through to download
-      }
+      } catch (_) {}
     }
   }
 
-  // Fallback: copy link only
-  try {
-    await navigator.clipboard.writeText(shareUrl);
-    toast.textContent = 'Link copied';
-  } catch (_) {
-    toast.textContent = 'Share link ready';
+  // Fallback: download composite
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.download = 'lover-letter.png';
+  link.href = url;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    window.open(url, '_blank');
+    toast.textContent = 'Long press image to save & send';
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 3000);
+  } else {
+    toast.textContent = 'Image saved — send it to them!';
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2500);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
-  toast.classList.add('visible');
-  setTimeout(() => {
-    toast.classList.remove('visible');
-  }, 2200);
-}
+});
 
 function createCompositeImage(letterCanvas, boothCanvas) {
   const MARGIN = 40;
