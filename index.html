@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lover Letter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Dancing+Script:wght@400;500;600;700&family=Noto+Serif+SC:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+
+  <!-- ============ LANDING / SETUP SCREEN ============ -->
+  <div id="setup-screen" class="screen active">
+    <div class="setup-container">
+      <div class="setup-stars">
+        <svg class="star star-1" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="star star-2" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="star star-3" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <h1 class="setup-title">Lover Letter</h1>
+      <p class="setup-subtitle">create your memory</p>
+
+      <form id="setup-form" class="setup-form">
+        <div class="form-group">
+          <label for="partner-name">Ta 的名字</label>
+          <input type="text" id="partner-name" placeholder="写下 ta 的名字" required />
+        </div>
+
+        <div class="form-group">
+          <label for="together-date">在一起的日期</label>
+          <input type="date" id="together-date" required />
+        </div>
+
+        <div class="form-group">
+          <label for="letter-content">写给 ta 的话</label>
+          <textarea id="letter-content" rows="4" placeholder="把想说的话写在这里..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>上传四张照片 <span class="label-hint">（用于 Photo Booth）</span></label>
+          <div class="photo-upload-grid">
+            <div class="photo-upload-slot" data-index="0">
+              <input type="file" accept="image/*" class="photo-input" />
+              <div class="photo-placeholder">
+                <span class="plus-icon">+</span>
+                <span class="slot-label">照片 1</span>
+              </div>
+              <img class="photo-preview" />
+            </div>
+            <div class="photo-upload-slot" data-index="1">
+              <input type="file" accept="image/*" class="photo-input" />
+              <div class="photo-placeholder">
+                <span class="plus-icon">+</span>
+                <span class="slot-label">照片 2</span>
+              </div>
+              <img class="photo-preview" />
+            </div>
+            <div class="photo-upload-slot" data-index="2">
+              <input type="file" accept="image/*" class="photo-input" />
+              <div class="photo-placeholder">
+                <span class="plus-icon">+</span>
+                <span class="slot-label">照片 3</span>
+              </div>
+              <img class="photo-preview" />
+            </div>
+            <div class="photo-upload-slot" data-index="3">
+              <input type="file" accept="image/*" class="photo-input" />
+              <div class="photo-placeholder">
+                <span class="plus-icon">+</span>
+                <span class="slot-label">照片 4</span>
+              </div>
+              <img class="photo-preview" />
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">生成情书</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <div id="result-screen" class="screen">
+
+    <!-- PAGE 1: LOVE LETTER -->
+    <section class="page page-letter" id="page-letter">
+      <div class="letter-bg">
+        <!-- Decorative stars -->
+        <svg class="deco-star deco-star-1" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="deco-star deco-star-2" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="deco-star deco-star-3" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="deco-star deco-star-4" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+
+        <!-- Dark red card behind the paper -->
+        <div class="letter-card-shadow"></div>
+
+        <!-- The torn paper note -->
+        <div class="letter-paper">
+          <div class="letter-date-line">
+            <span class="letter-day" id="letter-day"></span>
+            <span class="letter-month" id="letter-month"></span>
+          </div>
+          <div class="letter-greeting" id="letter-greeting"></div>
+          <div class="letter-body" id="letter-body"></div>
+          <div class="letter-days" id="letter-days"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: PHOTO BOOTH -->
+    <section class="page page-photobooth" id="page-photobooth">
+      <div class="photobooth-bg">
+        <!-- Envelope decoration -->
+        <div class="envelope envelope-back"></div>
+        <div class="envelope envelope-front"></div>
+
+        <!-- Photo booth strip -->
+        <div class="photobooth-strip">
+          <div class="strip-header">PHOTO BOOTH</div>
+          <div class="strip-photos">
+            <div class="strip-photo" id="strip-photo-0"></div>
+            <div class="strip-photo" id="strip-photo-1"></div>
+            <div class="strip-photo" id="strip-photo-2"></div>
+            <div class="strip-photo" id="strip-photo-3"></div>
+          </div>
+          <div class="strip-footer">
+            <span class="strip-caption" id="strip-caption"></span>
+          </div>
+        </div>
+
+        <!-- Handwritten text overlay -->
+        <div class="photobooth-text" id="photobooth-text"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: POLAROID MEMORY -->
+    <section class="page page-memory" id="page-memory">
+      <div class="memory-bg">
+        <!-- Date display -->
+        <div class="memory-date">
+          <span class="memory-day-num" id="memory-day-num"></span>
+          <span class="memory-month-text" id="memory-month-text"></span>
+        </div>
+
+        <!-- Envelope + letter -->
+        <div class="memory-envelope-scene">
+          <div class="memory-envelope"></div>
+          <div class="memory-note" id="memory-note"></div>
+        </div>
+
+        <!-- Polaroid photo -->
+        <div class="memory-polaroid">
+          <div class="memory-polaroid-img" id="memory-polaroid-img"></div>
+          <div class="memory-polaroid-label" id="memory-polaroid-label"></div>
+        </div>
+
+        <!-- Bottom quote -->
+        <div class="memory-quote" id="memory-quote"></div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="page-nav">
+      <button class="nav-dot active" data-page="0"></button>
+      <button class="nav-dot" data-page="1"></button>
+      <button class="nav-dot" data-page="2"></button>
+    </nav>
+
+    <!-- Back button -->
+    <button class="back-btn" id="back-btn">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
