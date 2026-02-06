@@ -1,5 +1,5 @@
 /* ============================================
-   LOVER LETTER — Main Application Logic
+   LOVE LETTER — Main Application Logic
    Flat-lay layout with tap-to-expand interaction
    ============================================ */
 
@@ -42,41 +42,64 @@ const expandLetterPanel = document.getElementById('expand-letter-panel');
 const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel');
 
 // ============ TYPEWRITER SOUND ============
-// Optimized: pre-decoded AudioBuffer for instant playback, no per-keystroke node creation overhead
+// Pre-decoded AudioBuffer for instant playback
 
 let audioCtx = null;
-let clickBuffer = null; // pre-decoded AudioBuffer
+let clickBuffer = null;
+let audioReady = false;
 
 function initAudio() {
   if (audioCtx) return audioCtx;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // Pre-generate click sound as AudioBuffer
     const sr = audioCtx.sampleRate;
-    const len = Math.floor(sr * 0.025); // 25ms click
+    const len = Math.floor(sr * 0.03); // 30ms click
     const buf = audioCtx.createBuffer(1, len, sr);
-    const data = buf.getChannelData(0);
+    const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) {
       const t = i / sr;
-      const env = Math.exp(-t * 180);
-      data[i] = (Math.sin(t * 1800 * 6.283) * 0.5 + (Math.random() - 0.5) * 0.2) * env * 0.08;
+      const env = Math.exp(-t * 150);
+      // Lower pitch: 600Hz base tone
+      d[i] = (Math.sin(t * 600 * 6.283) * 0.4 + (Math.random() - 0.5) * 0.15) * env * 0.1;
     }
     clickBuffer = buf;
   } catch (_) {}
   return audioCtx;
 }
 
-// Unlock on first user gesture (iOS requires touchend)
+// Unlock on first user gesture — must create context + resume + play within gesture
 function unlockAudio() {
   const ctx = initAudio();
-  if (ctx && ctx.state === 'suspended') ctx.resume();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => { audioReady = true; });
+  } else {
+    audioReady = true;
+  }
+  // Play a silent buffer to fully activate the audio pipeline on iOS
+  if (clickBuffer) {
+    try {
+      const src = ctx.createBufferSource();
+      src.buffer = clickBuffer;
+      const g = ctx.createGain();
+      g.gain.value = 0.001; // near-silent
+      src.connect(g);
+      g.connect(ctx.destination);
+      src.start();
+    } catch (_) {}
+  }
 }
+// iOS needs touchend; also listen on click and keydown for all platforms
 document.addEventListener('touchend', unlockAudio, { passive: true });
 document.addEventListener('click', unlockAudio);
+document.addEventListener('keydown', unlockAudio);
 
 function playTypeClick() {
   if (!audioCtx || !clickBuffer) { initAudio(); return; }
-  if (audioCtx.state === 'suspended') { audioCtx.resume(); return; }
+  if (!audioReady) {
+    if (audioCtx.state === 'suspended') audioCtx.resume().then(() => { audioReady = true; });
+    return;
+  }
   try {
     const src = audioCtx.createBufferSource();
     src.buffer = clickBuffer;
@@ -674,7 +697,7 @@ async function renderPhotoboothCanvas() {
   // Logo
   ctx.font = 'italic 20px "Cormorant Garamond", Georgia, serif';
   ctx.fillStyle = INK;
-  ctx.fillText('Lover Letter', STRIP_W / 2, footerY + 30);
+  ctx.fillText('Love Letter', STRIP_W / 2, footerY + 30);
 
   // Days
   const daysSince = calculateDaysTogether(state.togetherDate);
@@ -695,7 +718,7 @@ document.getElementById('btn-share').addEventListener('click', async (e) => {
   // Try native share (mobile)
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'Lover Letter', url: siteUrl });
+      await navigator.share({ title: 'Love Letter', url: siteUrl });
       return;
     } catch (_) {}
   }
@@ -729,7 +752,7 @@ document.getElementById('btn-send').addEventListener('click', async (e) => {
   // Try native share with image (mobile)
   if (navigator.share && navigator.canShare) {
     const file = new File([blob], 'lover-letter.png', { type: 'image/png' });
-    const data = { files: [file], title: 'Lover Letter' };
+    const data = { files: [file], title: 'Love Letter' };
     if (navigator.canShare(data)) {
       try {
         await navigator.share(data);
