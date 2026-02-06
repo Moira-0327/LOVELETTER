@@ -42,151 +42,47 @@ const expandLetterPanel = document.getElementById('expand-letter-panel');
 const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel');
 
 // ============ TYPEWRITER SOUND ============
-// Hybrid approach: Web Audio API + HTML Audio fallback for mobile
-// iOS silent switch blocks Web Audio, so we try both methods
+// Optimized: pre-decoded AudioBuffer for instant playback, no per-keystroke node creation overhead
 
 let audioCtx = null;
-let audioUnlocked = false;
-let useHTMLAudio = false; // fallback flag
+let clickBuffer = null; // pre-decoded AudioBuffer
 
-// --- Web Audio approach ---
-function ensureAudioContext() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (_) {
-      useHTMLAudio = true;
-      return null;
+function initAudio() {
+  if (audioCtx) return audioCtx;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Pre-generate click sound as AudioBuffer
+    const sr = audioCtx.sampleRate;
+    const len = Math.floor(sr * 0.025); // 25ms click
+    const buf = audioCtx.createBuffer(1, len, sr);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const t = i / sr;
+      const env = Math.exp(-t * 180);
+      data[i] = (Math.sin(t * 1800 * 6.283) * 0.5 + (Math.random() - 0.5) * 0.2) * env * 0.08;
     }
-  }
+    clickBuffer = buf;
+  } catch (_) {}
   return audioCtx;
 }
 
-// --- HTML Audio fallback (works with iOS silent mode in some cases) ---
-// Generate a tiny WAV click sound programmatically
-function generateClickWAV() {
-  const sampleRate = 22050;
-  const duration = 0.03;
-  const samples = Math.floor(sampleRate * duration);
-  const buffer = new ArrayBuffer(44 + samples * 2);
-  const view = new DataView(buffer);
-
-  // WAV header
-  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
-  writeStr(0, 'RIFF');
-  view.setUint32(4, 36 + samples * 2, true);
-  writeStr(8, 'WAVE');
-  writeStr(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  writeStr(36, 'data');
-  view.setUint32(40, samples * 2, true);
-
-  // Generate a short percussive click
-  for (let i = 0; i < samples; i++) {
-    const t = i / sampleRate;
-    const env = Math.exp(-t * 150); // fast decay
-    const wave = Math.sin(t * 2000 * Math.PI * 2) * 0.4 + (Math.random() - 0.5) * 0.3;
-    const sample = Math.max(-1, Math.min(1, wave * env));
-    view.setInt16(44 + i * 2, sample * 32767, true);
-  }
-
-  const blob = new Blob([buffer], { type: 'audio/wav' });
-  return URL.createObjectURL(blob);
+// Unlock on first user gesture (iOS requires touchend)
+function unlockAudio() {
+  const ctx = initAudio();
+  if (ctx && ctx.state === 'suspended') ctx.resume();
 }
-
-const clickSoundURL = generateClickWAV();
-
-// Pool of Audio elements for rapid playback
-const AUDIO_POOL_SIZE = 6;
-const audioPool = [];
-let poolIdx = 0;
-
-function initAudioPool() {
-  for (let i = 0; i < AUDIO_POOL_SIZE; i++) {
-    const a = new Audio(clickSoundURL);
-    a.volume = 0.2;
-    a.preload = 'auto';
-    audioPool.push(a);
-  }
-}
-initAudioPool();
-
-// Unlock audio on user gesture — try BOTH Web Audio + HTML Audio
-function tryUnlockAudio() {
-  if (audioUnlocked) return;
-
-  // Unlock HTML Audio pool
-  audioPool.forEach(a => {
-    a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(() => {});
-  });
-
-  // Unlock Web Audio
-  const ctx = ensureAudioContext();
-  if (ctx) {
-    if (ctx.state === 'suspended') ctx.resume();
-    try {
-      const buf = ctx.createBuffer(1, 1, 22050);
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
-      src.connect(ctx.destination);
-      src.start(0);
-    } catch (_) {}
-  }
-
-  audioUnlocked = true;
-}
-
-// Must use touchend for iOS (touchstart doesn't count as user gesture for audio)
-document.addEventListener('touchend', tryUnlockAudio, { passive: true });
-document.addEventListener('click', tryUnlockAudio);
-document.addEventListener('keydown', tryUnlockAudio);
+document.addEventListener('touchend', unlockAudio, { passive: true });
+document.addEventListener('click', unlockAudio);
 
 function playTypeClick() {
-  // Try Web Audio first (lower latency)
-  let webAudioPlayed = false;
-  const ctx = ensureAudioContext();
-  if (ctx && ctx.state === 'running') {
-    try {
-      const t = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const filter = ctx.createBiquadFilter();
-
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
-      osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
-
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(2000, t);
-      filter.Q.setValueAtTime(0.8, t);
-
-      gain.gain.setValueAtTime(0.06 + Math.random() * 0.02, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + 0.05);
-      webAudioPlayed = true;
-    } catch (_) {}
-  }
-
-  // Also play via HTML Audio (as fallback / for iOS silent mode)
-  if (!webAudioPlayed || useHTMLAudio) {
-    try {
-      const a = audioPool[poolIdx % AUDIO_POOL_SIZE];
-      a.currentTime = 0;
-      a.play().catch(() => {});
-      poolIdx++;
-    } catch (_) {}
-  }
+  if (!audioCtx || !clickBuffer) { initAudio(); return; }
+  if (audioCtx.state === 'suspended') { audioCtx.resume(); return; }
+  try {
+    const src = audioCtx.createBufferSource();
+    src.buffer = clickBuffer;
+    src.connect(audioCtx.destination);
+    src.start();
+  } catch (_) {}
 }
 
 // ============ INIT ============
@@ -197,73 +93,28 @@ generatePaperGrain();
 
 function generatePaperGrain() {
   const canvas = document.createElement('canvas');
-  const size = 400;
+  const size = 200; // smaller = faster
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  // Base pixel noise
+  // Pixel noise only — lightweight
   const imageData = ctx.createImageData(size, size);
   for (let i = 0; i < imageData.data.length; i += 4) {
     const v = 190 + Math.random() * 40;
     imageData.data[i] = v;
     imageData.data[i + 1] = v * 0.93;
     imageData.data[i + 2] = v * 0.82;
-    imageData.data[i + 3] = 15;
+    imageData.data[i + 3] = 14;
   }
   ctx.putImageData(imageData, 0, 0);
 
-  // Fiber lines
-  ctx.strokeStyle = 'rgba(170, 140, 90, 0.04)';
-  for (let y = 0; y < size; y += 4) {
-    ctx.lineWidth = 0.4 + Math.random() * 0.4;
+  // A few foxing spots
+  for (let s = 0; s < 12; s++) {
+    ctx.fillStyle = `rgba(150,120,70,${0.03 + Math.random() * 0.05})`;
     ctx.beginPath();
-    ctx.moveTo(0, y);
-    for (let x = 0; x < size; x += 10) {
-      ctx.lineTo(x + 10, y + (Math.random() - 0.5) * 0.6);
-    }
-    ctx.stroke();
-  }
-
-  // Foxing spots
-  for (let s = 0; s < 30; s++) {
-    const sx = Math.random() * size;
-    const sy = Math.random() * size;
-    const sr = 1 + Math.random() * 3;
-    const alpha = 0.03 + Math.random() * 0.06;
-    ctx.fillStyle = `rgba(${140 + Math.random() * 40}, ${110 + Math.random() * 30}, ${60 + Math.random() * 30}, ${alpha})`;
-    ctx.beginPath();
-    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.arc(Math.random() * size, Math.random() * size, 1 + Math.random() * 3, 0, 6.283);
     ctx.fill();
-  }
-
-  // Dark speckles
-  for (let s = 0; s < 80; s++) {
-    const sx = Math.random() * size;
-    const sy = Math.random() * size;
-    const sr = 0.2 + Math.random() * 0.5;
-    ctx.fillStyle = `rgba(${90 + Math.random() * 40}, ${70 + Math.random() * 30}, ${40 + Math.random() * 20}, ${0.06 + Math.random() * 0.08})`;
-    ctx.beginPath();
-    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Fiber strands
-  for (let f = 0; f < 8; f++) {
-    const fx = Math.random() * size;
-    const fy = Math.random() * size;
-    const angle = Math.random() * Math.PI;
-    const len = 10 + Math.random() * 25;
-    ctx.strokeStyle = `rgba(${150 + Math.random() * 40}, ${120 + Math.random() * 30}, ${70 + Math.random() * 30}, ${0.04 + Math.random() * 0.04})`;
-    ctx.lineWidth = 0.3 + Math.random() * 0.3;
-    ctx.beginPath();
-    ctx.moveTo(fx, fy);
-    const ex = fx + Math.cos(angle) * len;
-    const ey = fy + Math.sin(angle) * len;
-    const cpx = (fx + ex) / 2 + (Math.random() - 0.5) * 6;
-    const cpy = (fy + ey) / 2 + (Math.random() - 0.5) * 6;
-    ctx.quadraticCurveTo(cpx, cpy, ex, ey);
-    ctx.stroke();
   }
 
   const dataUrl = canvas.toDataURL('image/png');
@@ -519,29 +370,33 @@ async function startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greetin
 function typeText(element, text, baseSpeed) {
   return new Promise((resolve) => {
     let i = 0;
+    let nextTime = 0;
     element.textContent = '';
 
-    function tick() {
+    function tick(now) {
       if (!state.typingActive || i >= text.length) {
         element.textContent = text;
         resolve();
         return;
       }
 
-      element.textContent += text.charAt(i);
-      playTypeClick();
-      i++;
+      if (now >= nextTime) {
+        element.textContent += text.charAt(i);
+        playTypeClick();
 
-      let nextDelay = baseSpeed + Math.random() * 25 - 12;
-      const char = text.charAt(i - 1);
-      if (char === '.' || char === '!' || char === '?') nextDelay += 200;
-      else if (char === ',') nextDelay += 100;
-      else if (char === '\n') nextDelay += 150;
+        const char = text.charAt(i);
+        let gap = baseSpeed + Math.random() * 20 - 10;
+        if (char === '.' || char === '!' || char === '?') gap += 180;
+        else if (char === ',') gap += 80;
+        else if (char === '\n') gap += 120;
+        nextTime = now + gap;
+        i++;
+      }
 
-      setTimeout(tick, nextDelay);
+      requestAnimationFrame(tick);
     }
 
-    tick();
+    requestAnimationFrame(tick);
   });
 }
 
