@@ -4,25 +4,24 @@
    ============================================ */
 
 :root {
-  --accent: #C0392B;
-  --accent-deep: #961C14;
-  --accent-light: #D4544A;
-  --accent-muted: #D4817A;
+  --accent: #165dad;
+  --accent-deep: #0F4280;
+  --accent-light: #4A89C4;
+  --accent-muted: #8AACC8;
   --cream: #FDF6F2;
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #C0392B;
-  --ink-light: #D4544A;
-  --text-dark: #2A1A1A;
-  --text-muted: #8A7A76;
+  --ink: #1A3D5E;
+  --ink-light: #3A6080;
+  --text-dark: #165dad;
+  --text-muted: #7A8B96;
   --paper: #EAE2D3;
   --pink: #DFC8CD;
-  --pink-dark: #C49090;
+  --pink-dark: #C9A8B0;
 
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
-  --font-script: 'Mrs Saint Delafield', cursive;
   --font-ui: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
 
   --page-width: min(100vw, 430px);
@@ -73,6 +72,23 @@ html, body {
   scrollbar-width: none;
 }
 .setup-container::-webkit-scrollbar { display: none; }
+
+.setup-hearts {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 80px;
+  height: 80px;
+}
+
+.heart {
+  position: absolute;
+  color: var(--pink-dark);
+  opacity: 0.55;
+}
+.heart-1 { width: 42px; top: -2px; left: -4px; transform: rotate(-15deg); }
+.heart-2 { width: 26px; top: 44px; left: 54px; transform: rotate(12deg); }
+.heart-3 { width: 34px; top: 6px; left: 60px; transform: rotate(-5deg); }
 
 .setup-title {
   font-family: var(--font-serif);
@@ -303,7 +319,7 @@ html, body {
   background: var(--accent-deep);
   border-radius: 2px;
   transform: rotate(-1.2deg);
-  box-shadow: 0 8px 30px rgba(150, 28, 20, 0.3);
+  box-shadow: 0 8px 30px rgba(22, 93, 173, 0.25);
   z-index: 1;
 }
 
@@ -363,21 +379,21 @@ html, body {
 /* Vintage postmark stamp */
 .postmark {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 76px;
-  height: 76px;
-  color: var(--ink);
-  opacity: 0.7;
+  top: 8px;
+  right: 8px;
+  width: 52px;
+  height: 52px;
+  color: var(--accent-muted);
+  opacity: 0.55;
   z-index: 3;
   transform: rotate(12deg);
 }
 
 .postmark-expanded {
-  width: 100px;
-  height: 100px;
-  top: 12px;
-  right: 12px;
+  width: 72px;
+  height: 72px;
+  top: 14px;
+  right: 14px;
 }
 
 .letter-inner {
@@ -391,6 +407,31 @@ html, body {
   overflow: hidden;
 }
 
+.letter-date-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.letter-day {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.letter-month {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  text-transform: lowercase;
+  position: relative;
+  top: -2px;
+}
 
 .letter-greeting {
   font-family: var(--font-typewriter);
@@ -443,6 +484,7 @@ html, body {
 .postmark {
   filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='r'><feTurbulence baseFrequency='0.4' numOctaves='2' seed='3'/><feDisplacementMap in='SourceGraphic' scale='1.5'/></filter></svg>#r");
 }
+
 
 /* Typewriter cursor */
 .typing-cursor::after {
@@ -509,93 +551,20 @@ html, body {
   margin-top: 20px;
 }
 
-.letter-seal-date {
+.letter-days {
   font-family: var(--font-typewriter);
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-muted);
   letter-spacing: 2px;
-  text-transform: uppercase;
+  margin-top: auto;
+  padding-top: 8px;
   text-align: right;
-  margin-top: 4px;
   opacity: 0;
   transition: opacity 0.6s ease;
 }
 
-.letter-seal-date.visible {
+.letter-days.visible {
   opacity: 1;
-}
-
-.expand-letter-paper .letter-seal-date {
-  font-size: 11px;
-}
-
-/* Postage stamp — days of us (flat-lay scene) */
-.days-stamp {
-  --scallop-r: 3px;
-  --scallop-s: 9px;
-  position: absolute;
-  z-index: 12;
-  left: 7%;
-  bottom: 14%;
-  width: 80px;
-  height: 88px;
-  padding: 6px;
-  background: var(--cream);
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(-6deg);
-  box-shadow: 1px 2px 8px rgba(0,0,0,0.12);
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  animation: fadeInUp 0.8s ease 0.7s both;
-  -webkit-mask:
-    radial-gradient(var(--scallop-r) at 50% var(--scallop-r), #0000 98%, #000) 0 calc(-1 * var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
-    radial-gradient(var(--scallop-r) at 50% calc(100% - var(--scallop-r)), #0000 98%, #000) 0 calc(100% + var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
-    radial-gradient(var(--scallop-r) at var(--scallop-r) 50%, #0000 98%, #000) calc(-1 * var(--scallop-r)) 0 / 51% var(--scallop-s) repeat-y,
-    radial-gradient(var(--scallop-r) at calc(100% - var(--scallop-r)) 50%, #0000 98%, #000) calc(100% + var(--scallop-r)) 0 / 51% var(--scallop-s) repeat-y;
-  -webkit-mask-composite: source-in;
-  mask:
-    radial-gradient(var(--scallop-r) at 50% var(--scallop-r), #0000 98%, #000) 0 calc(-1 * var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
-    radial-gradient(var(--scallop-r) at 50% calc(100% - var(--scallop-r)), #0000 98%, #000) 0 calc(100% + var(--scallop-r)) / var(--scallop-s) 51% repeat-x,
-    radial-gradient(var(--scallop-r) at var(--scallop-r) 50%, #0000 98%, #000) calc(-1 * var(--scallop-r)) 0 / 51% var(--scallop-s) repeat-y,
-    radial-gradient(var(--scallop-r) at calc(100% - var(--scallop-r)) 50%, #0000 98%, #000) calc(100% + var(--scallop-r)) 0 / 51% var(--scallop-s) repeat-y;
-  mask-composite: intersect;
-}
-
-.days-stamp.visible {
-  opacity: 1;
-}
-
-.days-stamp-inner {
-  width: 100%;
-  height: 100%;
-  background: rgba(192, 57, 43, 0.10);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px;
-}
-
-.stamp-heart {
-  width: 28px;
-  height: 28px;
-  color: var(--ink);
-  opacity: 0.55;
-}
-
-.stamp-text {
-  font-family: var(--font-typewriter);
-  font-size: 6.5px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  line-height: 1;
-  color: var(--ink);
-  opacity: 0.7;
-  text-shadow: 0 0 0.5px currentColor;
 }
 
 /* ============ PHOTOBOOTH STRIP (flat-lay, tilted on top of letter) ============ */
@@ -794,6 +763,14 @@ html, body {
   gap: 16px;
 }
 
+.expand-letter-paper .letter-day {
+  font-size: 42px;
+}
+
+.expand-letter-paper .letter-month {
+  font-size: 14px;
+}
+
 .expand-letter-paper .letter-greeting {
   font-size: 18px;
 }
@@ -802,6 +779,10 @@ html, body {
   font-size: 15px;
   line-height: 2;
   overflow: visible;
+}
+
+.expand-letter-paper .letter-days {
+  font-size: 11px;
 }
 
 /* ============ EXPANDED PHOTOBOOTH ============ */
@@ -893,10 +874,12 @@ html, body {
 @media (max-width: 380px) {
   .letter-paper { width: 74%; height: 56%; }
   .letter-inner { padding: 22px 18px 16px; }
+  .letter-day { font-size: 28px; }
   .letter-body { font-size: 11px; }
   .photobooth-strip { width: 34%; }
   .expand-letter-paper { width: 92%; }
   .expand-letter-paper .letter-inner { padding: 28px 24px 22px; }
+  .expand-letter-paper .letter-day { font-size: 36px; }
   .expand-letter-paper .letter-body { font-size: 14px; }
   .expand-photobooth-strip { width: 56%; }
 }
