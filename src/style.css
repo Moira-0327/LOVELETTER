@@ -4,26 +4,24 @@
    ============================================ */
 
 :root {
-  --maroon: #6B1525;
-  --maroon-deep: #4A0E1A;
-  --maroon-light: #8B2035;
+  --accent: #165dad;
+  --accent-deep: #0F4280;
+  --accent-light: #4A89C4;
+  --accent-muted: #8AACC8;
   --cream: #FDF6F2;
-  --cream-dark: #F5EDE0;
+  --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #5C1018;
-  --ink-light: #8B3040;
-  --text-dark: #2C1810;
-  --text-muted: #8C7B70;
+  --ink: #1A3D5E;
+  --ink-light: #3A6080;
+  --text-dark: #1A2A38;
+  --text-muted: #7A8B96;
   --paper: #EAE2D3;
-  --blue: #8099B0;
-  --blue-deep: #5C7A94;
   --pink: #DFC8CD;
   --pink-dark: #C9A8B0;
 
-  --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
-  --font-heading: 'Instrument Serif', Georgia, serif;
   --font-ui: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
 
   --page-width: min(100vw, 430px);
@@ -86,18 +84,18 @@ html, body {
 .heart {
   position: absolute;
   color: var(--pink-dark);
-  opacity: 0.5;
+  opacity: 0.55;
 }
-.heart-1 { width: 32px; top: 0; left: 0; transform: rotate(-15deg); }
-.heart-2 { width: 20px; top: 38px; left: 50px; transform: rotate(10deg); }
-.heart-3 { width: 26px; top: 8px; left: 58px; transform: rotate(-5deg); }
+.heart-1 { width: 42px; top: -2px; left: -4px; transform: rotate(-15deg); }
+.heart-2 { width: 26px; top: 44px; left: 54px; transform: rotate(12deg); }
+.heart-3 { width: 34px; top: 6px; left: 60px; transform: rotate(-5deg); }
 
 .setup-title {
-  font-family: var(--font-heading);
-  font-size: 46px;
-  font-weight: 400;
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 500;
   font-style: italic;
-  color: var(--maroon);
+  color: var(--accent);
   text-align: center;
   margin-top: 30px;
   letter-spacing: -0.5px;
@@ -178,7 +176,7 @@ html, body {
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-bottom-color: var(--maroon);
+  border-bottom-color: var(--accent);
 }
 
 .form-group textarea {
@@ -189,7 +187,7 @@ html, body {
 }
 
 .form-group textarea:focus {
-  border-color: var(--maroon);
+  border-color: var(--accent);
 }
 
 /* Photo upload grid */
@@ -265,7 +263,7 @@ html, body {
   letter-spacing: 4px;
   text-transform: uppercase;
   color: var(--cream);
-  background: var(--maroon);
+  background: var(--accent);
   border: none;
   padding: 16px 48px;
   margin-top: 10px;
@@ -274,7 +272,7 @@ html, body {
   align-self: center;
 }
 
-.submit-btn:hover { background: var(--maroon-deep); }
+.submit-btn:hover { background: var(--accent-deep); }
 .submit-btn:active { transform: scale(0.98); }
 
 /* ============ RESULT SCREEN — FLAT-LAY ============ */
@@ -300,7 +298,7 @@ html, body {
 /* Decorative stars */
 .deco-star {
   position: absolute;
-  color: var(--blue);
+  color: var(--accent-muted);
   opacity: 0.35;
   z-index: 2;
   animation: floatStar 4s ease-in-out infinite;
@@ -318,10 +316,10 @@ html, body {
   position: absolute;
   width: 72%;
   height: 55%;
-  background: var(--blue-deep);
+  background: var(--accent-deep);
   border-radius: 2px;
   transform: rotate(-1.2deg);
-  box-shadow: 0 8px 30px rgba(92, 122, 148, 0.3);
+  box-shadow: 0 8px 30px rgba(22, 93, 173, 0.25);
   z-index: 1;
 }
 
@@ -385,7 +383,7 @@ html, body {
   right: 8px;
   width: 52px;
   height: 52px;
-  color: var(--blue);
+  color: var(--accent-muted);
   opacity: 0.55;
   z-index: 3;
   transform: rotate(12deg);
@@ -600,7 +598,7 @@ html, body {
 }
 
 .save-btn:hover {
-  border-color: var(--maroon);
+  border-color: var(--accent);
   background: rgba(255, 248, 240, 1);
 }
 
@@ -610,7 +608,7 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--blue-deep);
+  background: var(--accent-deep);
   color: var(--cream);
   font-family: var(--font-ui);
   font-size: 11px;

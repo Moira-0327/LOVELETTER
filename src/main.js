@@ -463,8 +463,8 @@ function delay(ms) {
 
 const PAPER_COLOR = '#EAE2D3';
 const CREAM = '#FFF8F0';
-const INK = '#5C1018';
-const MUTED = '#8C7B70';
+const INK = '#1A3D5E';
+const MUTED = '#7A8B96';
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -593,14 +593,14 @@ function renderLetterCanvas() {
   let y = pad;
 
   // Date
-  ctx.font = '300 72px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '300 72px "Playfair Display", Georgia, serif';
   ctx.fillStyle = INK;
   ctx.textBaseline = 'top';
   const dayText = document.getElementById('letter-day').textContent;
   ctx.fillText(dayText, pad, y);
   const dayWidth = ctx.measureText(dayText).width;
 
-  ctx.font = '300 22px "Cormorant Garamond", Georgia, serif';
+  ctx.font = '300 22px "Playfair Display", Georgia, serif';
   ctx.fillStyle = MUTED;
   ctx.fillText(document.getElementById('letter-month').textContent, pad + dayWidth + 12, y + 42);
   y += 100;
@@ -667,7 +667,7 @@ function renderLetterCanvas() {
   ctx.save();
   ctx.translate(stampX, stampY);
   ctx.rotate(0.2);
-  ctx.strokeStyle = '#8099B0';
+  ctx.strokeStyle = '#6A9BC5';
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0, 0, stampR, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 1;
@@ -675,7 +675,7 @@ function renderLetterCanvas() {
   ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(-stampR - 6, 0); ctx.lineTo(-stampR, 0); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(stampR, 0); ctx.lineTo(stampR + 6, 0); ctx.stroke();
-  ctx.fillStyle = '#8099B0';
+  ctx.fillStyle = '#6A9BC5';
   ctx.font = '400 8px "DM Sans", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -756,7 +756,7 @@ async function renderPhotoboothCanvas() {
   ctx.fillText(caption, STRIP_W / 2, footerY);
 
   // Logo
-  ctx.font = 'italic 22px "Instrument Serif", Georgia, serif';
+  ctx.font = 'italic 22px "Playfair Display", Georgia, serif';
   ctx.fillStyle = INK;
   ctx.fillText('Love Letter', STRIP_W / 2, footerY + 30);
 
@@ -856,7 +856,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
     composite.height = h * SCALE;
     const ctx = composite.getContext('2d');
     ctx.scale(SCALE, SCALE);
-    ctx.fillStyle = '#5C7A94';
+    ctx.fillStyle = '#165dad';
     ctx.fillRect(0, 0, w, h);
     ctx.drawImage(letterCanvas, 0, 0, letterCanvas.width, letterCanvas.height,
       MARGIN, MARGIN, letterCanvas.width / SCALE, letterCanvas.height / SCALE);
@@ -882,7 +882,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
   ctx.scale(SCALE, SCALE);
 
   // Maroon background
-  ctx.fillStyle = '#5C7A94';
+  ctx.fillStyle = '#165dad';
   ctx.fillRect(0, 0, totalW, totalH);
 
   // Letter — left side
