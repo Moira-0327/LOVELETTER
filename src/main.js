@@ -223,6 +223,11 @@ function renderResult() {
   const month = MONTHS_EN[today.getMonth()];
   const daysSince = calculateDaysTogether(state.togetherDate);
 
+  // --- Postmark stamp date ---
+  const stampDate = `${month.toUpperCase().slice(0, 3)} ${day}, '${String(today.getFullYear()).slice(2)}`;
+  const stampEl = document.getElementById('stamp-date');
+  if (stampEl) stampEl.textContent = stampDate;
+
   // --- Flat-lay letter thumbnail (static text, no typewriter) ---
   document.getElementById('letter-day').textContent = day;
   document.getElementById('letter-month').textContent = `\u2014 ${month}`;
@@ -322,6 +327,8 @@ function expandLetter() {
   // Fill expand panel
   document.getElementById('expand-letter-day').textContent = day;
   document.getElementById('expand-letter-month').textContent = `\u2014 ${month}`;
+  const expandStamp = document.getElementById('expand-stamp-date');
+  if (expandStamp) expandStamp.textContent = `${month.toUpperCase().slice(0, 3)} ${day}, '${String(today.getFullYear()).slice(2)}`;
 
   const greetingEl = document.getElementById('expand-letter-greeting');
   const bodyEl = document.getElementById('expand-letter-body');
@@ -652,6 +659,34 @@ function renderLetterCanvas() {
   ctx.textAlign = 'right';
   ctx.fillText(daysText, LETTER_W - pad, LETTER_H - pad);
   ctx.textAlign = 'left';
+
+  // Postmark stamp (top-right)
+  const stampX = LETTER_W - pad - 50;
+  const stampY = pad + 10;
+  const stampR = 42;
+  ctx.save();
+  ctx.translate(stampX, stampY);
+  ctx.rotate(0.2);
+  ctx.strokeStyle = '#8099B0';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0, 0, stampR, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(0, 0, stampR - 7, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(-stampR - 6, 0); ctx.lineTo(-stampR, 0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(stampR, 0); ctx.lineTo(stampR + 6, 0); ctx.stroke();
+  ctx.fillStyle = '#8099B0';
+  ctx.font = '400 8px "DM Sans", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('LOVE LETTER', 0, -16);
+  const now = new Date();
+  const stampStr = `${MONTHS_EN[now.getMonth()].toUpperCase().slice(0, 3)} ${now.getDate()}, '${String(now.getFullYear()).slice(2)}`;
+  ctx.font = '500 12px "DM Sans", sans-serif';
+  ctx.fillText(stampStr, 0, 2);
+  ctx.font = '300 7px "DM Sans", sans-serif';
+  ctx.fillText('NEW YORK, NY', 0, 18);
+  ctx.restore();
 
   return canvas;
 }

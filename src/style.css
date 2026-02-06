@@ -86,11 +86,11 @@ html, body {
 .heart {
   position: absolute;
   color: var(--pink-dark);
-  opacity: 0.4;
+  opacity: 0.5;
 }
-.heart-1 { width: 18px; top: 0; left: 0; transform: rotate(-12deg); }
-.heart-2 { width: 11px; top: 26px; left: 36px; transform: rotate(8deg); }
-.heart-3 { width: 14px; top: 6px; left: 48px; transform: rotate(-5deg); }
+.heart-1 { width: 32px; top: 0; left: 0; transform: rotate(-15deg); }
+.heart-2 { width: 20px; top: 38px; left: 50px; transform: rotate(10deg); }
+.heart-3 { width: 26px; top: 8px; left: 58px; transform: rotate(-5deg); }
 
 .setup-title {
   font-family: var(--font-heading);
@@ -376,6 +376,26 @@ html, body {
     radial-gradient(circle at 40% 65%, rgba(155, 125, 70, 0.05) 0%, transparent 8%),
     radial-gradient(ellipse at 30% 30%, rgba(180, 150, 90, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 60%, rgba(180, 150, 90, 0.05) 0%, transparent 45%);
+}
+
+/* Vintage postmark stamp */
+.postmark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 52px;
+  height: 52px;
+  color: var(--blue);
+  opacity: 0.55;
+  z-index: 3;
+  transform: rotate(12deg);
+}
+
+.postmark-expanded {
+  width: 72px;
+  height: 72px;
+  top: 14px;
+  right: 14px;
 }
 
 .letter-inner {
