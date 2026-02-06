@@ -1,7 +1,6 @@
 /* ============================================
    LOVER LETTER — Main Application Logic
-   Original 3-page layout + typewriter effect,
-   optional photobooth, save-to-image
+   Flat-lay layout with tap-to-expand interaction
    ============================================ */
 
 const MONTHS_EN = [
@@ -18,7 +17,8 @@ const state = {
   photos: [null, null, null, null],
   typingActive: false,
   hasPhotos: false,
-  activePages: [],   // which page elements are active
+  expandedPanel: null, // 'letter' | 'photobooth' | null
+  letterTyped: false,  // has typewriter already played?
 };
 
 // ============ DOM ============
@@ -28,14 +28,17 @@ const resultScreen = document.getElementById('result-screen');
 const setupForm = document.getElementById('setup-form');
 const photoSlots = document.querySelectorAll('.photo-upload-slot');
 const backBtn = document.getElementById('back-btn');
-const pageNav = document.getElementById('page-nav');
 
-const pageLetter = document.getElementById('page-letter');
-const pagePhotobooth = document.getElementById('page-photobooth');
+// Flat-lay elements
+const flatlayScene = document.getElementById('flatlay-scene');
+const letterPaper = document.getElementById('letter-paper');
+const photoboothStrip = document.getElementById('photobooth-strip-el');
+const flatlayActions = document.getElementById('flatlay-actions');
 
-let currentPage = 0;
-let pages = [];
-let navDots = [];
+// Expand overlay
+const expandBackdrop = document.getElementById('expand-backdrop');
+const expandLetterPanel = document.getElementById('expand-letter-panel');
+const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel');
 
 // ============ TYPEWRITER SOUND (Web Audio API) ============
 
@@ -55,12 +58,10 @@ function playTypeClick() {
 
     const t = ctx.currentTime;
 
-    // Short percussive click — simulates typewriter key strike
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
 
-    // Noise-like click via high-frequency square wave
     osc.type = 'square';
     osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
     osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
@@ -87,7 +88,7 @@ function playTypeClick() {
 
 generatePaperGrain();
 
-// ============ PAPER GRAIN TEXTURE (aged vintage paper) ============
+// ============ PAPER GRAIN TEXTURE ============
 
 function generatePaperGrain() {
   const canvas = document.createElement('canvas');
@@ -96,7 +97,7 @@ function generatePaperGrain() {
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
-  // Base: warm aged pixel noise
+  // Base pixel noise
   const imageData = ctx.createImageData(size, size);
   for (let i = 0; i < imageData.data.length; i += 4) {
     const v = 190 + Math.random() * 40;
@@ -107,7 +108,7 @@ function generatePaperGrain() {
   }
   ctx.putImageData(imageData, 0, 0);
 
-  // Subtle fiber lines (horizontal)
+  // Fiber lines
   ctx.strokeStyle = 'rgba(170, 140, 90, 0.04)';
   for (let y = 0; y < size; y += 4) {
     ctx.lineWidth = 0.4 + Math.random() * 0.4;
@@ -119,7 +120,7 @@ function generatePaperGrain() {
     ctx.stroke();
   }
 
-  // Foxing spots — larger age marks
+  // Foxing spots
   for (let s = 0; s < 30; s++) {
     const sx = Math.random() * size;
     const sy = Math.random() * size;
@@ -131,7 +132,7 @@ function generatePaperGrain() {
     ctx.fill();
   }
 
-  // Tiny dark speckles
+  // Dark speckles
   for (let s = 0; s < 80; s++) {
     const sx = Math.random() * size;
     const sy = Math.random() * size;
@@ -209,28 +210,29 @@ setupForm.addEventListener('submit', (e) => {
   showScreen(resultScreen);
 });
 
-// ============ RENDER RESULT ============
+// ============ RENDER RESULT (flat-lay) ============
 
 function renderResult() {
   const today = new Date();
   const day = today.getDate();
   const month = MONTHS_EN[today.getMonth()];
-  const year = today.getFullYear();
   const daysSince = calculateDaysTogether(state.togetherDate);
 
-  // --- Page 1: Love Letter (always shown) ---
+  // --- Flat-lay letter thumbnail (static text, no typewriter) ---
   document.getElementById('letter-day').textContent = day;
   document.getElementById('letter-month').textContent = `\u2014 ${month}`;
 
-  // Clear text — typewriter will fill these
-  document.getElementById('letter-greeting').textContent = '';
-  document.getElementById('letter-body').textContent = '';
-  document.getElementById('letter-days').textContent = '';
-  document.getElementById('letter-days').classList.remove('visible');
-  document.getElementById('letter-actions').classList.add('hidden');
+  const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
+  const body = state.letterContent || 'You are the most beautiful chapter in my story.';
 
-  // --- Page 2: Photo Booth (only if photos uploaded) ---
+  document.getElementById('letter-greeting').textContent = greeting;
+  document.getElementById('letter-body').textContent = body;
+  document.getElementById('letter-days').textContent = `${daysSince} days together`;
+  document.getElementById('letter-days').classList.add('visible');
+
+  // --- Photobooth strip ---
   if (state.hasPhotos) {
+    photoboothStrip.style.display = '';
     state.photos.forEach((photo, i) => {
       const el = document.getElementById(`strip-photo-${i}`);
       if (photo) {
@@ -242,17 +244,15 @@ function renderResult() {
 
     document.getElementById('strip-caption').textContent =
       state.partnerName ? `${state.partnerName} & me` : 'you & me';
-
-    document.getElementById('photobooth-text').textContent =
-      `${daysSince} days of love`;
+  } else {
+    photoboothStrip.style.display = 'none';
   }
 
-  // --- Build active pages array ---
-  buildActivePages();
-  showPage(0);
-
-  // Start typewriter on first page (letter)
-  startLetterTyping();
+  // Show Save/Share buttons after a short delay
+  state.letterTyped = false;
+  setTimeout(() => {
+    flatlayActions.classList.add('visible');
+  }, 1200);
 }
 
 function calculateDaysTogether(startDate) {
@@ -261,60 +261,106 @@ function calculateDaysTogether(startDate) {
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
 }
 
-// ============ DYNAMIC PAGE MANAGEMENT ============
+// ============ EXPAND / COLLAPSE ============
 
-function buildActivePages() {
-  // Letter always shown. Photobooth only if photos uploaded.
-  pages = [pageLetter];
-  if (state.hasPhotos) {
-    pagePhotobooth.style.display = '';
-    pages.push(pagePhotobooth);
-  } else {
-    pagePhotobooth.style.display = 'none';
+// Click letter thumbnail → expand letter
+letterPaper.addEventListener('click', () => {
+  if (state.expandedPanel) return;
+  expandLetter();
+});
+
+// Click photobooth thumbnail → expand photobooth
+photoboothStrip.addEventListener('click', () => {
+  if (state.expandedPanel) return;
+  expandPhotobooth();
+});
+
+// Click backdrop → collapse
+expandBackdrop.addEventListener('click', () => {
+  collapsePanel();
+});
+
+// Escape key → collapse
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.expandedPanel) {
+      collapsePanel();
+    } else if (resultScreen.classList.contains('active')) {
+      state.typingActive = false;
+      showScreen(setupScreen);
+    }
   }
+});
 
-  // Build nav dots
-  pageNav.innerHTML = '';
-  navDots = [];
-  pages.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'nav-dot';
-    dot.dataset.page = i;
-    dot.addEventListener('click', () => {
-      showPage(i);
-      if (i === 0) startLetterTyping();
-    });
-    pageNav.appendChild(dot);
-    navDots.push(dot);
-  });
-}
+function expandLetter() {
+  state.expandedPanel = 'letter';
 
-// ============ TYPEWRITER EFFECT ============
-
-async function startLetterTyping() {
-  state.typingActive = true;
-
-  const greetingEl = document.getElementById('letter-greeting');
-  const bodyEl = document.getElementById('letter-body');
-  const daysEl = document.getElementById('letter-days');
-  const actionsEl = document.getElementById('letter-actions');
-
+  const today = new Date();
+  const day = today.getDate();
+  const month = MONTHS_EN[today.getMonth()];
+  const daysSince = calculateDaysTogether(state.togetherDate);
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
   const body = state.letterContent || 'You are the most beautiful chapter in my story.';
-  const daysSince = calculateDaysTogether(state.togetherDate);
-  const daysStr = `${daysSince} days together`;
 
-  // Reset
+  // Fill expand panel
+  document.getElementById('expand-letter-day').textContent = day;
+  document.getElementById('expand-letter-month').textContent = `\u2014 ${month}`;
+
+  const greetingEl = document.getElementById('expand-letter-greeting');
+  const bodyEl = document.getElementById('expand-letter-body');
+  const daysEl = document.getElementById('expand-letter-days');
+
+  // Clear for typewriter
   greetingEl.textContent = '';
-  greetingEl.classList.remove('typing-cursor');
   bodyEl.textContent = '';
-  bodyEl.classList.remove('typing-cursor');
   daysEl.textContent = '';
   daysEl.classList.remove('visible');
-  actionsEl.classList.add('hidden');
 
-  // Wait for paper animation
-  await delay(900);
+  // Show overlay
+  expandBackdrop.classList.add('active');
+  expandLetterPanel.classList.add('active');
+
+  // Start typewriter
+  startExpandedTyping(greetingEl, bodyEl, daysEl, greeting, body, `${daysSince} days together`);
+}
+
+function expandPhotobooth() {
+  state.expandedPanel = 'photobooth';
+
+  // Fill expand panel photos
+  state.photos.forEach((photo, i) => {
+    const el = document.getElementById(`expand-strip-photo-${i}`);
+    if (photo) {
+      el.style.backgroundImage = `url(${photo})`;
+    } else {
+      el.style.background = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
+    }
+  });
+
+  document.getElementById('expand-strip-caption').textContent =
+    state.partnerName ? `${state.partnerName} & me` : 'you & me';
+
+  // Show overlay
+  expandBackdrop.classList.add('active');
+  expandPhotoboothPanel.classList.add('active');
+}
+
+function collapsePanel() {
+  state.typingActive = false;
+  state.expandedPanel = null;
+
+  expandBackdrop.classList.remove('active');
+  expandLetterPanel.classList.remove('active');
+  expandPhotoboothPanel.classList.remove('active');
+}
+
+// ============ TYPEWRITER EFFECT (in expanded letter) ============
+
+async function startExpandedTyping(greetingEl, bodyEl, daysEl, greeting, body, daysStr) {
+  state.typingActive = true;
+
+  // Wait for expand animation
+  await delay(500);
   if (!state.typingActive) return;
 
   // Type greeting
@@ -333,12 +379,11 @@ async function startLetterTyping() {
 
   await delay(500);
 
-  // Show days counter (fade in)
+  // Show days counter
   daysEl.textContent = daysStr;
   daysEl.classList.add('visible');
 
-  // Show save & share buttons
-  actionsEl.classList.remove('hidden');
+  state.letterTyped = true;
 }
 
 function typeText(element, text, baseSpeed) {
@@ -376,7 +421,7 @@ function delay(ms) {
 
 // ============ IMAGE HELPERS ============
 
-const PAPER_COLOR = '#E8D4A8';
+const PAPER_COLOR = '#EAE2D3';
 const CREAM = '#FFF8F0';
 const INK = '#5C1018';
 const MUTED = '#8C7B70';
@@ -411,17 +456,33 @@ function downloadCanvas(canvas, filename) {
 
 // ============ SAVE TO IMAGE ============
 
-// US Letter proportions
 const LETTER_W = 850;
 const LETTER_H = 1100;
 const SCALE = 3;
 
-document.getElementById('save-letter').addEventListener('click', () => {
+// Save button in flat-lay (saves composite)
+document.getElementById('save-letter').addEventListener('click', async (e) => {
+  e.stopPropagation();
+  const letterCanvas = renderLetterCanvas();
+  if (state.hasPhotos) {
+    const boothCanvas = await renderPhotoboothCanvas();
+    const composite = createCompositeImage(letterCanvas, boothCanvas);
+    downloadCanvas(composite, 'lover-letter.png');
+  } else {
+    downloadCanvas(letterCanvas, 'love-letter.png');
+  }
+});
+
+// Save in expanded letter
+document.getElementById('expand-save-letter').addEventListener('click', (e) => {
+  e.stopPropagation();
   const canvas = renderLetterCanvas();
   downloadCanvas(canvas, 'love-letter.png');
 });
 
-document.getElementById('save-photobooth').addEventListener('click', async () => {
+// Save in expanded photobooth
+document.getElementById('expand-save-photobooth').addEventListener('click', async (e) => {
+  e.stopPropagation();
   const canvas = await renderPhotoboothCanvas();
   downloadCanvas(canvas, 'photobooth.png');
 });
@@ -465,8 +526,9 @@ function renderLetterCanvas() {
   ctx.font = '300 72px "Cormorant Garamond", Georgia, serif';
   ctx.fillStyle = INK;
   ctx.textBaseline = 'top';
-  ctx.fillText(document.getElementById('letter-day').textContent, pad, y);
-  const dayWidth = ctx.measureText(document.getElementById('letter-day').textContent).width;
+  const dayText = document.getElementById('letter-day').textContent;
+  ctx.fillText(dayText, pad, y);
+  const dayWidth = ctx.measureText(dayText).width;
 
   ctx.font = '300 22px "Cormorant Garamond", Georgia, serif';
   ctx.fillStyle = MUTED;
@@ -474,18 +536,19 @@ function renderLetterCanvas() {
   y += 100;
 
   // Greeting
+  const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
   ctx.font = '28px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = INK;
-  ctx.fillText(document.getElementById('letter-greeting').textContent, pad, y);
+  ctx.fillText(greeting, pad, y);
   y += 50;
 
   // Body — word wrap
+  const body = state.letterContent || 'You are the most beautiful chapter in my story.';
   ctx.font = '22px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = INK;
   const maxWidth = LETTER_W - pad * 2;
   const lineHeight = 44;
-  const bodyText = document.getElementById('letter-body').textContent;
-  const paragraphs = bodyText.split('\n');
+  const paragraphs = body.split('\n');
 
   for (const para of paragraphs) {
     const words = para.split(' ');
@@ -504,14 +567,15 @@ function renderLetterCanvas() {
       ctx.fillText(line, pad, y);
       y += lineHeight;
     }
-    y += 8; // paragraph gap
+    y += 8;
   }
 
-  // Days counter — bottom right
+  // Days counter
+  const daysSince = calculateDaysTogether(state.togetherDate);
+  const daysText = `${daysSince} days together`;
   ctx.font = '16px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'right';
-  const daysText = document.getElementById('letter-days').textContent;
   ctx.fillText(daysText, LETTER_W - pad, LETTER_H - pad);
   ctx.textAlign = 'left';
 
@@ -524,7 +588,6 @@ async function renderPhotoboothCanvas() {
   const PHOTO_W = W - PAD * 2;
   const PHOTO_H = Math.round(PHOTO_W * 3 / 4);
   const GAP = 6;
-  const HEADER_Y = 32;
   const PHOTOS_TOP = 52;
   const H = PHOTOS_TOP + (PHOTO_H + GAP) * 4 - GAP + 50;
 
@@ -551,8 +614,6 @@ async function renderPhotoboothCanvas() {
     if (state.photos[i]) {
       try {
         const img = await loadImage(state.photos[i]);
-
-        // Draw grayscale by drawing to temp canvas with filter
         const tmp = document.createElement('canvas');
         tmp.width = PHOTO_W * SCALE;
         tmp.height = PHOTO_H * SCALE;
@@ -586,21 +647,21 @@ async function renderPhotoboothCanvas() {
 
 // ============ SHARE — composite image ============
 
-document.getElementById('share-letter').addEventListener('click', shareAll);
+document.getElementById('share-letter').addEventListener('click', (e) => {
+  e.stopPropagation();
+  shareAll();
+});
 
 async function shareAll() {
   const toast = document.getElementById('share-toast');
 
-  // Generate letter canvas
   const letterCanvas = renderLetterCanvas();
 
-  // Generate photobooth canvas if photos exist
   let boothCanvas = null;
   if (state.hasPhotos) {
     boothCanvas = await renderPhotoboothCanvas();
   }
 
-  // Composite: maroon background, letter + booth side by side or stacked
   const composite = createCompositeImage(letterCanvas, boothCanvas);
   const blob = await new Promise(r => composite.toBlob(r, 'image/png'));
 
@@ -613,7 +674,7 @@ async function shareAll() {
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
   const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
 
-  // Try native Web Share API (mobile)
+  // Try native Web Share API
   if (navigator.share && navigator.canShare) {
     const file = new File([blob], 'lover-letter.png', { type: 'image/png' });
     const data = { files: [file], title: 'Lover Letter', url: shareUrl };
@@ -621,9 +682,9 @@ async function shareAll() {
     if (navigator.canShare(data)) {
       try {
         await navigator.share(data);
-        return; // shared successfully
+        return;
       } catch (_) {
-        // User cancelled or share failed — fall through to download
+        // Fall through to download
       }
     }
   }
@@ -652,7 +713,6 @@ function createCompositeImage(letterCanvas, boothCanvas) {
   const composite = document.createElement('canvas');
 
   if (!boothCanvas) {
-    // Just letter with maroon border
     const w = letterCanvas.width / SCALE + MARGIN * 2;
     const h = letterCanvas.height / SCALE + MARGIN * 2;
     composite.width = w * SCALE;
@@ -666,13 +726,12 @@ function createCompositeImage(letterCanvas, boothCanvas) {
     return composite;
   }
 
-  // Letter + photobooth — flat lay composition
+  // Letter + photobooth flat-lay
   const lw = letterCanvas.width / SCALE;
   const lh = letterCanvas.height / SCALE;
   const bw = boothCanvas.width / SCALE;
   const bh = boothCanvas.height / SCALE;
 
-  // Scale booth to fit beside letter
   const boothScale = Math.min(lh * 0.7 / bh, (lw * 0.5) / bw);
   const sbw = bw * boothScale;
   const sbh = bh * boothScale;
@@ -689,7 +748,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
   ctx.fillStyle = '#6B1525';
   ctx.fillRect(0, 0, totalW, totalH);
 
-  // Letter — left side, slight rotation
+  // Letter — left side
   ctx.save();
   ctx.translate(MARGIN + lw / 2, MARGIN + lh / 2);
   ctx.rotate(-0.01);
@@ -701,7 +760,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
     -lw / 2, -lh / 2, lw, lh);
   ctx.restore();
 
-  // Booth strip — right side, slight rotation
+  // Booth — right side
   ctx.save();
   const bx = MARGIN * 2 + lw + sbw / 2;
   const by = totalH / 2;
@@ -726,89 +785,14 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-function showPage(index) {
-  const allPages = [pageLetter, pagePhotobooth];
-  allPages.forEach(p => p.classList.remove('active', 'exit-left'));
-
-  pages.forEach((page, i) => {
-    if (i < index) {
-      page.classList.add('exit-left');
-    } else if (i === index) {
-      page.classList.add('active');
-    }
-  });
-
-  navDots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === index);
-  });
-
-  currentPage = index;
-
-  // Adjust nav dot color for dark backgrounds (photobooth page)
-  const isDark = pages[index] === pagePhotobooth;
-  navDots.forEach(dot => {
-    dot.style.borderColor = isDark ? 'rgba(255,248,240,0.5)' : '';
-  });
-  navDots.forEach(dot => {
-    if (dot.classList.contains('active')) {
-      dot.style.borderColor = isDark ? 'var(--cream)' : '';
-      dot.style.background = isDark ? 'var(--cream)' : '';
-    }
-  });
-
-  backBtn.style.color = isDark ? 'var(--cream)' : '';
-  backBtn.style.background = isDark ? 'rgba(74, 14, 26, 0.6)' : '';
-}
-
-navDots.forEach && pageNav.addEventListener('click', () => {});
-
 backBtn.addEventListener('click', () => {
+  if (state.expandedPanel) {
+    collapsePanel();
+    return;
+  }
   state.typingActive = false;
+  flatlayActions.classList.remove('visible');
   showScreen(setupScreen);
-});
-
-// ============ SWIPE SUPPORT ============
-
-let touchStartX = 0;
-let touchEndX = 0;
-
-resultScreen.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
-
-resultScreen.addEventListener('touchend', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  handleSwipe();
-}, { passive: true });
-
-function handleSwipe() {
-  const diff = touchStartX - touchEndX;
-  const threshold = 50;
-
-  if (diff > threshold && currentPage < pages.length - 1) {
-    state.typingActive = false;
-    showPage(currentPage + 1);
-  } else if (diff < -threshold && currentPage > 0) {
-    showPage(currentPage - 1);
-    if (currentPage === 0) startLetterTyping();
-  }
-}
-
-// ============ KEYBOARD NAVIGATION ============
-
-document.addEventListener('keydown', (e) => {
-  if (!resultScreen.classList.contains('active')) return;
-
-  if (e.key === 'ArrowRight' && currentPage < pages.length - 1) {
-    state.typingActive = false;
-    showPage(currentPage + 1);
-  } else if (e.key === 'ArrowLeft' && currentPage > 0) {
-    showPage(currentPage - 1);
-    if (currentPage === 0) startLetterTyping();
-  } else if (e.key === 'Escape') {
-    state.typingActive = false;
-    showScreen(setupScreen);
-  }
 });
 
 // ============ LOAD FROM SHARE LINK ============
@@ -829,7 +813,6 @@ function decodeShareData(hash) {
   const data = decodeShareData(hash);
   if (!data) return;
 
-  // Fill form fields
   if (data.n) {
     document.getElementById('partner-name').value = data.n;
     state.partnerName = data.n;
@@ -843,7 +826,6 @@ function decodeShareData(hash) {
     state.letterContent = data.l;
   }
 
-  // Auto-render the letter
   state.hasPhotos = false;
   renderResult();
   showScreen(resultScreen);

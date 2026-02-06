@@ -79,79 +79,108 @@
     </div>
   </div>
 
-  <!-- ============ RESULT SCREEN ============ -->
+  <!-- ============ RESULT SCREEN — FLAT-LAY ============ -->
   <div id="result-screen" class="screen">
 
-    <!-- PAGE 1: LOVE LETTER -->
-    <section class="page page-letter" id="page-letter">
-      <div class="letter-bg">
-        <svg class="deco-star deco-star-1" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-        <svg class="deco-star deco-star-2" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-        <svg class="deco-star deco-star-3" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-        <svg class="deco-star deco-star-4" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    <!-- Flat-lay scene: letter + photobooth together -->
+    <div class="flatlay-scene" id="flatlay-scene">
 
-        <div class="letter-card-shadow"></div>
+      <!-- Decorative stars -->
+      <svg class="deco-star deco-star-1" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <svg class="deco-star deco-star-2" viewBox="0 0 60 60"><polygon points="30,2 36,22 57,22 40,34 46,55 30,43 14,55 20,34 3,22 24,22" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <svg class="deco-star deco-star-3" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <svg class="deco-star deco-star-4" viewBox="0 0 60 60"><polygon points="30,8 33,20 46,20 36,28 39,40 30,33 21,40 24,28 14,20 27,20" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
 
-        <div class="letter-paper">
-          <div class="paper-grain"></div>
-          <div class="letter-inner">
-            <div class="letter-date-line">
-              <span class="letter-day" id="letter-day"></span>
-              <span class="letter-month" id="letter-month"></span>
-            </div>
-            <div class="letter-greeting" id="letter-greeting"></div>
-            <div class="letter-body" id="letter-body"></div>
-            <div class="letter-days" id="letter-days"></div>
+      <!-- Dark red card behind paper -->
+      <div class="letter-card-shadow"></div>
+
+      <!-- Letter (clickable to expand) -->
+      <div class="letter-paper" id="letter-paper">
+        <div class="paper-grain"></div>
+        <div class="letter-inner">
+          <div class="letter-date-line">
+            <span class="letter-day" id="letter-day"></span>
+            <span class="letter-month" id="letter-month"></span>
           </div>
-        </div>
-
-        <!-- Save & Share buttons for letter -->
-        <div class="letter-actions hidden" id="letter-actions">
-          <button class="save-btn save-letter" id="save-letter">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Save
-          </button>
-          <button class="save-btn share-btn" id="share-letter">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            Share
-          </button>
+          <div class="letter-greeting" id="letter-greeting"></div>
+          <div class="letter-body" id="letter-body"></div>
+          <div class="letter-days" id="letter-days"></div>
         </div>
       </div>
-    </section>
 
-    <!-- PAGE 2: PHOTO BOOTH -->
-    <section class="page page-photobooth" id="page-photobooth">
-      <div class="photobooth-bg">
-        <div class="envelope envelope-back"></div>
-        <div class="envelope envelope-front"></div>
-
-        <div class="photobooth-strip" id="photobooth-strip-el">
-          <div class="strip-header">PHOTO BOOTH</div>
-          <div class="strip-photos">
-            <div class="strip-photo" id="strip-photo-0"></div>
-            <div class="strip-photo" id="strip-photo-1"></div>
-            <div class="strip-photo" id="strip-photo-2"></div>
-            <div class="strip-photo" id="strip-photo-3"></div>
-          </div>
-          <div class="strip-footer">
-            <span class="strip-caption" id="strip-caption"></span>
-          </div>
+      <!-- Photobooth strip (tilted, on top of letter) -->
+      <div class="photobooth-strip" id="photobooth-strip-el">
+        <div class="strip-header">PHOTO BOOTH</div>
+        <div class="strip-photos">
+          <div class="strip-photo" id="strip-photo-0"></div>
+          <div class="strip-photo" id="strip-photo-1"></div>
+          <div class="strip-photo" id="strip-photo-2"></div>
+          <div class="strip-photo" id="strip-photo-3"></div>
         </div>
+        <div class="strip-footer">
+          <span class="strip-caption" id="strip-caption"></span>
+        </div>
+      </div>
 
-        <div class="photobooth-text" id="photobooth-text"></div>
-
-        <!-- Save button for photobooth -->
-        <button class="save-btn save-photobooth" id="save-photobooth">
+      <!-- Action buttons at bottom -->
+      <div class="flatlay-actions" id="flatlay-actions">
+        <button class="save-btn" id="save-letter">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Save
         </button>
+        <button class="save-btn share-btn" id="share-letter">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
       </div>
-    </section>
+    </div>
 
-    <!-- Navigation dots -->
-    <nav class="page-nav" id="page-nav">
-      <!-- dots generated by JS based on active pages -->
-    </nav>
+    <!-- Expand overlay backdrop -->
+    <div class="expand-backdrop" id="expand-backdrop"></div>
+
+    <!-- Expanded letter view -->
+    <div class="expand-panel" id="expand-letter-panel">
+      <div class="expand-letter-paper">
+        <div class="paper-grain"></div>
+        <div class="letter-inner">
+          <div class="letter-date-line">
+            <span class="letter-day expand-letter-day" id="expand-letter-day"></span>
+            <span class="letter-month expand-letter-month" id="expand-letter-month"></span>
+          </div>
+          <div class="letter-greeting" id="expand-letter-greeting"></div>
+          <div class="letter-body" id="expand-letter-body"></div>
+          <div class="letter-days" id="expand-letter-days"></div>
+        </div>
+      </div>
+      <div class="expand-actions" id="expand-letter-actions">
+        <button class="save-btn" id="expand-save-letter">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save Letter
+        </button>
+      </div>
+    </div>
+
+    <!-- Expanded photobooth view -->
+    <div class="expand-panel" id="expand-photobooth-panel">
+      <div class="expand-photobooth-strip">
+        <div class="strip-header">PHOTO BOOTH</div>
+        <div class="strip-photos">
+          <div class="strip-photo expand-strip-photo" id="expand-strip-photo-0"></div>
+          <div class="strip-photo expand-strip-photo" id="expand-strip-photo-1"></div>
+          <div class="strip-photo expand-strip-photo" id="expand-strip-photo-2"></div>
+          <div class="strip-photo expand-strip-photo" id="expand-strip-photo-3"></div>
+        </div>
+        <div class="strip-footer">
+          <span class="strip-caption" id="expand-strip-caption"></span>
+        </div>
+      </div>
+      <div class="expand-actions">
+        <button class="save-btn save-photobooth-expanded" id="expand-save-photobooth">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save Photo
+        </button>
+      </div>
+    </div>
 
     <button class="back-btn" id="back-btn">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
