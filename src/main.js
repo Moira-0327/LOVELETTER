@@ -110,7 +110,7 @@ let poolIdx = 0;
 function initAudioPool() {
   for (let i = 0; i < AUDIO_POOL_SIZE; i++) {
     const a = new Audio(clickSoundURL);
-    a.volume = 0.5;
+    a.volume = 0.2;
     a.preload = 'auto';
     audioPool.push(a);
   }
@@ -166,7 +166,7 @@ function playTypeClick() {
       filter.frequency.setValueAtTime(2000, t);
       filter.Q.setValueAtTime(0.8, t);
 
-      gain.gain.setValueAtTime(0.15 + Math.random() * 0.05, t);
+      gain.gain.setValueAtTime(0.06 + Math.random() * 0.02, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
       osc.connect(filter);
@@ -756,47 +756,47 @@ function renderLetterCanvas() {
 }
 
 async function renderPhotoboothCanvas() {
-  const W = 440;
-  const PAD = 24;
-  const PHOTO_W = W - PAD * 2;
-  const PHOTO_H = Math.round(PHOTO_W * 3 / 4);
-  const GAP = 6;
-  const PHOTOS_TOP = 52;
-  const H = PHOTOS_TOP + (PHOTO_H + GAP) * 4 - GAP + 50;
+  // 2×6 inch strip at 300dpi = 600×1800 pixels
+  const DPI = 300;
+  const STRIP_W = 2 * DPI;   // 600
+  const STRIP_H = 6 * DPI;   // 1800
+  const PAD = 30;
+  const PHOTO_W = STRIP_W - PAD * 2;  // 540
+  const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 405
+  const GAP = 12;
+  const HEADER_H = 60;
+  const FOOTER_H = 120;
+  const PHOTOS_TOP = HEADER_H;
 
   const canvas = document.createElement('canvas');
-  canvas.width = W * SCALE;
-  canvas.height = H * SCALE;
+  canvas.width = STRIP_W;
+  canvas.height = STRIP_H;
   const ctx = canvas.getContext('2d');
-  ctx.scale(SCALE, SCALE);
 
   // Background
   ctx.fillStyle = CREAM;
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, STRIP_W, STRIP_H);
 
   // Header
-  ctx.font = '9px "Special Elite", monospace';
+  ctx.font = '12px "Special Elite", monospace';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillText('P H O T O   B O O T H', W / 2, 16);
+  ctx.fillText('P H O T O   B O O T H', STRIP_W / 2, 24);
 
-  // Photos
+  // Photos (4 photos, B&W)
   let y = PHOTOS_TOP;
   for (let i = 0; i < 4; i++) {
     if (state.photos[i]) {
       try {
         const img = await loadImage(state.photos[i]);
         const tmp = document.createElement('canvas');
-        tmp.width = PHOTO_W * SCALE;
-        tmp.height = PHOTO_H * SCALE;
+        tmp.width = PHOTO_W;
+        tmp.height = PHOTO_H;
         const tc = tmp.getContext('2d');
-        tc.scale(SCALE, SCALE);
         tc.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
         drawImageCover(tc, img, 0, 0, PHOTO_W, PHOTO_H);
-
-        ctx.drawImage(tmp, PAD * SCALE, y * SCALE, PHOTO_W * SCALE, PHOTO_H * SCALE,
-          PAD, y, PHOTO_W, PHOTO_H);
+        ctx.drawImage(tmp, PAD, y, PHOTO_W, PHOTO_H);
       } catch (_) {
         ctx.fillStyle = '#F5EDE0';
         ctx.fillRect(PAD, y, PHOTO_W, PHOTO_H);
@@ -808,12 +808,26 @@ async function renderPhotoboothCanvas() {
     y += PHOTO_H + GAP;
   }
 
-  // Caption
-  ctx.font = '12px "Special Elite", monospace';
+  // Footer: names + logo
+  const footerY = y + 10;
+  ctx.font = '16px "Special Elite", monospace';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'center';
-  const caption = (state.partnerName && state.senderName) ? `${state.partnerName} & ${state.senderName}` : state.partnerName ? `${state.partnerName} & me` : 'you & me';
-  ctx.fillText(caption, W / 2, y + 16);
+  const caption = (state.partnerName && state.senderName)
+    ? `${state.partnerName} & ${state.senderName}`
+    : state.partnerName ? `${state.partnerName} & me` : 'you & me';
+  ctx.fillText(caption, STRIP_W / 2, footerY);
+
+  // Logo
+  ctx.font = 'italic 20px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = INK;
+  ctx.fillText('Lover Letter', STRIP_W / 2, footerY + 30);
+
+  // Days
+  const daysSince = calculateDaysTogether(state.togetherDate);
+  ctx.font = '10px "Special Elite", monospace';
+  ctx.fillStyle = MUTED;
+  ctx.fillText(`${daysSince} days of love`, STRIP_W / 2, footerY + 58);
 
   return canvas;
 }
