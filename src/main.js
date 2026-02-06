@@ -11,12 +11,6 @@ const MONTHS_EN = [
   'july', 'august', 'september', 'october', 'november', 'december'
 ];
 
-const QUOTES = [
-  '"No matter how many years pass,\nI will always be by your side,\nmy one and only lover."',
-  '"In all the world, there is no heart for me\nlike yours. In all the world,\nthere is no love for you like mine."',
-  '"I saw that you were perfect,\nand so I loved you.\nThen I saw that you were not perfect\nand I loved you even more."',
-];
-
 // ============ STATE ============
 
 const state = {
@@ -40,7 +34,6 @@ const pageNav = document.getElementById('page-nav');
 
 const pageLetter = document.getElementById('page-letter');
 const pagePhotobooth = document.getElementById('page-photobooth');
-const pageMemory = document.getElementById('page-memory');
 
 let currentPage = 0;
 let pages = [];
@@ -178,6 +171,12 @@ function generatePaperGrain() {
   });
 }
 
+// ============ FORM INPUT TYPEWRITER SOUND ============
+
+document.querySelectorAll('#setup-form input[type="text"], #setup-form textarea').forEach(el => {
+  el.addEventListener('input', () => playTypeClick());
+});
+
 // ============ PHOTO UPLOAD ============
 
 photoSlots.forEach((slot) => {
@@ -232,7 +231,7 @@ function renderResult() {
   document.getElementById('letter-body').textContent = '';
   document.getElementById('letter-days').textContent = '';
   document.getElementById('letter-days').classList.remove('visible');
-  document.getElementById('save-letter').classList.add('hidden');
+  document.getElementById('letter-actions').classList.add('hidden');
 
   // --- Page 2: Photo Booth (only if photos uploaded) ---
   if (state.hasPhotos) {
@@ -252,46 +251,12 @@ function renderResult() {
       `${daysSince} days of love`;
   }
 
-  // --- Page 3: Polaroid Memory (always shown) ---
-  document.getElementById('memory-day-num').textContent = day;
-  document.getElementById('memory-month-text').textContent = `\u2014 ${month} ${year}`;
-
-  document.getElementById('memory-note').innerHTML = buildNoteHTML();
-
-  const polaroidEl = document.getElementById('memory-polaroid-img');
-  if (state.photos[0]) {
-    polaroidEl.style.backgroundImage = `url(${state.photos[0]})`;
-  }
-  document.getElementById('memory-polaroid-label').textContent =
-    state.partnerName ? `${state.partnerName} & me` : 'us';
-
-  const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-  document.getElementById('memory-quote').textContent = quote;
-
   // --- Build active pages array ---
   buildActivePages();
   showPage(0);
 
   // Start typewriter on first page (letter)
   startLetterTyping();
-}
-
-function buildNoteHTML() {
-  const name = state.partnerName || 'you';
-  const lines = [];
-  lines.push(`I love you, ${name}.`);
-  lines.push(`I will always love you,`);
-  lines.push(`even with your flaws.`);
-
-  if (state.letterContent) {
-    lines.push('');
-    const preview = state.letterContent.length > 60
-      ? state.letterContent.slice(0, 60) + '...'
-      : state.letterContent;
-    lines.push(preview);
-  }
-
-  return lines.join('<br>');
 }
 
 function calculateDaysTogether(startDate) {
@@ -303,7 +268,7 @@ function calculateDaysTogether(startDate) {
 // ============ DYNAMIC PAGE MANAGEMENT ============
 
 function buildActivePages() {
-  // Always: letter + memory. Photobooth only if photos uploaded.
+  // Letter always shown. Photobooth only if photos uploaded.
   pages = [pageLetter];
   if (state.hasPhotos) {
     pagePhotobooth.style.display = '';
@@ -311,7 +276,6 @@ function buildActivePages() {
   } else {
     pagePhotobooth.style.display = 'none';
   }
-  pages.push(pageMemory);
 
   // Build nav dots
   pageNav.innerHTML = '';
@@ -337,7 +301,7 @@ async function startLetterTyping() {
   const greetingEl = document.getElementById('letter-greeting');
   const bodyEl = document.getElementById('letter-body');
   const daysEl = document.getElementById('letter-days');
-  const saveBtn = document.getElementById('save-letter');
+  const actionsEl = document.getElementById('letter-actions');
 
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
   const body = state.letterContent || 'You are the most beautiful chapter in my story.';
@@ -351,7 +315,7 @@ async function startLetterTyping() {
   bodyEl.classList.remove('typing-cursor');
   daysEl.textContent = '';
   daysEl.classList.remove('visible');
-  saveBtn.classList.add('hidden');
+  actionsEl.classList.add('hidden');
 
   // Wait for paper animation
   await delay(900);
@@ -377,8 +341,8 @@ async function startLetterTyping() {
   daysEl.textContent = daysStr;
   daysEl.classList.add('visible');
 
-  // Show save button
-  saveBtn.classList.remove('hidden');
+  // Show save & share buttons
+  actionsEl.classList.remove('hidden');
 }
 
 function typeText(element, text, baseSpeed) {
@@ -416,29 +380,173 @@ function delay(ms) {
 
 // ============ SAVE TO IMAGE ============
 
+// US Letter: 8.5 x 11 inches. At 300 DPI: 2550 x 3300 px.
+// We render at a scaled-down size for html2canvas, then scale up.
+const LETTER_W = 850;
+const LETTER_H = 1100;
+
 document.getElementById('save-letter').addEventListener('click', () => {
-  saveElementAsImage(document.querySelector('.letter-paper'), 'love-letter.png');
+  saveLetterAsImage();
 });
 
 document.getElementById('save-photobooth').addEventListener('click', () => {
-  saveElementAsImage(document.getElementById('photobooth-strip-el'), 'photobooth.png');
+  savePhotoboothAsImage();
 });
 
-async function saveElementAsImage(element, filename) {
+async function saveLetterAsImage() {
+  // Build an off-screen clone at US Letter proportions — no clip-path
+  const container = document.createElement('div');
+  container.style.cssText = `
+    position: fixed; left: -9999px; top: 0;
+    width: ${LETTER_W}px; height: ${LETTER_H}px;
+    background: #EAE2D3;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    color: #5C1018;
+    display: flex; flex-direction: column;
+    padding: 80px 72px 60px;
+    overflow: hidden;
+  `;
+
+  // Paper grain overlay
+  const grain = document.createElement('div');
+  const grainSrc = document.querySelector('.paper-grain');
+  if (grainSrc && grainSrc.style.backgroundImage) {
+    grain.style.cssText = `
+      position: absolute; inset: 0; pointer-events: none;
+      opacity: 0.5; mix-blend-mode: multiply;
+      background-image: ${grainSrc.style.backgroundImage};
+      background-size: 300px 300px;
+    `;
+  }
+  container.appendChild(grain);
+
+  // Fiber overlay (same as ::after)
+  const fibers = document.createElement('div');
+  fibers.style.cssText = `
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(196,168,130,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 75% 70%, rgba(196,168,130,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 10%, rgba(196,168,130,0.05) 0%, transparent 40%);
+  `;
+  container.appendChild(fibers);
+
+  // Content wrapper
+  const content = document.createElement('div');
+  content.style.cssText = `
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; gap: 28px;
+    flex: 1;
+  `;
+
+  // Date line
+  const dateLine = document.createElement('div');
+  dateLine.style.cssText = `display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;`;
+  const dayEl = document.createElement('span');
+  dayEl.style.cssText = `font-family: 'Cormorant Garamond', Georgia, serif; font-size: 72px; font-weight: 300; color: #5C1018; line-height: 1;`;
+  dayEl.textContent = document.getElementById('letter-day').textContent;
+  const monthEl = document.createElement('span');
+  monthEl.style.cssText = `font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 300; color: #8C7B70; letter-spacing: 4px;`;
+  monthEl.textContent = document.getElementById('letter-month').textContent;
+  dateLine.appendChild(dayEl);
+  dateLine.appendChild(monthEl);
+  content.appendChild(dateLine);
+
+  // Greeting
+  const greeting = document.createElement('div');
+  greeting.style.cssText = `font-size: 28px; line-height: 1.4;`;
+  greeting.textContent = document.getElementById('letter-greeting').textContent;
+  content.appendChild(greeting);
+
+  // Body
+  const body = document.createElement('div');
+  body.style.cssText = `font-size: 22px; line-height: 2.2; white-space: pre-wrap; flex: 1;`;
+  body.textContent = document.getElementById('letter-body').textContent;
+  content.appendChild(body);
+
+  // Days counter
+  const days = document.createElement('div');
+  days.style.cssText = `font-size: 16px; color: #8C7B70; letter-spacing: 3px; text-align: right; margin-top: auto; padding-top: 20px;`;
+  days.textContent = document.getElementById('letter-days').textContent;
+  content.appendChild(days);
+
+  container.appendChild(content);
+  document.body.appendChild(container);
+
   try {
-    const canvas = await html2canvas(element, {
-      backgroundColor: null,
-      scale: 2,
+    const canvas = await html2canvas(container, {
+      backgroundColor: '#EAE2D3',
+      scale: 3,
+      useCORS: true,
+      logging: false,
+      width: LETTER_W,
+      height: LETTER_H,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'love-letter.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    console.error('Save letter failed:', err);
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
+async function savePhotoboothAsImage() {
+  const strip = document.getElementById('photobooth-strip-el');
+
+  // Clone the strip into a clean off-screen container without transform
+  const container = document.createElement('div');
+  container.style.cssText = `position: fixed; left: -9999px; top: 0;`;
+
+  const clone = strip.cloneNode(true);
+  clone.style.cssText = `
+    width: 440px;
+    background: #FFF8F0;
+    padding: 28px 20px 36px;
+    display: flex; flex-direction: column; align-items: center;
+    transform: none;
+    box-shadow: none;
+    font-family: 'Special Elite', 'Courier New', monospace;
+  `;
+
+  // Fix photo background images in clone
+  const origPhotos = strip.querySelectorAll('.strip-photo');
+  const clonePhotos = clone.querySelectorAll('.strip-photo');
+  origPhotos.forEach((orig, i) => {
+    const bg = orig.style.backgroundImage || orig.style.background;
+    if (bg) {
+      clonePhotos[i].style.backgroundImage = orig.style.backgroundImage;
+      clonePhotos[i].style.background = orig.style.background;
+    }
+    clonePhotos[i].style.backgroundSize = 'cover';
+    clonePhotos[i].style.backgroundPosition = 'center';
+    clonePhotos[i].style.width = '100%';
+    clonePhotos[i].style.aspectRatio = '4/3';
+    clonePhotos[i].style.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
+  });
+
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(clone, {
+      backgroundColor: '#FFF8F0',
+      scale: 3,
       useCORS: true,
       logging: false,
     });
 
     const link = document.createElement('a');
-    link.download = filename;
+    link.download = 'photobooth.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   } catch (err) {
-    console.error('Save failed:', err);
+    console.error('Save photobooth failed:', err);
+  } finally {
+    document.body.removeChild(container);
   }
 }
 
@@ -451,7 +559,7 @@ function showScreen(screen) {
 }
 
 function showPage(index) {
-  const allPages = [pageLetter, pagePhotobooth, pageMemory];
+  const allPages = [pageLetter, pagePhotobooth];
   allPages.forEach(p => p.classList.remove('active', 'exit-left'));
 
   pages.forEach((page, i) => {
@@ -534,3 +642,74 @@ document.addEventListener('keydown', (e) => {
     showScreen(setupScreen);
   }
 });
+
+// ============ SHARE LINK ============
+
+function encodeShareData() {
+  const data = {
+    n: state.partnerName,
+    d: document.getElementById('together-date').value,
+    l: state.letterContent,
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+
+function decodeShareData(hash) {
+  try {
+    const json = decodeURIComponent(escape(atob(hash)));
+    return JSON.parse(json);
+  } catch (_) {
+    return null;
+  }
+}
+
+document.getElementById('share-letter').addEventListener('click', async () => {
+  const encoded = encodeShareData();
+  const url = `${window.location.origin}${window.location.pathname}#${encoded}`;
+
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch (_) {
+    // Fallback for older browsers
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+  }
+
+  // Show toast
+  const toast = document.getElementById('share-toast');
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 1800);
+});
+
+// ============ LOAD FROM SHARE LINK ============
+
+(function checkShareLink() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return;
+
+  const data = decodeShareData(hash);
+  if (!data) return;
+
+  // Fill form fields
+  if (data.n) {
+    document.getElementById('partner-name').value = data.n;
+    state.partnerName = data.n;
+  }
+  if (data.d) {
+    document.getElementById('together-date').value = data.d;
+    state.togetherDate = new Date(data.d + 'T00:00:00');
+  }
+  if (data.l) {
+    document.getElementById('letter-content').value = data.l;
+    state.letterContent = data.l;
+  }
+
+  // Auto-render the letter
+  state.hasPhotos = false;
+  renderResult();
+  showScreen(resultScreen);
+})();

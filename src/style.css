@@ -604,147 +604,19 @@ html, body {
   letter-spacing: 2px;
 }
 
-/* ============ PAGE 3: POLAROID MEMORY ============ */
+/* ============ SAVE & SHARE BUTTONS ============ */
 
-.memory-bg {
-  width: var(--page-width);
-  height: var(--page-height);
-  background: #FAFAFA;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  padding: 0 28px;
-}
-
-.memory-date {
-  margin-top: 12%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 2;
-}
-
-.memory-day-num {
-  font-family: var(--font-serif);
-  font-size: 64px;
-  font-weight: 300;
-  color: var(--text-dark);
-  line-height: 1;
-  letter-spacing: -2px;
-}
-
-.memory-month-text {
-  font-family: var(--font-serif);
-  font-size: 14px;
-  font-weight: 300;
-  letter-spacing: 6px;
-  color: var(--text-muted);
-  margin-top: 2px;
-  text-transform: lowercase;
-}
-
-.memory-envelope-scene {
-  position: relative;
-  width: 80%;
-  margin-top: 8%;
-  z-index: 2;
-}
-
-.memory-envelope {
-  width: 65%;
-  height: 100px;
-  background: linear-gradient(135deg, var(--kraft-light) 0%, var(--kraft) 100%);
-  border-radius: 2px;
-  transform: rotate(-5deg);
-  position: relative;
-  z-index: 1;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.08);
-}
-
-.memory-envelope::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 45%;
-  background: linear-gradient(135deg, transparent 48%, var(--kraft) 48%, var(--kraft) 52%, transparent 52%);
-  opacity: 0.3;
-}
-
-.memory-note {
-  position: absolute;
-  top: -20px;
-  left: -5%;
-  width: 70%;
-  padding: 20px 18px;
-  background: #FFF5F0;
-  transform: rotate(-8deg);
-  z-index: 2;
-  box-shadow: 2px 3px 12px rgba(0,0,0,0.06);
-  font-family: var(--font-typewriter);
-  font-size: 14px;
-  color: var(--ink);
-  line-height: 1.7;
-}
-
-.memory-polaroid {
-  position: absolute;
-  top: 38%;
-  right: 6%;
-  width: 48%;
-  max-width: 200px;
-  background: white;
-  padding: 8px 8px 30px;
-  transform: rotate(3deg);
-  box-shadow: 2px 4px 15px rgba(0,0,0,0.1);
-  z-index: 3;
-  animation: fadeInUp 0.8s ease 0.4s both;
-}
-
-.memory-polaroid-img {
-  width: 100%;
-  aspect-ratio: 1;
-  background: var(--cream-dark);
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(80%) contrast(1.05) brightness(1.05);
-}
-
-.memory-polaroid-label {
-  font-family: var(--font-typewriter);
-  font-size: 11px;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 8px;
-  letter-spacing: 0.5px;
-}
-
-.memory-quote {
-  position: absolute;
-  bottom: 8%;
-  left: 0; right: 0;
-  text-align: center;
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 300;
-  font-style: italic;
-  color: var(--text-muted);
-  line-height: 1.8;
-  padding: 0 32px;
-  letter-spacing: 0.3px;
-  z-index: 2;
-}
-
-/* ============ SAVE BUTTONS ============ */
-
-.save-btn {
+.letter-actions {
   position: absolute;
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  display: flex;
+  gap: 10px;
+}
+
+.save-btn {
   font-family: var(--font-typewriter);
   font-size: 11px;
   letter-spacing: 2px;
@@ -775,7 +647,36 @@ html, body {
   border-color: rgba(255, 248, 240, 0.6);
 }
 
+.save-photobooth {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .save-photobooth svg { stroke: var(--cream); }
+
+/* Share copied toast */
+.share-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--maroon);
+  color: var(--cream);
+  font-family: var(--font-typewriter);
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.share-toast.visible {
+  opacity: 1;
+}
 
 /* ============ NAVIGATION ============ */
 
@@ -851,7 +752,6 @@ html, body {
 
 .letter-paper { animation: fadeInUp 0.8s ease 0.2s both; }
 .photobooth-strip { animation: fadeInUp 0.8s ease 0.3s both; }
-.memory-polaroid { animation: fadeInUp 0.8s ease 0.4s both; }
 
 /* ============ RESPONSIVE ============ */
 
@@ -861,5 +761,4 @@ html, body {
   .letter-day { font-size: 36px; }
   .letter-body { font-size: 14px; }
   .photobooth-strip { width: 56%; }
-  .memory-day-num { font-size: 52px; }
 }
