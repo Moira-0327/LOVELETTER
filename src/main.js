@@ -46,28 +46,130 @@ let currentPage = 0;
 let pages = [];
 let navDots = [];
 
+// ============ TYPEWRITER SOUND (Web Audio API) ============
+
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function playTypeClick() {
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const t = ctx.currentTime;
+
+    // Short percussive click — simulates typewriter key strike
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    // Noise-like click via high-frequency square wave
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
+    osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2000, t);
+    filter.Q.setValueAtTime(0.8, t);
+
+    gain.gain.setValueAtTime(0.03 + Math.random() * 0.015, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.05);
+  } catch (_) {
+    // Silently ignore audio errors
+  }
+}
+
 // ============ INIT ============
 
 generatePaperGrain();
 
-// ============ PAPER GRAIN TEXTURE ============
+// ============ PAPER GRAIN TEXTURE (woven cotton canvas) ============
 
 function generatePaperGrain() {
   const canvas = document.createElement('canvas');
-  const size = 150;
+  const size = 300;
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
 
+  // Base: warm off-white with subtle variation
   const imageData = ctx.createImageData(size, size);
   for (let i = 0; i < imageData.data.length; i += 4) {
-    const v = 120 + Math.random() * 80;
+    const v = 200 + Math.random() * 30;
     imageData.data[i] = v;
-    imageData.data[i + 1] = v * 0.96;
-    imageData.data[i + 2] = v * 0.9;
-    imageData.data[i + 3] = 18;
+    imageData.data[i + 1] = v * 0.97;
+    imageData.data[i + 2] = v * 0.92;
+    imageData.data[i + 3] = 12;
   }
   ctx.putImageData(imageData, 0, 0);
+
+  // Woven horizontal thread lines
+  ctx.strokeStyle = 'rgba(180, 160, 130, 0.06)';
+  for (let y = 0; y < size; y += 3) {
+    ctx.lineWidth = 0.5 + Math.random() * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, y + Math.random() * 0.5);
+    for (let x = 0; x < size; x += 8) {
+      ctx.lineTo(x + 8, y + (Math.random() - 0.5) * 0.8);
+    }
+    ctx.stroke();
+  }
+
+  // Woven vertical thread lines
+  ctx.strokeStyle = 'rgba(170, 150, 120, 0.05)';
+  for (let x = 0; x < size; x += 3) {
+    ctx.lineWidth = 0.4 + Math.random() * 0.4;
+    ctx.beginPath();
+    ctx.moveTo(x + Math.random() * 0.5, 0);
+    for (let y = 0; y < size; y += 8) {
+      ctx.lineTo(x + (Math.random() - 0.5) * 0.8, y + 8);
+    }
+    ctx.stroke();
+  }
+
+  // Speckles — tiny dark spots like cotton paper inclusions
+  for (let s = 0; s < 60; s++) {
+    const sx = Math.random() * size;
+    const sy = Math.random() * size;
+    const sr = 0.3 + Math.random() * 0.8;
+    ctx.fillStyle = `rgba(${100 + Math.random() * 40}, ${85 + Math.random() * 30}, ${60 + Math.random() * 30}, ${0.08 + Math.random() * 0.1})`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Fiber strands — thin wavy lines like visible cotton fibers
+  for (let f = 0; f < 12; f++) {
+    const fx = Math.random() * size;
+    const fy = Math.random() * size;
+    const angle = Math.random() * Math.PI;
+    const len = 8 + Math.random() * 20;
+    ctx.strokeStyle = `rgba(${160 + Math.random() * 40}, ${140 + Math.random() * 30}, ${100 + Math.random() * 30}, ${0.06 + Math.random() * 0.06})`;
+    ctx.lineWidth = 0.3 + Math.random() * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    const cp1x = fx + Math.cos(angle) * len * 0.3 + (Math.random() - 0.5) * 4;
+    const cp1y = fy + Math.sin(angle) * len * 0.3 + (Math.random() - 0.5) * 4;
+    const cp2x = fx + Math.cos(angle) * len * 0.7 + (Math.random() - 0.5) * 4;
+    const cp2y = fy + Math.sin(angle) * len * 0.7 + (Math.random() - 0.5) * 4;
+    const ex = fx + Math.cos(angle) * len;
+    const ey = fy + Math.sin(angle) * len;
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, ex, ey);
+    ctx.stroke();
+  }
 
   const dataUrl = canvas.toDataURL('image/png');
   document.querySelectorAll('.paper-grain').forEach(el => {
@@ -115,11 +217,11 @@ setupForm.addEventListener('submit', (e) => {
 // ============ RENDER RESULT ============
 
 function renderResult() {
-  const date = state.togetherDate;
-  const day = date.getDate();
-  const month = MONTHS_EN[date.getMonth()];
-  const year = date.getFullYear();
-  const daysSince = calculateDaysTogether(date);
+  const today = new Date();
+  const day = today.getDate();
+  const month = MONTHS_EN[today.getMonth()];
+  const year = today.getFullYear();
+  const daysSince = calculateDaysTogether(state.togetherDate);
 
   // --- Page 1: Love Letter (always shown) ---
   document.getElementById('letter-day').textContent = day;
@@ -292,6 +394,7 @@ function typeText(element, text, baseSpeed) {
       }
 
       element.textContent += text.charAt(i);
+      playTypeClick();
       i++;
 
       let nextDelay = baseSpeed + Math.random() * 25 - 12;
