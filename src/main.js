@@ -41,81 +41,151 @@ const expandBackdrop = document.getElementById('expand-backdrop');
 const expandLetterPanel = document.getElementById('expand-letter-panel');
 const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel');
 
-// ============ TYPEWRITER SOUND (Web Audio API) ============
+// ============ TYPEWRITER SOUND ============
+// Hybrid approach: Web Audio API + HTML Audio fallback for mobile
+// iOS silent switch blocks Web Audio, so we try both methods
 
 let audioCtx = null;
 let audioUnlocked = false;
+let useHTMLAudio = false; // fallback flag
 
+// --- Web Audio approach ---
 function ensureAudioContext() {
   if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (_) {
+      useHTMLAudio = true;
+      return null;
+    }
   }
   return audioCtx;
 }
 
-// iOS requires AudioContext resume + a sound played within a user gesture.
-// Keep trying on every touch/click until it works.
-function tryUnlockAudio() {
-  if (audioUnlocked) return;
-  try {
-    const ctx = ensureAudioContext();
-    if (ctx.state === 'suspended') {
-      ctx.resume().then(() => {
-        // Play a silent buffer to fully unlock on iOS
-        const buf = ctx.createBuffer(1, 1, 22050);
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        src.connect(ctx.destination);
-        src.start(0);
-        audioUnlocked = true;
-      });
-    } else {
-      audioUnlocked = true;
-    }
-  } catch (_) {}
+// --- HTML Audio fallback (works with iOS silent mode in some cases) ---
+// Generate a tiny WAV click sound programmatically
+function generateClickWAV() {
+  const sampleRate = 22050;
+  const duration = 0.03;
+  const samples = Math.floor(sampleRate * duration);
+  const buffer = new ArrayBuffer(44 + samples * 2);
+  const view = new DataView(buffer);
+
+  // WAV header
+  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + samples * 2, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, samples * 2, true);
+
+  // Generate a short percussive click
+  for (let i = 0; i < samples; i++) {
+    const t = i / sampleRate;
+    const env = Math.exp(-t * 150); // fast decay
+    const wave = Math.sin(t * 2000 * Math.PI * 2) * 0.4 + (Math.random() - 0.5) * 0.3;
+    const sample = Math.max(-1, Math.min(1, wave * env));
+    view.setInt16(44 + i * 2, sample * 32767, true);
+  }
+
+  const blob = new Blob([buffer], { type: 'audio/wav' });
+  return URL.createObjectURL(blob);
 }
 
-// Listen on ALL user gesture events — don't remove, iOS can re-suspend
-document.addEventListener('touchstart', tryUnlockAudio, { passive: true });
+const clickSoundURL = generateClickWAV();
+
+// Pool of Audio elements for rapid playback
+const AUDIO_POOL_SIZE = 6;
+const audioPool = [];
+let poolIdx = 0;
+
+function initAudioPool() {
+  for (let i = 0; i < AUDIO_POOL_SIZE; i++) {
+    const a = new Audio(clickSoundURL);
+    a.volume = 0.5;
+    a.preload = 'auto';
+    audioPool.push(a);
+  }
+}
+initAudioPool();
+
+// Unlock audio on user gesture — try BOTH Web Audio + HTML Audio
+function tryUnlockAudio() {
+  if (audioUnlocked) return;
+
+  // Unlock HTML Audio pool
+  audioPool.forEach(a => {
+    a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(() => {});
+  });
+
+  // Unlock Web Audio
+  const ctx = ensureAudioContext();
+  if (ctx) {
+    if (ctx.state === 'suspended') ctx.resume();
+    try {
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+    } catch (_) {}
+  }
+
+  audioUnlocked = true;
+}
+
+// Must use touchend for iOS (touchstart doesn't count as user gesture for audio)
 document.addEventListener('touchend', tryUnlockAudio, { passive: true });
-document.addEventListener('mousedown', tryUnlockAudio);
+document.addEventListener('click', tryUnlockAudio);
 document.addEventListener('keydown', tryUnlockAudio);
 
 function playTypeClick() {
-  try {
-    const ctx = ensureAudioContext();
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-      return; // skip this click, will work next time
-    }
+  // Try Web Audio first (lower latency)
+  let webAudioPlayed = false;
+  const ctx = ensureAudioContext();
+  if (ctx && ctx.state === 'running') {
+    try {
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
 
-    const t = ctx.currentTime;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
+      osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(2000, t);
+      filter.Q.setValueAtTime(0.8, t);
 
-    // Percussive click
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(1800 + Math.random() * 600, t);
-    osc.frequency.exponentialRampToValueAtTime(200, t + 0.02);
+      gain.gain.setValueAtTime(0.15 + Math.random() * 0.05, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(2000, t);
-    filter.Q.setValueAtTime(0.8, t);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.05);
+      webAudioPlayed = true;
+    } catch (_) {}
+  }
 
-    // Higher volume for mobile speakers
-    gain.gain.setValueAtTime(0.12 + Math.random() * 0.04, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.05);
-  } catch (_) {
-    // Silently ignore audio errors
+  // Also play via HTML Audio (as fallback / for iOS silent mode)
+  if (!webAudioPlayed || useHTMLAudio) {
+    try {
+      const a = audioPool[poolIdx % AUDIO_POOL_SIZE];
+      a.currentTime = 0;
+      a.play().catch(() => {});
+      poolIdx++;
+    } catch (_) {}
   }
 }
 
