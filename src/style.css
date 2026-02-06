@@ -7,7 +7,7 @@
   --maroon: #6B1525;
   --maroon-deep: #4A0E1A;
   --maroon-light: #8B2035;
-  --cream: #FFF8F0;
+  --cream: #FDF6F2;
   --cream-dark: #F5EDE0;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
@@ -16,6 +16,10 @@
   --text-dark: #2C1810;
   --text-muted: #8C7B70;
   --paper: #EAE2D3;
+  --blue: #8099B0;
+  --blue-deep: #5C7A94;
+  --pink: #DFC8CD;
+  --pink-dark: #C9A8B0;
 
   --font-serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
@@ -71,7 +75,7 @@ html, body {
 }
 .setup-container::-webkit-scrollbar { display: none; }
 
-.setup-stars {
+.setup-hearts {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -79,14 +83,14 @@ html, body {
   height: 80px;
 }
 
-.star {
+.heart {
   position: absolute;
-  color: var(--maroon);
-  opacity: 0.25;
+  color: var(--pink-dark);
+  opacity: 0.4;
 }
-.star-1 { width: 16px; top: 0; left: 0; transform: rotate(0deg); }
-.star-2 { width: 10px; top: 28px; left: 38px; transform: rotate(45deg); }
-.star-3 { width: 12px; top: 4px; left: 52px; transform: rotate(0deg); }
+.heart-1 { width: 18px; top: 0; left: 0; transform: rotate(-12deg); }
+.heart-2 { width: 11px; top: 26px; left: 36px; transform: rotate(8deg); }
+.heart-3 { width: 14px; top: 6px; left: 48px; transform: rotate(-5deg); }
 
 .setup-title {
   font-family: var(--font-heading);
@@ -206,8 +210,8 @@ html, body {
 }
 
 .photo-upload-slot:hover {
-  border-color: var(--maroon-light);
-  background: rgba(107, 21, 37, 0.03);
+  border-color: var(--pink-dark);
+  background: rgba(223, 200, 205, 0.12);
 }
 
 .photo-upload-slot.has-photo {
@@ -296,8 +300,8 @@ html, body {
 /* Decorative stars */
 .deco-star {
   position: absolute;
-  color: var(--maroon);
-  opacity: 0.25;
+  color: var(--blue);
+  opacity: 0.35;
   z-index: 2;
   animation: floatStar 4s ease-in-out infinite;
   will-change: transform;
@@ -309,28 +313,15 @@ html, body {
 .deco-star-5 { width: 8px; bottom: 22%; left: 14%; --rot: 0deg; animation-delay: 0.5s; }
 .deco-star-6 { width: 11px; bottom: 28%; right: 8%; --rot: 45deg; animation-delay: 2.5s; }
 
-/* Cherub illustration */
-.cherub-deco {
-  position: absolute;
-  width: 80px;
-  top: 6%;
-  left: 50%;
-  transform: translateX(-50%) rotate(-4deg);
-  color: var(--maroon);
-  opacity: 0.35;
-  z-index: 2;
-  animation: fadeInUp 1s ease 0.3s both;
-}
-
-/* Dark red card behind paper */
+/* Card behind paper */
 .letter-card-shadow {
   position: absolute;
   width: 72%;
   height: 55%;
-  background: var(--maroon);
+  background: var(--blue-deep);
   border-radius: 2px;
   transform: rotate(-1.2deg);
-  box-shadow: 0 8px 30px rgba(74, 14, 26, 0.3);
+  box-shadow: 0 8px 30px rgba(92, 122, 148, 0.3);
   z-index: 1;
 }
 
@@ -599,7 +590,7 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--maroon);
+  background: var(--blue-deep);
   color: var(--cream);
   font-family: var(--font-ui);
   font-size: 11px;

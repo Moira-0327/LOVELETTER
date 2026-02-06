@@ -821,7 +821,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
     composite.height = h * SCALE;
     const ctx = composite.getContext('2d');
     ctx.scale(SCALE, SCALE);
-    ctx.fillStyle = '#6B1525';
+    ctx.fillStyle = '#5C7A94';
     ctx.fillRect(0, 0, w, h);
     ctx.drawImage(letterCanvas, 0, 0, letterCanvas.width, letterCanvas.height,
       MARGIN, MARGIN, letterCanvas.width / SCALE, letterCanvas.height / SCALE);
@@ -847,7 +847,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
   ctx.scale(SCALE, SCALE);
 
   // Maroon background
-  ctx.fillStyle = '#6B1525';
+  ctx.fillStyle = '#5C7A94';
   ctx.fillRect(0, 0, totalW, totalH);
 
   // Letter — left side
