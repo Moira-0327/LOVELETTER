@@ -414,17 +414,18 @@ html, body {
 .letter-greeting,
 .letter-body {
   text-shadow:
-    0 0 0.8px currentColor,
-    0.2px 0.2px 0.3px rgba(192, 57, 43, 0.15);
-  -webkit-text-stroke: 0.15px currentColor;
+    0 0 1px currentColor,
+    0.3px 0.3px 0.5px rgba(192, 57, 43, 0.2);
+  -webkit-text-stroke: 0.2px currentColor;
 }
 
 .letter-sender {
   text-shadow:
-    0 0 2px currentColor,
-    0.4px 0.4px 1px rgba(192, 57, 43, 0.25),
-    -0.2px 0.2px 0.8px rgba(192, 57, 43, 0.15);
-  -webkit-text-stroke: 0.3px currentColor;
+    0 0 3px currentColor,
+    0.6px 0.6px 1.5px rgba(192, 57, 43, 0.35),
+    -0.3px 0.3px 1px rgba(192, 57, 43, 0.2),
+    1px -0.5px 2px rgba(192, 57, 43, 0.12);
+  -webkit-text-stroke: 0.4px currentColor;
 }
 
 .setup-title {
@@ -459,14 +460,52 @@ html, body {
 
 .letter-sender {
   font-family: var(--font-script);
-  font-size: 20px;
+  font-size: 22px;
   color: var(--ink);
   text-align: right;
   margin-top: 12px;
+  position: relative;
+  transform: rotate(-1.5deg);
+  transform-origin: right center;
+}
+
+/* Ink splatter dots near signature */
+.letter-sender::before,
+.letter-sender::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: var(--ink);
+  pointer-events: none;
+}
+.letter-sender::before {
+  width: 2px;
+  height: 2px;
+  right: -4px;
+  bottom: 6px;
+  opacity: 0.35;
+  box-shadow:
+    -8px -12px 0 0.5px currentColor,
+    4px -6px 0 0.3px currentColor,
+    -18px 3px 0 0.8px currentColor,
+    12px -10px 0 0.2px currentColor,
+    -30px -4px 0 0.6px currentColor;
+}
+.letter-sender::after {
+  width: 1.5px;
+  height: 3px;
+  right: 20%;
+  bottom: -3px;
+  opacity: 0.25;
+  transform: rotate(35deg);
+  box-shadow:
+    -14px 2px 0 0.4px currentColor,
+    8px -2px 0 0.3px currentColor,
+    -6px -8px 0 0.5px currentColor;
 }
 
 .expand-letter-paper .letter-sender {
-  font-size: 28px;
+  font-size: 32px;
   margin-top: 20px;
 }
 

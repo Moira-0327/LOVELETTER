@@ -637,15 +637,30 @@ function renderLetterCanvas() {
     y += 8;
   }
 
-  // Sender signature (ink handwriting script)
+  // Sender signature (ink handwriting script with splatter)
   if (state.senderName) {
     y += 20;
-    ctx.font = '36px "Mrs Saint Delafield", cursive';
+    ctx.save();
+    ctx.translate(LETTER_W - pad, y);
+    ctx.rotate(-0.025); // slight tilt for dynamic feel
+    ctx.font = '38px "Mrs Saint Delafield", cursive';
     ctx.fillStyle = INK;
     ctx.textAlign = 'right';
-    ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
+    // Ink bleed layer
+    ctx.globalAlpha = 0.15;
+    ctx.fillText(`Yours, ${state.senderName}`, 0.8, 0.8);
+    ctx.globalAlpha = 1;
+    ctx.fillText(`Yours, ${state.senderName}`, 0, 0);
+    // Ink splatter dots
+    ctx.globalAlpha = 0.25;
+    const dots = [[6, -8, 1.2], [-12, 5, 0.8], [20, -14, 1], [-30, 2, 1.5], [8, 8, 0.6], [-18, -10, 0.9]];
+    for (const [dx, dy, r] of dots) {
+      ctx.beginPath(); ctx.arc(dx, dy, r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
     ctx.textAlign = 'left';
-    y += 44;
+    y += 48;
   }
 
   // Seal time below signature (24h format)
