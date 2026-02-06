@@ -42,70 +42,95 @@ const expandLetterPanel = document.getElementById('expand-letter-panel');
 const expandPhotoboothPanel = document.getElementById('expand-photobooth-panel');
 
 // ============ TYPEWRITER SOUND ============
-// Pre-decoded AudioBuffer for instant playback
+// Web Audio (fast) + HTML Audio fallback (works without secure context)
 
 let audioCtx = null;
 let clickBuffer = null;
 let audioReady = false;
+let fallbackAudio = null; // single HTML Audio element as fallback
 
 function initAudio() {
   if (audioCtx) return audioCtx;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const sr = audioCtx.sampleRate;
-    const len = Math.floor(sr * 0.03); // 30ms click
+    const len = Math.floor(sr * 0.03);
     const buf = audioCtx.createBuffer(1, len, sr);
     const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) {
       const t = i / sr;
       const env = Math.exp(-t * 150);
-      // Lower pitch: 600Hz base tone
       d[i] = (Math.sin(t * 600 * 6.283) * 0.4 + (Math.random() - 0.5) * 0.15) * env * 0.1;
     }
     clickBuffer = buf;
   } catch (_) {}
+
+  // HTML Audio fallback: generate a tiny WAV click
+  if (!fallbackAudio) {
+    try {
+      const sr2 = 22050, dur = 0.03, n = Math.floor(sr2 * dur);
+      const ab = new ArrayBuffer(44 + n * 2), v = new DataView(ab);
+      const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+      ws(0,'RIFF'); v.setUint32(4,36+n*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+      v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+      v.setUint32(24,sr2,true); v.setUint32(28,sr2*2,true); v.setUint16(32,2,true);
+      v.setUint16(34,16,true); ws(36,'data'); v.setUint32(40,n*2,true);
+      for (let i = 0; i < n; i++) {
+        const t = i / sr2;
+        const s = Math.sin(t * 600 * 6.283) * 0.3 * Math.exp(-t * 150);
+        v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, s)) * 32767, true);
+      }
+      fallbackAudio = new Audio(URL.createObjectURL(new Blob([ab], { type: 'audio/wav' })));
+      fallbackAudio.volume = 0.15;
+    } catch (_) {}
+  }
   return audioCtx;
 }
 
-// Unlock on first user gesture — must create context + resume + play within gesture
 function unlockAudio() {
   const ctx = initAudio();
-  if (!ctx) return;
-  if (ctx.state === 'suspended') {
-    ctx.resume().then(() => { audioReady = true; });
-  } else {
-    audioReady = true;
+  if (ctx) {
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => { audioReady = true; });
+    } else {
+      audioReady = true;
+    }
+    // Play near-silent buffer to activate iOS audio pipeline
+    if (clickBuffer) {
+      try {
+        const src = ctx.createBufferSource();
+        src.buffer = clickBuffer;
+        const g = ctx.createGain();
+        g.gain.value = 0.001;
+        src.connect(g); g.connect(ctx.destination); src.start();
+      } catch (_) {}
+    }
   }
-  // Play a silent buffer to fully activate the audio pipeline on iOS
-  if (clickBuffer) {
-    try {
-      const src = ctx.createBufferSource();
-      src.buffer = clickBuffer;
-      const g = ctx.createGain();
-      g.gain.value = 0.001; // near-silent
-      src.connect(g);
-      g.connect(ctx.destination);
-      src.start();
-    } catch (_) {}
-  }
+  // Also unlock HTML Audio fallback
+  if (fallbackAudio) fallbackAudio.play().then(() => { fallbackAudio.pause(); fallbackAudio.currentTime = 0; }).catch(() => {});
 }
-// iOS needs touchend; also listen on click and keydown for all platforms
 document.addEventListener('touchend', unlockAudio, { passive: true });
 document.addEventListener('click', unlockAudio);
 document.addEventListener('keydown', unlockAudio);
 
 function playTypeClick() {
   if (!audioCtx || !clickBuffer) { initAudio(); return; }
-  if (!audioReady) {
-    if (audioCtx.state === 'suspended') audioCtx.resume().then(() => { audioReady = true; });
-    return;
+  // Try Web Audio first (lowest latency)
+  if (audioReady && audioCtx.state === 'running') {
+    try {
+      const src = audioCtx.createBufferSource();
+      src.buffer = clickBuffer;
+      src.connect(audioCtx.destination);
+      src.start();
+      return;
+    } catch (_) {}
   }
-  try {
-    const src = audioCtx.createBufferSource();
-    src.buffer = clickBuffer;
-    src.connect(audioCtx.destination);
-    src.start();
-  } catch (_) {}
+  // Fallback: HTML Audio (works without secure context)
+  if (fallbackAudio) {
+    try { fallbackAudio.currentTime = 0; fallbackAudio.play().catch(() => {}); } catch (_) {}
+  }
+  // Try to resume suspended context for next time
+  if (audioCtx.state === 'suspended') audioCtx.resume().then(() => { audioReady = true; });
 }
 
 // ============ INIT ============
