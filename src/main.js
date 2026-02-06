@@ -240,7 +240,7 @@ function renderResult() {
   const sealTimeStr = `sealed at ${hours}:${mins}`;
   document.getElementById('letter-seal-date').textContent = sealTimeStr;
   document.getElementById('letter-seal-date').classList.add('visible');
-  document.getElementById('letter-days').innerHTML = `${daysSince}\nDAYS`;
+  document.getElementById('letter-days').innerHTML = stampHTML(daysSince);
   document.getElementById('letter-days').classList.add('visible');
 
   // --- Photobooth strip ---
@@ -266,6 +266,10 @@ function renderResult() {
   setTimeout(() => {
     flatlayActions.classList.add('visible');
   }, 1200);
+}
+
+function stampHTML(days) {
+  return `<svg class="stamp-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="stamp-text">${days} days of us</span>`;
 }
 
 function calculateDaysTogether(startDate) {
@@ -354,7 +358,7 @@ function expandLetter() {
   expandLetterPanel.classList.add('active');
 
   // Start typewriter
-  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, `${daysSince}\nDAYS`);
+  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, daysSince);
 }
 
 function expandPhotobooth() {
@@ -427,8 +431,8 @@ async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, day
 
   await delay(400);
 
-  // Show days counter (square stamp)
-  daysEl.innerHTML = daysStr;
+  // Show days counter (postage stamp)
+  daysEl.innerHTML = stampHTML(daysStr);
   daysEl.classList.add('visible');
 
   state.letterTyped = true;
@@ -664,26 +668,58 @@ function renderLetterCanvas() {
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter — square stamp style
+  // Days counter — postage stamp style
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const stampBoxW = 110;
-  const stampBoxH = 60;
-  const stampBoxX = LETTER_W - pad - stampBoxW;
-  const stampBoxY = LETTER_H - pad - stampBoxH;
+  const sW = 120, sH = 100;
+  const sX = LETTER_W - pad - sW;
+  const sY = LETTER_H - pad - sH;
+
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+
+  // Stamp background
+  ctx.fillStyle = 'rgba(192, 57, 43, 0.08)';
+  ctx.fillRect(sX, sY, sW, sH);
+
+  // Perforation circles along edges
+  ctx.fillStyle = PAPER_COLOR;
+  const step = 10, pr = 3;
+  for (let px = sX + step / 2; px < sX + sW; px += step) {
+    ctx.beginPath(); ctx.arc(px, sY, pr, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, sY + sH, pr, 0, Math.PI * 2); ctx.fill();
+  }
+  for (let py = sY + step / 2; py < sY + sH; py += step) {
+    ctx.beginPath(); ctx.arc(sX, py, pr, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(sX + sW, py, pr, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Heart outline
+  const hx = sX + sW / 2, hy = sY + 38, hs = 0.9;
+  ctx.save();
+  ctx.translate(hx, hy);
+  ctx.scale(hs, hs);
+  ctx.beginPath();
+  ctx.moveTo(0, 8);
+  ctx.bezierCurveTo(-2, 4, -12, -4, -12, -10);
+  ctx.bezierCurveTo(-12, -16, -6, -20, 0, -14);
+  ctx.bezierCurveTo(6, -20, 12, -16, 12, -10);
+  ctx.bezierCurveTo(12, -4, 2, 4, 0, 8);
+  ctx.closePath();
   ctx.strokeStyle = INK;
-  ctx.lineWidth = 2;
-  ctx.globalAlpha = 0.7;
-  ctx.strokeRect(stampBoxX, stampBoxY, stampBoxW, stampBoxH);
-  ctx.font = '28px "Special Elite", "Courier New", monospace';
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+  ctx.restore();
+
+  // Text
   ctx.fillStyle = INK;
+  ctx.font = '13px "Special Elite", "Courier New", monospace';
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(String(daysSince), stampBoxX + stampBoxW / 2, stampBoxY + stampBoxH / 2 - 8);
-  ctx.font = '12px "Special Elite", "Courier New", monospace';
-  ctx.fillText('DAYS', stampBoxX + stampBoxW / 2, stampBoxY + stampBoxH / 2 + 16);
+  ctx.textBaseline = 'top';
+  ctx.fillText(`${daysSince} days of us`, sX + sW / 2, sY + sH - 28);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.globalAlpha = 1;
+  ctx.restore();
 
   // Postmark stamp (top-right, enlarged deep red)
   const stampX = LETTER_W - pad - 55;
