@@ -12,6 +12,7 @@ const MONTHS_EN = [
 
 const state = {
   partnerName: '',
+  senderName: '',
   togetherDate: null,
   letterContent: '',
   photos: [null, null, null, null],
@@ -170,7 +171,7 @@ function generatePaperGrain() {
 
 // ============ FORM INPUT TYPEWRITER SOUND ============
 
-document.querySelectorAll('#setup-form input[type="text"], #setup-form textarea').forEach(el => {
+document.querySelectorAll('#setup-form input[type="text"], #setup-form input[type="date"], #setup-form textarea').forEach(el => {
   el.addEventListener('input', () => playTypeClick());
 });
 
@@ -201,6 +202,7 @@ setupForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   state.partnerName = document.getElementById('partner-name').value.trim();
+  state.senderName = document.getElementById('sender-name').value.trim();
   const dateStr = document.getElementById('together-date').value;
   state.togetherDate = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
   state.letterContent = document.getElementById('letter-content').value.trim();
@@ -227,6 +229,7 @@ function renderResult() {
 
   document.getElementById('letter-greeting').textContent = greeting;
   document.getElementById('letter-body').textContent = body;
+  document.getElementById('letter-sender').textContent = state.senderName ? `Yours, ${state.senderName}` : '';
   document.getElementById('letter-days').textContent = `${daysSince} days together`;
   document.getElementById('letter-days').classList.add('visible');
 
@@ -243,7 +246,7 @@ function renderResult() {
     });
 
     document.getElementById('strip-caption').textContent =
-      state.partnerName ? `${state.partnerName} & me` : 'you & me';
+      (state.partnerName && state.senderName) ? `${state.partnerName} & ${state.senderName}` : state.partnerName ? `${state.partnerName} & me` : 'you & me';
   } else {
     photoboothStrip.style.display = 'none';
   }
@@ -319,11 +322,14 @@ function expandLetter() {
 
   const greetingEl = document.getElementById('expand-letter-greeting');
   const bodyEl = document.getElementById('expand-letter-body');
+  const senderEl = document.getElementById('expand-letter-sender');
   const daysEl = document.getElementById('expand-letter-days');
+  const senderStr = state.senderName ? `Yours, ${state.senderName}` : '';
 
   // Clear for typewriter
   greetingEl.textContent = '';
   bodyEl.textContent = '';
+  senderEl.textContent = '';
   daysEl.textContent = '';
   daysEl.classList.remove('visible');
 
@@ -332,7 +338,7 @@ function expandLetter() {
   expandLetterPanel.classList.add('active');
 
   // Start typewriter
-  startExpandedTyping(greetingEl, bodyEl, daysEl, greeting, body, `${daysSince} days together`);
+  startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greeting, body, senderStr, `${daysSince} days together`);
 }
 
 function expandPhotobooth() {
@@ -367,7 +373,7 @@ function collapsePanel() {
 
 // ============ TYPEWRITER EFFECT (in expanded letter) ============
 
-async function startExpandedTyping(greetingEl, bodyEl, daysEl, greeting, body, daysStr) {
+async function startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greeting, body, senderStr, daysStr) {
   state.typingActive = true;
 
   // Wait for expand animation
@@ -387,6 +393,15 @@ async function startExpandedTyping(greetingEl, bodyEl, daysEl, greeting, body, d
   await typeText(bodyEl, body, 40);
   bodyEl.classList.remove('typing-cursor');
   if (!state.typingActive) return;
+
+  // Type sender signature
+  if (senderStr) {
+    await delay(300);
+    senderEl.classList.add('typing-cursor');
+    await typeText(senderEl, senderStr, 50);
+    senderEl.classList.remove('typing-cursor');
+    if (!state.typingActive) return;
+  }
 
   await delay(500);
 
@@ -581,6 +596,17 @@ function renderLetterCanvas() {
     y += 8;
   }
 
+  // Sender signature
+  if (state.senderName) {
+    y += 20;
+    ctx.font = 'italic 22px "Special Elite", "Courier New", monospace';
+    ctx.fillStyle = INK;
+    ctx.textAlign = 'right';
+    ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
+    ctx.textAlign = 'left';
+    y += lineHeight;
+  }
+
   // Days counter
   const daysSince = calculateDaysTogether(state.togetherDate);
   const daysText = `${daysSince} days together`;
@@ -650,7 +676,7 @@ async function renderPhotoboothCanvas() {
   ctx.font = '12px "Special Elite", monospace';
   ctx.fillStyle = MUTED;
   ctx.textAlign = 'center';
-  const caption = state.partnerName ? `${state.partnerName} & me` : 'you & me';
+  const caption = (state.partnerName && state.senderName) ? `${state.partnerName} & ${state.senderName}` : state.partnerName ? `${state.partnerName} & me` : 'you & me';
   ctx.fillText(caption, W / 2, y + 16);
 
   return canvas;
@@ -679,6 +705,7 @@ async function shareAll() {
   // Build share URL
   const shareData = {
     n: state.partnerName,
+    s: state.senderName,
     d: document.getElementById('together-date').value,
     l: state.letterContent,
   };
@@ -821,6 +848,10 @@ function decodeShareData(hash) {
   if (data.n) {
     document.getElementById('partner-name').value = data.n;
     state.partnerName = data.n;
+  }
+  if (data.s) {
+    document.getElementById('sender-name').value = data.s;
+    state.senderName = data.s;
   }
   if (data.d) {
     document.getElementById('together-date').value = data.d;
