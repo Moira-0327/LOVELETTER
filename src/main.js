@@ -238,6 +238,9 @@ function renderResult() {
   document.getElementById('letter-greeting').textContent = greeting;
   document.getElementById('letter-body').textContent = body;
   document.getElementById('letter-sender').textContent = state.senderName ? `Yours, ${state.senderName}` : '';
+  const sealDateStr = `sealed on ${month} ${day}, ${today.getFullYear()}`;
+  document.getElementById('letter-seal-date').textContent = sealDateStr;
+  document.getElementById('letter-seal-date').classList.add('visible');
   document.getElementById('letter-days').textContent = `${daysSince} days together`;
   document.getElementById('letter-days').classList.add('visible');
 
@@ -333,13 +336,17 @@ function expandLetter() {
   const greetingEl = document.getElementById('expand-letter-greeting');
   const bodyEl = document.getElementById('expand-letter-body');
   const senderEl = document.getElementById('expand-letter-sender');
+  const sealDateEl = document.getElementById('expand-letter-seal-date');
   const daysEl = document.getElementById('expand-letter-days');
   const senderStr = state.senderName ? `Yours, ${state.senderName}` : '';
+  const sealStr = `sealed on ${month} ${day}, ${today.getFullYear()}`;
 
   // Clear for typewriter
   greetingEl.textContent = '';
   bodyEl.textContent = '';
   senderEl.textContent = '';
+  sealDateEl.textContent = '';
+  sealDateEl.classList.remove('visible');
   daysEl.textContent = '';
   daysEl.classList.remove('visible');
 
@@ -348,7 +355,7 @@ function expandLetter() {
   expandLetterPanel.classList.add('active');
 
   // Start typewriter
-  startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greeting, body, senderStr, `${daysSince} days together`);
+  startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, `${daysSince} days together`);
 }
 
 function expandPhotobooth() {
@@ -383,7 +390,7 @@ function collapsePanel() {
 
 // ============ TYPEWRITER EFFECT (in expanded letter) ============
 
-async function startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greeting, body, senderStr, daysStr) {
+async function startExpandedTyping(greetingEl, bodyEl, senderEl, sealDateEl, daysEl, greeting, body, senderStr, sealStr, daysStr) {
   state.typingActive = true;
 
   // Wait for expand animation
@@ -413,7 +420,13 @@ async function startExpandedTyping(greetingEl, bodyEl, senderEl, daysEl, greetin
     if (!state.typingActive) return;
   }
 
-  await delay(500);
+  await delay(300);
+
+  // Show seal date
+  sealDateEl.textContent = sealStr;
+  sealDateEl.classList.add('visible');
+
+  await delay(400);
 
   // Show days counter
   daysEl.textContent = daysStr;
@@ -463,8 +476,10 @@ function delay(ms) {
 
 const PAPER_COLOR = '#EAE2D3';
 const CREAM = '#FFF8F0';
-const INK = '#1A3D5E';
-const MUTED = '#7A8B96';
+const INK = '#3A1E1E';
+const MUTED = '#8A7A76';
+const ACCENT = '#B83A3A';
+const ACCENT_MUTED = '#C49090';
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -592,15 +607,15 @@ function renderLetterCanvas() {
   const pad = 80;
   let y = pad;
 
-  // Date
-  ctx.font = '300 72px "Playfair Display", Georgia, serif';
+  // Date (typewriter font)
+  ctx.font = '400 72px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = INK;
   ctx.textBaseline = 'top';
   const dayText = document.getElementById('letter-day').textContent;
   ctx.fillText(dayText, pad, y);
   const dayWidth = ctx.measureText(dayText).width;
 
-  ctx.font = '300 22px "Playfair Display", Georgia, serif';
+  ctx.font = '400 22px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = MUTED;
   ctx.fillText(document.getElementById('letter-month').textContent, pad + dayWidth + 12, y + 42);
   y += 100;
@@ -640,16 +655,26 @@ function renderLetterCanvas() {
     y += 8;
   }
 
-  // Sender signature
+  // Sender signature (ink handwriting script)
   if (state.senderName) {
     y += 20;
-    ctx.font = 'italic 22px "Special Elite", "Courier New", monospace';
+    ctx.font = '36px "Mrs Saint Delafield", cursive';
     ctx.fillStyle = INK;
     ctx.textAlign = 'right';
     ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
     ctx.textAlign = 'left';
-    y += lineHeight;
+    y += 44;
   }
+
+  // Seal date below signature
+  const now2 = new Date();
+  const sealMonth = MONTHS_EN[now2.getMonth()];
+  const sealText = `sealed on ${sealMonth} ${now2.getDate()}, ${now2.getFullYear()}`;
+  ctx.font = '14px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'right';
+  ctx.fillText(sealText.toUpperCase(), LETTER_W - pad, y);
+  ctx.textAlign = 'left';
 
   // Days counter
   const daysSince = calculateDaysTogether(state.togetherDate);
@@ -667,7 +692,7 @@ function renderLetterCanvas() {
   ctx.save();
   ctx.translate(stampX, stampY);
   ctx.rotate(0.2);
-  ctx.strokeStyle = '#6A9BC5';
+  ctx.strokeStyle = ACCENT_MUTED;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0, 0, stampR, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 1;
@@ -675,7 +700,7 @@ function renderLetterCanvas() {
   ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(-stampR - 6, 0); ctx.lineTo(-stampR, 0); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(stampR, 0); ctx.lineTo(stampR + 6, 0); ctx.stroke();
-  ctx.fillStyle = '#6A9BC5';
+  ctx.fillStyle = ACCENT_MUTED;
   ctx.font = '400 8px "DM Sans", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -756,8 +781,8 @@ async function renderPhotoboothCanvas() {
   ctx.fillText(caption, STRIP_W / 2, footerY);
 
   // Logo
-  ctx.font = 'italic 22px "Playfair Display", Georgia, serif';
-  ctx.fillStyle = INK;
+  ctx.font = 'italic 500 22px "Playfair Display", Georgia, serif';
+  ctx.fillStyle = ACCENT;
   ctx.fillText('Love Letter', STRIP_W / 2, footerY + 30);
 
   // Days
@@ -856,7 +881,7 @@ function createCompositeImage(letterCanvas, boothCanvas) {
     composite.height = h * SCALE;
     const ctx = composite.getContext('2d');
     ctx.scale(SCALE, SCALE);
-    ctx.fillStyle = '#165dad';
+    ctx.fillStyle = ACCENT;
     ctx.fillRect(0, 0, w, h);
     ctx.drawImage(letterCanvas, 0, 0, letterCanvas.width, letterCanvas.height,
       MARGIN, MARGIN, letterCanvas.width / SCALE, letterCanvas.height / SCALE);
