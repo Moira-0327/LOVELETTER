@@ -4,18 +4,18 @@
    ============================================ */
 
 :root {
-  --accent: #fca1e6;
-  --accent-deep: #d386c0;
-  --accent-light: #4A89C4;
-  --accent-muted: #8AACC8;
+  --accent: #C1121F;
+  --accent-deep: #780000;
+  --accent-light: #f16a73ec;
+  --accent-muted: #f16a73b7;
   --cream: #FDF6F2;
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #1A3D5E;
-  --ink-light: #3A6080;
-  --text-dark: #165dad;
-  --text-muted: #7A8B96;
+  --ink: #C1121F;
+  --ink-light: #f16a73ec;
+  --text-dark: #780000;
+  --text-muted: #6590ac;
   --paper: #EAE2D3;
   --pink: #DFC8CD;
   --pink-dark: #C9A8B0;
@@ -502,7 +502,7 @@ html, body {
 
 .letter-sender {
   font-family: var(--font-script);
-  font-size: 22px;
+  font-size: 24x;
   color: var(--ink);
   text-align: right;
   margin-top: 12px;
@@ -547,7 +547,7 @@ html, body {
 }
 
 .expand-letter-paper .letter-sender {
-  font-size: 32px;
+  font-size: 24px;
   margin-top: 20px;
 }
 
