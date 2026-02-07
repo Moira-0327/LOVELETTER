@@ -689,12 +689,12 @@ function renderLetterCanvas() {
   // Sender signature
   if (state.senderName) {
     y += 20;
-    ctx.font = '24px "Special Elite", "Courier New", monospace';
+    ctx.font = '22px "Special Elite", "Courier New", monospace';
     ctx.fillStyle = INK;
     ctx.textAlign = 'right';
     ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
     ctx.textAlign = 'left';
-    y += 48;
+    y += 36;
   }
 
   // Seal time below signature (24h format)
@@ -703,7 +703,7 @@ function renderLetterCanvas() {
   const sealMins = String(now2.getMinutes()).padStart(2, '0');
   const sealText = `SEALED AT ${sealHours}:${sealMins}`;
   ctx.font = '14px "Special Elite", "Courier New", monospace';
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = INK;
   ctx.textAlign = 'right';
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
