@@ -462,6 +462,7 @@ const SCALE = 3;
 
 // Save button in flat-lay (saves composite)
 document.getElementById('save-letter').addEventListener('click', async (e) => {
+  e.preventDefault();
   e.stopPropagation();
   const letterCanvas = renderLetterCanvas();
   if (state.hasPhotos) {
@@ -475,6 +476,7 @@ document.getElementById('save-letter').addEventListener('click', async (e) => {
 
 // Save in expanded letter
 document.getElementById('expand-save-letter').addEventListener('click', (e) => {
+  e.preventDefault();
   e.stopPropagation();
   const canvas = renderLetterCanvas();
   downloadCanvas(canvas, 'love-letter.png');
@@ -482,6 +484,7 @@ document.getElementById('expand-save-letter').addEventListener('click', (e) => {
 
 // Save in expanded photobooth
 document.getElementById('expand-save-photobooth').addEventListener('click', async (e) => {
+  e.preventDefault();
   e.stopPropagation();
   const canvas = await renderPhotoboothCanvas();
   downloadCanvas(canvas, 'photobooth.png');
@@ -648,6 +651,7 @@ async function renderPhotoboothCanvas() {
 // ============ SHARE — composite image ============
 
 document.getElementById('share-letter').addEventListener('click', (e) => {
+  e.preventDefault();
   e.stopPropagation();
   shareAll();
 });
