@@ -3,7 +3,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
   root: '.',
-  base: '/LOVELETTER/',
+  base: '/lover-letter/',
   plugins: [basicSsl()],
   server: {
     host: true,
