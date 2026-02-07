@@ -175,6 +175,12 @@ html, body {
   resize: none;
 }
 
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
 /* Match date input font and alignment to other inputs */
 .form-group input[type="date"] {
   -webkit-appearance: none;
@@ -182,6 +188,11 @@ html, body {
   appearance: none;
   text-align: left;
   padding-left: 0;
+}
+
+/* Date input placeholder styling (when empty) */
+.form-group input[type="date"]:not(:valid) {
+  color: #999999;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit {
@@ -206,6 +217,14 @@ html, body {
 .form-group input[type="date"]::-webkit-datetime-edit-day-field,
 .form-group input[type="date"]::-webkit-datetime-edit-year-field {
   color: var(--text-dark);
+}
+
+/* Date input placeholder fields (when empty) */
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-text,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-year-field {
+  color: #999999;
 }
 
 .form-group input:focus,
