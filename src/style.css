@@ -164,7 +164,7 @@ html, body {
 .form-group textarea {
   font-family: var(--font-typewriter);
   font-size: 15px;
-  color: var(--text-dark);
+  color: var(--accent-deep);
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--kraft-light);
