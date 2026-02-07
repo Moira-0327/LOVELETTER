@@ -175,29 +175,6 @@ html, body {
   resize: none;
 }
 
-/* Match date input font and alignment to other inputs */
-.form-group input[type="date"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  text-align: left;
-  padding-left: 0;
-}
-
-.form-group input[type="date"]::-webkit-datetime-edit {
-  font-family: var(--font-typewriter);
-  font-size: 15px;
-  color: #8A7A76;
-  padding: 0;
-  text-align: left;
-}
-
-.form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  font-family: var(--font-typewriter);
-  color: #8A7A76;
-  padding: 0;
-}
-
 .form-group input:focus,
 .form-group textarea:focus {
   border-bottom-color: var(--accent);
@@ -214,19 +191,11 @@ html, body {
   border-color: var(--accent);
 }
 
-/* Photo upload grid — 4-slot layout */
-.photo-input-hidden {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
+/* Photo upload grid */
 .photo-upload-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 12px;
 }
 
 .photo-upload-slot {
@@ -244,21 +213,27 @@ html, body {
   background: rgba(223, 200, 205, 0.12);
 }
 
-.photo-upload-slot.filled {
+.photo-upload-slot.has-photo {
   border-style: solid;
   border-color: var(--kraft);
 }
 
-.photo-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+.photo-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
 }
 
-.photo-upload-slot.filled .photo-placeholder {
-  display: none;
+.photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .plus-icon {
@@ -269,16 +244,17 @@ html, body {
 }
 
 .photo-preview {
-  display: none;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.15) brightness(1.0);
+  display: none;
+  filter: grayscale(100%) contrast(1.1) brightness(1.05);
 }
 
-.photo-upload-slot.filled .photo-preview {
-  display: block;
-}
+.photo-upload-slot.has-photo .photo-placeholder { display: none; }
+.photo-upload-slot.has-photo .photo-preview { display: block; }
 
 /* Submit button */
 .submit-btn {
@@ -354,9 +330,8 @@ html, body {
   position: absolute;
   z-index: 3;
   width: 70%;
-  aspect-ratio: 850 / 1100;
-  background: url('/src/paper-texture.png') repeat;
-  background-size: 256px 256px;
+  height: 54%;
+  background-color: var(--paper);
   padding: 0;
   transform: rotate(0.5deg);
   display: flex;
@@ -365,7 +340,6 @@ html, body {
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: fadeInUp 0.8s ease 0.2s both;
-  overflow: hidden;
 }
 
 .letter-paper:hover {
@@ -406,12 +380,12 @@ html, body {
 /* Vintage postmark stamp */
 .postmark {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 60px;
-  height: 60px;
-  color: var(--ink);
-  opacity: 0.65;
+  top: 8px;
+  right: 8px;
+  width: 52px;
+  height: 52px;
+  color: var(--accent-muted);
+  opacity: 0.55;
   z-index: 3;
   transform: rotate(12deg);
 }
@@ -426,7 +400,7 @@ html, body {
 .letter-inner {
   position: relative;
   z-index: 2;
-  padding: 78px 24px 20px;
+  padding: 28px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -478,6 +452,15 @@ html, body {
   overflow: hidden;
 }
 
+/* Ink texture — heavier bleed for handwritten feel */
+.letter-greeting,
+.letter-body {
+  text-shadow:
+    0 0 1px currentColor,
+    0.3px 0.3px 0.5px rgba(192, 57, 43, 0.2);
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
 .setup-title {
   text-shadow:
     0.5px 0.5px 0 currentColor,
@@ -489,7 +472,7 @@ html, body {
 .letter-seal-date {
   font-family: var(--font-typewriter);
   font-size: 9px;
-  color: var(--ink);
+  color: var(--text-deep);
   letter-spacing: 2px;
   text-transform: uppercase;
   text-align: right;
@@ -503,6 +486,9 @@ html, body {
   opacity: 1;
 }
 
+.postmark {
+  filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='r'><feTurbulence baseFrequency='0.4' numOctaves='2' seed='3'/><feDisplacementMap in='SourceGraphic' scale='1.5'/></filter></svg>#r");
+}
 
 
 /* Typewriter cursor */
@@ -521,14 +507,14 @@ html, body {
 
 .letter-sender {
   font-family: var(--font-typewriter);
-  font-size: 12px;
+  font-size: 20px;
   color: var(--ink);
   text-align: right;
   margin-top: 12px;
 }
 
 .expand-letter-paper .letter-sender {
-  font-size: 15px;
+  font-size: 24px;
   margin-top: 20px;
 }
 
@@ -548,33 +534,33 @@ html, body {
   opacity: 1;
 }
 
-/* ============ DAYS STAMP — Rectangular Ink Stamp Style ============ */
+/* ============ DAYS STAMP — Oval Library Stamp Style ============ */
 
 .days-stamp {
   position: absolute;
   z-index: 4;
   right: 8px;
   bottom: 8px;
-  width: 110px;
-  height: 60px;
-  color: #165dad;
-  transform: rotate(-3deg);
+  width: 90px;
+  height: 68px;
+  color: var(--accent);
+  transform: rotate(-5deg);
   opacity: 0;
   transition: opacity 0.6s ease;
 }
 
 .days-stamp.visible {
-  opacity: 1;
+  opacity: 0.70;
 }
 
 .days-stamp-expanded {
-  width: 145px;
-  height: 80px;
+  width: 120px;
+  height: 90px;
   right: 14px;
   bottom: 14px;
 }
 
-.rect-stamp-svg {
+.oval-stamp-svg {
   width: 100%;
   height: 100%;
 }
@@ -588,9 +574,9 @@ html, body {
   bottom: 18%;
   width: 30%;
   max-width: 140px;
-  background: var(--accent-deep);
-  padding: 7px 7px 6px;
-  transform: rotate(30deg);
+  background: var(--cream);
+  padding: 7px;
+  transform: rotate(15deg);
   box-shadow: 4px 6px 25px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
@@ -601,17 +587,17 @@ html, body {
 }
 
 .photobooth-strip:hover {
-  transform: rotate(30deg) scale(1.04);
+  transform: rotate(15deg) scale(1.04);
   box-shadow: 6px 8px 30px rgba(0,0,0,0.3);
 }
 
 .strip-header {
   font-family: var(--font-ui);
-  font-size: 7px;
+  font-size: 6px;
   font-weight: 400;
-  letter-spacing: 1.5px;
-  color: #FDF6F2;
-  margin-bottom: 5px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
   text-transform: uppercase;
 }
 
@@ -622,23 +608,18 @@ html, body {
   gap: 3px;
 }
 
-.strip-photos .strip-photo:last-child {
-  margin-bottom: 0;
-}
-
 .strip-photo {
   width: 100%;
   aspect-ratio: 4/3;
-  background-color: var(--cream-dark);
+  background: var(--cream-dark);
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  filter: grayscale(100%) contrast(1.15) brightness(1.0);
-  position: relative;
+  filter: grayscale(100%) contrast(1.1) brightness(1.05);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .strip-footer {
-  margin-top: 5px;
+  margin-top: 8px;
   text-align: center;
 }
 
@@ -646,7 +627,7 @@ html, body {
   font-family: var(--font-ui);
   font-size: 7px;
   font-weight: 400;
-  color: #FDF6F2;
+  color: var(--ink);
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
@@ -762,10 +743,9 @@ html, body {
   position: relative;
   width: 86%;
   max-width: 380px;
-  aspect-ratio: 850 / 1100;
-  max-height: 85vh;
-  background: url('/src/paper-texture.png') repeat;
-  background-size: 256px 256px;
+  min-height: 68vh;
+  max-height: 80vh;
+  background-color: var(--paper);
   display: flex;
   flex-direction: column;
   box-shadow: 4px 8px 40px rgba(0,0,0,0.25);
@@ -777,7 +757,7 @@ html, body {
 .expand-letter-paper::-webkit-scrollbar { display: none; }
 
 .expand-letter-paper .letter-inner {
-  padding: 94px 32px 28px;
+  padding: 36px 32px 28px;
   gap: 16px;
 }
 
@@ -808,8 +788,8 @@ html, body {
 .expand-photobooth-strip {
   width: 52%;
   max-width: 220px;
-  background: var(--accent-deep);
-  padding: 12px;
+  background: var(--cream);
+  padding: 14px 10px 18px;
   box-shadow: 4px 8px 40px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
@@ -817,9 +797,9 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-header {
-  font-size: 11px;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  font-size: 9px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
 }
 
 .expand-photobooth-strip .strip-photos {
@@ -836,7 +816,7 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-footer {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 /* ============ EXPAND ACTIONS ============ */
@@ -890,13 +870,13 @@ html, body {
 /* ============ RESPONSIVE ============ */
 
 @media (max-width: 380px) {
-  .letter-paper { width: 74%; }
+  .letter-paper { width: 74%; height: 56%; }
   .letter-inner { padding: 22px 18px 16px; }
   .letter-day { font-size: 28px; }
   .letter-body { font-size: 11px; }
   .photobooth-strip { width: 34%; }
   .expand-letter-paper { width: 92%; }
-  .expand-letter-paper .letter-inner { padding: 78px 24px 22px; }
+  .expand-letter-paper .letter-inner { padding: 28px 24px 22px; }
   .expand-letter-paper .letter-day { font-size: 36px; }
   .expand-letter-paper .letter-body { font-size: 14px; }
   .expand-photobooth-strip { width: 56%; }
