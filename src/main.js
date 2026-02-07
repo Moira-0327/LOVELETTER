@@ -234,18 +234,21 @@ photoSlots.forEach((slot, i) => {
 
 photoInput.addEventListener('change', (e) => {
   const files = Array.from(e.target.files);
-  const currentCount = state.photos.filter(p => p !== null).length;
-  const allowed = Math.min(files.length, 4 - currentCount);
+
+  // Pre-collect empty slot indices synchronously so each file gets a unique slot
+  const emptySlots = [];
+  for (let i = 0; i < 4; i++) {
+    if (state.photos[i] === null) emptySlots.push(i);
+  }
+  const allowed = Math.min(files.length, emptySlots.length);
 
   for (let i = 0; i < allowed; i++) {
     const reader = new FileReader();
-    const slotIndex = state.photos.indexOf(null);
-    if (slotIndex === -1) break;
-
-    reader.onload = ((idx) => (ev) => {
-      state.photos[idx] = ev.target.result;
-      updateSlotUI(idx);
-    })(slotIndex);
+    const slotIndex = emptySlots[i];
+    reader.onload = (ev) => {
+      state.photos[slotIndex] = ev.target.result;
+      updateSlotUI(slotIndex);
+    };
     reader.readAsDataURL(files[i]);
   }
   photoInput.value = '';
