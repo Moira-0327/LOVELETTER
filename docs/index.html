@@ -1838,7 +1838,7 @@ function renderLetterCanvas() {
   // Sender signature
   if (state.senderName) {
     y += 20;
-    ctx.font = '38px "Special Elite", "Courier New", monospace';
+    ctx.font = '30px "Special Elite", "Courier New", monospace';
     ctx.fillStyle = INK;
     ctx.textAlign = 'right';
     ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
@@ -1852,81 +1852,70 @@ function renderLetterCanvas() {
   const sealMins = String(now2.getMinutes()).padStart(2, '0');
   const sealText = `SEALED AT ${sealHours}:${sealMins}`;
   ctx.font = '14px "Special Elite", "Courier New", monospace';
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = INK;
   ctx.textAlign = 'right';
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter — postage stamp style (matches LOVE stamp reference)
+  // Days counter — circular postage stamp style
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const sW = 150, sH = 165;
-  const sX = LETTER_W - pad - sW;
-  const sY = LETTER_H - pad - sH;
-  const sPad = 12; // cream border width
+  const stampCx = LETTER_W - pad - 60;
+  const stampCy = LETTER_H - pad - 60;
+  const stampR = 60;
+  const stampPadding = 8;
 
   ctx.save();
 
-  // Cream outer border
+  // Outer circle background (cream)
   ctx.fillStyle = CREAM;
-  ctx.fillRect(sX, sY, sW, sH);
+  ctx.beginPath();
+  ctx.arc(stampCx, stampCy, stampR, 0, Math.PI * 2);
+  ctx.fill();
 
-  // Scalloped perforation circles along edges
+  // Perforated/scalloped edge circles around the stamp
   ctx.fillStyle = PAPER_COLOR;
-  const step = 16, pr = 5;
-  for (let px = sX + step / 2; px < sX + sW; px += step) {
-    ctx.beginPath(); ctx.arc(px, sY, pr, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(px, sY + sH, pr, 0, Math.PI * 2); ctx.fill();
-  }
-  for (let py = sY + step / 2; py < sY + sH; py += step) {
-    ctx.beginPath(); ctx.arc(sX, py, pr, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(sX + sW, py, pr, 0, Math.PI * 2); ctx.fill();
+  const perfStep = Math.PI / 8; // 16 perforations around circle
+  const perfR = 6;
+  for (let i = 0; i < Math.PI * 2; i += perfStep) {
+    const px = stampCx + Math.cos(i) * (stampR + perfR * 0.5);
+    const py = stampCy + Math.sin(i) * (stampR + perfR * 0.5);
+    ctx.beginPath();
+    ctx.arc(px, py, perfR, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Pink inner area
+  // Inner pink/muted circle
   ctx.fillStyle = ACCENT_MUTED;
-  ctx.fillRect(sX + sPad, sY + sPad, sW - sPad * 2, sH - sPad * 2);
+  ctx.beginPath();
+  ctx.arc(stampCx, stampCy, stampR - stampPadding, 0, Math.PI * 2);
+  ctx.fill();
 
-  // Large hand-drawn heart (double stroke for sketch feel)
-  const hx = sX + sW / 2, hy = sY + sPad + (sH - sPad * 2) * 0.48;
-  const hs = 2.8;
-  ctx.save();
-  ctx.translate(hx, hy);
-  ctx.scale(hs, hs);
-  // Outer heart
-  ctx.beginPath();
-  ctx.moveTo(0, 14);
-  ctx.bezierCurveTo(-2, 10, -18, -2, -18, -10);
-  ctx.bezierCurveTo(-18, -18, -10, -22, 0, -14);
-  ctx.bezierCurveTo(10, -22, 18, -18, 18, -10);
-  ctx.bezierCurveTo(18, -2, 2, 10, 0, 14);
-  ctx.closePath();
+  // Outer circle border
   ctx.strokeStyle = INK;
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  // Inner heart (sketch double-line)
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(0, 11);
-  ctx.bezierCurveTo(-2, 8, -15, -1, -15, -8);
-  ctx.bezierCurveTo(-15, -15, -8, -18, 0, -11);
-  ctx.bezierCurveTo(8, -18, 15, -15, 15, -8);
-  ctx.bezierCurveTo(15, -1, 2, 8, 0, 11);
-  ctx.closePath();
-  ctx.lineWidth = 0.5;
-  ctx.globalAlpha = 0.5;
+  ctx.arc(stampCx, stampCy, stampR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Inner circle border
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.6;
+  ctx.beginPath();
+  ctx.arc(stampCx, stampCy, stampR - stampPadding - 2, 0, Math.PI * 2);
   ctx.stroke();
   ctx.globalAlpha = 1;
-  ctx.restore();
 
-  // "LOVE" text inside heart
+  // Number (large, bold)
   ctx.fillStyle = INK;
-  ctx.font = '600 18px "Playfair Display", Georgia, serif';
+  ctx.font = 'bold 36px "Playfair Display", Georgia, serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('LOVE', hx, hy - 4);
+  ctx.fillText(String(daysSince), stampCx, stampCy - 4);
 
-  // "xxx days of us" handwritten at bottom
-  ctx.font = '16px "Mrs Saint Delafield", cursive';
-  ctx.fillText(`${daysSince} days of us`, hx, sY + sH - sPad - 12);
+  // "of us" text below
+  ctx.font = '14px "Special Elite", "Courier New", monospace';
+  ctx.fillStyle = INK;
+  ctx.fillText('of us', stampCx, stampCy + 20);
 
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
