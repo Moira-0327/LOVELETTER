@@ -492,7 +492,7 @@ html, body {
 .letter-greeting {
   font-family: var(--font-typewriter);
   font-size: 14px;
-  color: var(--ink);
+  color: var(--accent-deep);
   line-height: 1.4;
   min-height: 1.4em;
 }
@@ -500,7 +500,7 @@ html, body {
 .letter-body {
   font-family: var(--font-typewriter);
   font-size: 12px;
-  color: var(--ink);
+  color: var(--accent-deep);
   line-height: 1.8;
   white-space: pre-wrap;
   min-height: 40px;
@@ -551,7 +551,7 @@ html, body {
 .letter-sender {
   font-family: var(--font-typewriter);
   font-size: 12px;
-  color: var(--ink);
+  color: var(--accent-deep);
   text-align: right;
   margin-top: 12px;
 }
