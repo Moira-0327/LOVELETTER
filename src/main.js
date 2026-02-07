@@ -295,7 +295,7 @@ function renderResult() {
   const sealTimeStr = `sealed at ${hours}:${mins}`;
   document.getElementById('letter-seal-date').textContent = sealTimeStr;
   document.getElementById('letter-seal-date').classList.add('visible');
-  document.getElementById('days-stamp').innerHTML = stampHTML(daysSince);
+  document.getElementById('days-stamp').innerHTML = stampHTML(daysSince, state.togetherDate);
   document.getElementById('days-stamp').classList.add('visible');
 
   // --- Photobooth strip ---
@@ -330,16 +330,23 @@ function renderResult() {
   }, 1200);
 }
 
-function stampHTML(days) {
-  return `<svg class="rect-stamp-svg" viewBox="0 0 170 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g opacity="0.7" transform="rotate(-1.5 85 45)">
-      <rect x="2" y="2" width="166" height="86" rx="1" stroke="currentColor" stroke-width="2.5"/>
-      <rect x="8" y="8" width="154" height="74" rx="1" stroke="currentColor" stroke-width="1"/>
-      <text x="85" y="24" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="500" letter-spacing="2" fill="currentColor">${days} DAYS</text>
-      <line x1="16" y1="45" x2="58" y2="45" stroke="currentColor" stroke-width="1" opacity="0.6"/>
-      <line x1="112" y1="45" x2="154" y2="45" stroke="currentColor" stroke-width="1" opacity="0.6"/>
-      <text x="85" y="49" text-anchor="middle" font-family="'Playfair Display',Georgia,serif" font-size="17" font-weight="600" letter-spacing="2" fill="currentColor">LOVE</text>
-      <text x="85" y="73" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="500" letter-spacing="3" fill="currentColor">OF US</text>
+function stampHTML(days, togetherDate) {
+  const d = togetherDate || new Date();
+  const dateStr = `${d.getDate()} ${MONTHS_EN[d.getMonth()].toUpperCase().slice(0, 3)} ${d.getFullYear()}`;
+  return `<svg class="rect-stamp-svg" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g opacity="0.7" transform="rotate(-1.5 100 55)">
+      <!-- Dotted outer border -->
+      <rect x="2" y="2" width="196" height="106" rx="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 2.5"/>
+      <!-- Double solid inner border -->
+      <rect x="10" y="10" width="180" height="90" rx="1" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="14" y="14" width="172" height="82" rx="1" stroke="currentColor" stroke-width="0.7"/>
+      <!-- Horizontal divider -->
+      <line x1="14" y1="62" x2="186" y2="62" stroke="currentColor" stroke-width="0.7"/>
+      <!-- Top section -->
+      <text x="100" y="38" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" letter-spacing="3" fill="currentColor">${days} DAYS</text>
+      <text x="100" y="55" text-anchor="middle" font-family="'Instrument Serif',Georgia,serif" font-size="13" font-style="italic" letter-spacing="2" fill="currentColor">of Love</text>
+      <!-- Bottom section -->
+      <text x="100" y="84" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="400" letter-spacing="1.5" fill="currentColor">since:  ${dateStr}</text>
     </g>
   </svg>`;
 }
@@ -758,21 +765,26 @@ function renderLetterCanvas() {
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter — rectangular ink stamp style
+  // Days counter — multi-border ink stamp (reference: "Excellently Handmade" style)
   const STAMP_COLOR = '#165dad';
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const rW = 170, rH = 90;
+  const rW = 200, rH = 110;
   const rX = LETTER_W - pad - rW - 5;
   const rY = LETTER_H - pad - rH - 5;
+
+  // Format together date
+  const td = state.togetherDate || new Date();
+  const stampDateStr = `${td.getDate()} ${MONTHS_EN[td.getMonth()].toUpperCase().slice(0, 3)} ${td.getFullYear()}`;
 
   ctx.save();
   ctx.translate(rX + rW / 2, rY + rH / 2);
   ctx.rotate(-0.06);
   ctx.translate(-(rX + rW / 2), -(rY + rH / 2));
 
-  // Ink bleed effect — multiple offset strokes at low alpha
   ctx.strokeStyle = STAMP_COLOR;
   ctx.fillStyle = STAMP_COLOR;
+
+  // Ink bleed effect — multiple offset strokes at low alpha
   for (let pass = 0; pass < 3; pass++) {
     const ox = (Math.random() - 0.5) * 1.2;
     const oy = (Math.random() - 0.5) * 1.2;
@@ -780,45 +792,51 @@ function renderLetterCanvas() {
     ctx.translate(ox, oy);
     ctx.globalAlpha = pass === 0 ? 0.65 : 0.12;
 
-    // Outer rectangle
-    ctx.lineWidth = 2.5;
+    // Dotted outer border
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([2.5, 2.5]);
     ctx.strokeRect(rX, rY, rW, rH);
-    // Inner rectangle
-    ctx.lineWidth = 1;
-    ctx.strokeRect(rX + 6, rY + 6, rW - 12, rH - 12);
+
+    // Double solid inner border
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(rX + 8, rY + 8, rW - 16, rH - 16);
+    ctx.lineWidth = 0.7;
+    ctx.strokeRect(rX + 12, rY + 12, rW - 24, rH - 24);
+
+    // Horizontal divider
+    ctx.beginPath();
+    ctx.moveTo(rX + 12, rY + 60);
+    ctx.lineTo(rX + rW - 12, rY + 60);
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
 
     ctx.restore();
   }
 
-  // Text content with ink bleed
+  // Text content
   ctx.globalAlpha = 0.7;
   ctx.fillStyle = STAMP_COLOR;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const cx = rX + rW / 2;
-  const cy = rY + rH / 2;
 
-  // Top text: "xxx DAYS"
-  ctx.font = '500 12px "DM Sans", sans-serif';
-  ctx.letterSpacing = '2px';
-  ctx.fillText(`${daysSince} DAYS`, cx, rY + 20);
+  // Top section: "XXX DAYS"
+  ctx.font = '500 13px "DM Sans", sans-serif';
+  ctx.letterSpacing = '3px';
+  ctx.fillText(`${daysSince} DAYS`, cx, rY + 36);
   ctx.letterSpacing = '0px';
 
-  // Horizontal divider lines
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.5;
-  ctx.beginPath(); ctx.moveTo(rX + 12, cy); ctx.lineTo(cx - 26, cy); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx + 26, cy); ctx.lineTo(rX + rW - 12, cy); ctx.stroke();
+  // "of Love" italic
+  ctx.font = 'italic 13px "Instrument Serif", Georgia, serif';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('of Love', cx, rY + 52);
+  ctx.letterSpacing = '0px';
 
-  // Center: "LOVE"
-  ctx.globalAlpha = 0.7;
-  ctx.font = '600 17px "Playfair Display", Georgia, serif';
-  ctx.fillText('LOVE', cx, cy);
-
-  // Bottom text: "OF US"
-  ctx.font = '500 12px "DM Sans", sans-serif';
-  ctx.letterSpacing = '3px';
-  ctx.fillText('OF US', cx, rY + rH - 20);
+  // Bottom section: "since: DATE"
+  ctx.font = '400 11px "DM Sans", sans-serif';
+  ctx.letterSpacing = '1.5px';
+  ctx.fillText(`since:  ${stampDateStr}`, cx, rY + 82);
   ctx.letterSpacing = '0px';
 
   ctx.globalAlpha = 1;
