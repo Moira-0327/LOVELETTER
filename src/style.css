@@ -426,7 +426,7 @@ html, body {
 .letter-inner {
   position: relative;
   z-index: 2;
-  padding: 28px 24px 20px;
+  padding: 78px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -786,7 +786,7 @@ html, body {
 .expand-letter-paper::-webkit-scrollbar { display: none; }
 
 .expand-letter-paper .letter-inner {
-  padding: 36px 32px 28px;
+  padding: 94px 32px 28px;
   gap: 16px;
 }
 
@@ -905,7 +905,7 @@ html, body {
   .letter-body { font-size: 11px; }
   .photobooth-strip { width: 34%; }
   .expand-letter-paper { width: 92%; }
-  .expand-letter-paper .letter-inner { padding: 28px 24px 22px; }
+  .expand-letter-paper .letter-inner { padding: 78px 24px 22px; }
   .expand-letter-paper .letter-day { font-size: 36px; }
   .expand-letter-paper .letter-body { font-size: 14px; }
   .expand-photobooth-strip { width: 56%; }
