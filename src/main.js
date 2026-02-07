@@ -864,9 +864,8 @@ async function renderPhotoboothCanvas() {
   const PHOTO_W = STRIP_W - PAD * 2;  // 540
   const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 405
   const GAP = 12;
-  const HEADER_H = 50;
-  const FOOTER_H = 50;
-  const STRIP_H = HEADER_H + PHOTO_H * 4 + GAP * 3 + FOOTER_H;
+  const TEXT_H = 36;          // space for header/footer text
+  const STRIP_H = PAD + TEXT_H + PHOTO_H * 4 + GAP * 3 + TEXT_H + PAD;
 
   const canvas = document.createElement('canvas');
   canvas.width = STRIP_W;
@@ -884,10 +883,10 @@ async function renderPhotoboothCanvas() {
   ctx.fillStyle = '#FDF6F2';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(dateStr, STRIP_W / 2, HEADER_H / 2);
+  ctx.fillText(dateStr, STRIP_W / 2, PAD + TEXT_H / 2);
 
   // Photos (4 photos, B&W film effect)
-  let y = HEADER_H;
+  let y = PAD + TEXT_H;
   for (let i = 0; i < 4; i++) {
     if (state.photos[i]) {
       try {
@@ -945,7 +944,7 @@ async function renderPhotoboothCanvas() {
   ctx.fillStyle = '#FDF6F2';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(namesStr.toUpperCase(), STRIP_W / 2, y - GAP + FOOTER_H / 2);
+  ctx.fillText(namesStr.toUpperCase(), STRIP_W / 2, y - GAP + TEXT_H / 2);
 
   return canvas;
 }

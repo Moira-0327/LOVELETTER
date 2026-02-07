@@ -602,7 +602,7 @@ html, body {
   width: 30%;
   max-width: 140px;
   background: var(--accent-deep);
-  padding: 7px;
+  padding: 7px 7px 6px;
   transform: rotate(15deg);
   box-shadow: 4px 6px 25px rgba(0,0,0,0.25);
   display: flex;
@@ -624,7 +624,7 @@ html, body {
   font-weight: 400;
   letter-spacing: 1.5px;
   color: #FDF6F2;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   text-transform: uppercase;
 }
 
@@ -635,6 +635,10 @@ html, body {
   gap: 3px;
 }
 
+.strip-photos .strip-photo:last-child {
+  margin-bottom: 0;
+}
+
 .strip-photo {
   width: 100%;
   aspect-ratio: 4/3;
@@ -643,7 +647,6 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
   filter: grayscale(100%) contrast(1.15) brightness(1.0) sepia(8%);
-  border: 1px solid rgba(0,0,0,0.05);
   position: relative;
 }
 
@@ -659,7 +662,7 @@ html, body {
 }
 
 .strip-footer {
-  margin-top: 6px;
+  margin-top: 5px;
   text-align: center;
 }
 
@@ -830,7 +833,7 @@ html, body {
   width: 52%;
   max-width: 220px;
   background: var(--accent-deep);
-  padding: 14px 10px;
+  padding: 12px;
   box-shadow: 4px 8px 40px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
@@ -840,7 +843,7 @@ html, body {
 .expand-photobooth-strip .strip-header {
   font-size: 11px;
   letter-spacing: 2px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .expand-photobooth-strip .strip-photos {
@@ -857,7 +860,7 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-footer {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 /* ============ EXPAND ACTIONS ============ */
