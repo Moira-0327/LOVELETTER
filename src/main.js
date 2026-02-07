@@ -137,6 +137,20 @@ function playTypeClick() {
 
 generatePaperGrain();
 
+// Initialize audio context on first user interaction
+let audioInitialized = false;
+document.addEventListener('click', () => {
+  if (!audioInitialized) {
+    try {
+      const ctx = getAudioContext();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      audioInitialized = true;
+    } catch (_) {}
+  }
+}, { once: false });
+
 // ============ PAPER GRAIN TEXTURE ============
 
 function generatePaperGrain() {
