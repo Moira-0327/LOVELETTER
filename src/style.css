@@ -604,10 +604,10 @@ html, body {
 
 .strip-header {
   font-family: var(--font-ui);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 400;
-  letter-spacing: 3px;
-  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  color: var(--ink);
   margin-bottom: 6px;
   text-transform: uppercase;
 }
@@ -809,8 +809,8 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-header {
-  font-size: 9px;
-  letter-spacing: 4px;
+  font-size: 11px;
+  letter-spacing: 2px;
   margin-bottom: 10px;
 }
 
