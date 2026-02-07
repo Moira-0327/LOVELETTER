@@ -175,6 +175,23 @@ html, body {
   resize: none;
 }
 
+/* Match date input internal text to other inputs */
+.form-group input[type="date"]::-webkit-datetime-edit {
+  font-family: var(--font-typewriter);
+  font-size: 15px;
+  color: var(--text-dark);
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  font-family: var(--font-typewriter);
+  color: var(--text-dark);
+}
+
+.form-group input[type="date"]:invalid::-webkit-datetime-edit,
+.form-group input[type="date"][value=""]::-webkit-datetime-edit {
+  color: var(--text-muted);
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
   border-bottom-color: var(--accent);
@@ -506,7 +523,7 @@ html, body {
 }
 
 .letter-sender {
-  font-family: var(--font-script);
+  font-family: var(--font-typewriter);
   font-size: 24px;
   color: var(--ink);
   text-align: right;
