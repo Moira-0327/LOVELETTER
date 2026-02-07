@@ -175,16 +175,14 @@ html, body {
   resize: none;
 }
 
-/* Match date input internal text to other inputs */
+/* Match date input font to other inputs */
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
-  color: var(--text-dark);
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
-  color: var(--text-dark);
 }
 
 .form-group input:focus,
