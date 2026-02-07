@@ -478,15 +478,6 @@ html, body {
   overflow: hidden;
 }
 
-/* Ink texture — heavier bleed for handwritten feel */
-.letter-greeting,
-.letter-body {
-  text-shadow:
-    0 0 1px currentColor,
-    0.3px 0.3px 0.5px rgba(192, 57, 43, 0.2);
-  -webkit-text-stroke: 0.2px currentColor;
-}
-
 .setup-title {
   text-shadow:
     0.5px 0.5px 0 currentColor,
