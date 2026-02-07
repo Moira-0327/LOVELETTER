@@ -15,15 +15,15 @@
   --ink: #C1121F;
   --ink-light: #f16a73ec;
   --text-dark: #780000;
-  --text-muted: #6590ac;
+  --text-muted: #f16a73b7;
   --paper: #EAE2D3;
   --pink: #DFC8CD;
   --pink-dark: #C9A8B0;
 
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
   --font-typewriter: 'Special Elite', 'Courier New', monospace;
   --font-ui: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
-  --font-script: 'Mrs Saint Delafield', cursive;
+  --font-script: 'Homemade Apple', cursive;
 
   --page-width: min(100vw, 430px);
   --page-height: 100dvh;
