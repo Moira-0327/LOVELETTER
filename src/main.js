@@ -27,7 +27,10 @@ const state = {
 const setupScreen = document.getElementById('setup-screen');
 const resultScreen = document.getElementById('result-screen');
 const setupForm = document.getElementById('setup-form');
-const photoSlots = document.querySelectorAll('.photo-upload-slot');
+const photoInput = document.getElementById('photo-input-multi');
+const photoUploadArea = document.getElementById('photo-upload-area');
+const photoPreviewGrid = document.getElementById('photo-preview-grid');
+const photoUploadPrompt = document.getElementById('photo-upload-prompt');
 const backBtn = document.getElementById('back-btn');
 
 // Flat-lay elements
@@ -198,25 +201,56 @@ document.querySelectorAll('#setup-form input[type="text"], #setup-form input[typ
   el.addEventListener('input', () => playTypeClick());
 });
 
-// ============ PHOTO UPLOAD ============
+// ============ PHOTO UPLOAD (multi-select, max 4) ============
 
-photoSlots.forEach((slot) => {
-  const input = slot.querySelector('.photo-input');
-  const preview = slot.querySelector('.photo-preview');
-  const index = parseInt(slot.dataset.index);
+function renderPhotoPreview() {
+  photoPreviewGrid.innerHTML = '';
+  const hasAny = state.photos.some(p => p !== null);
+  photoUploadArea.classList.toggle('has-photos', hasAny);
 
-  input.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      state.photos[index] = ev.target.result;
-      preview.src = ev.target.result;
-      slot.classList.add('has-photo');
-    };
-    reader.readAsDataURL(file);
+  state.photos.forEach((src, i) => {
+    if (!src) return;
+    const item = document.createElement('div');
+    item.className = 'photo-preview-item';
+    item.innerHTML = `<img src="${src}" /><button class="photo-remove" data-index="${i}">&times;</button>`;
+    photoPreviewGrid.appendChild(item);
   });
+
+  // Show prompt again if less than 4 and allow adding more
+  if (state.photos.filter(p => p !== null).length < 4) {
+    photoUploadPrompt.style.display = '';
+  } else {
+    photoUploadPrompt.style.display = 'none';
+  }
+}
+
+photoInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files);
+  const currentCount = state.photos.filter(p => p !== null).length;
+  const allowed = Math.min(files.length, 4 - currentCount);
+
+  for (let i = 0; i < allowed; i++) {
+    const reader = new FileReader();
+    const slotIndex = state.photos.indexOf(null);
+    if (slotIndex === -1) break;
+
+    reader.onload = (ev) => {
+      state.photos[slotIndex] = ev.target.result;
+      renderPhotoPreview();
+    };
+    reader.readAsDataURL(files[i]);
+  }
+  photoInput.value = '';
+});
+
+photoPreviewGrid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.photo-remove');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const index = parseInt(btn.dataset.index);
+  state.photos[index] = null;
+  renderPhotoPreview();
 });
 
 // ============ FORM SUBMISSION ============

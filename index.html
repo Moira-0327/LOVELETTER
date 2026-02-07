@@ -40,36 +40,14 @@
 
         <div class="form-group">
           <label>Photo Booth <span class="label-optional">optional</span></label>
-          <p class="label-hint">Upload four photos to create a photo booth strip</p>
-          <div class="photo-upload-grid">
-            <div class="photo-upload-slot" data-index="0">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
+          <p class="label-hint">Select up to 4 photos to create a photo booth strip</p>
+          <div class="photo-upload-area" id="photo-upload-area">
+            <input type="file" accept="image/*" multiple class="photo-input-multi" id="photo-input-multi" />
+            <div class="photo-upload-prompt" id="photo-upload-prompt">
+              <span class="plus-icon">+</span>
+              <span class="upload-text">Tap to select photos</span>
             </div>
-            <div class="photo-upload-slot" data-index="1">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
-            <div class="photo-upload-slot" data-index="2">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
-            <div class="photo-upload-slot" data-index="3">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
+            <div class="photo-preview-grid" id="photo-preview-grid"></div>
           </div>
         </div>
 
