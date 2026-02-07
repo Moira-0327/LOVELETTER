@@ -488,7 +488,7 @@ html, body {
 
 .letter-seal-date {
   font-family: var(--font-typewriter);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--ink);
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -528,7 +528,7 @@ html, body {
 }
 
 .expand-letter-paper .letter-sender {
-  font-size: 15px;
+  font-size: 14px;
   margin-top: 20px;
 }
 
@@ -790,11 +790,11 @@ html, body {
 }
 
 .expand-letter-paper .letter-greeting {
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .expand-letter-paper .letter-body {
-  font-size: 17px;
+  font-size: 14px;
   line-height: 2;
   overflow: visible;
 }
