@@ -1,0 +1,6 @@
+{
+  "javascript.validate.enable": true,
+  "files.exclude": {
+    "docs/**": true
+  }
+}
