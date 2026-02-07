@@ -315,7 +315,7 @@ function renderResult() {
       if (photo) {
         el.style.backgroundImage = `url(${photo})`;
       } else {
-        el.style.background = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
+        el.style.backgroundImage = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
       }
     });
 
@@ -457,7 +457,7 @@ function expandPhotobooth() {
     if (photo) {
       el.style.backgroundImage = `url(${photo})`;
     } else {
-      el.style.background = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
+      el.style.backgroundImage = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
     }
   });
 

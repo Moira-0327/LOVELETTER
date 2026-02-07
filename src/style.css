@@ -638,9 +638,10 @@ html, body {
 .strip-photo {
   width: 100%;
   aspect-ratio: 4/3;
-  background: var(--cream-dark);
+  background-color: var(--cream-dark);
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   filter: grayscale(100%) contrast(1.15) brightness(1.0) sepia(8%);
   border: 1px solid rgba(0,0,0,0.05);
   position: relative;
@@ -658,7 +659,7 @@ html, body {
 }
 
 .strip-footer {
-  margin-top: 8px;
+  margin-top: 6px;
   text-align: center;
 }
 
@@ -829,7 +830,7 @@ html, body {
   width: 52%;
   max-width: 220px;
   background: var(--accent-deep);
-  padding: 14px 10px 18px;
+  padding: 14px 10px;
   box-shadow: 4px 8px 40px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
@@ -856,7 +857,7 @@ html, body {
 }
 
 .expand-photobooth-strip .strip-footer {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 /* ============ EXPAND ACTIONS ============ */
