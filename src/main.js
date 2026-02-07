@@ -255,8 +255,6 @@ function renderResult() {
       }
     });
 
-    document.getElementById('strip-caption').textContent =
-      (state.partnerName && state.senderName) ? `${state.partnerName} & ${state.senderName}` : state.partnerName ? `${state.partnerName} & me` : 'you & me';
   } else {
     photoboothStrip.style.display = 'none';
   }
@@ -352,6 +350,11 @@ function expandLetter() {
   const mins = String(today.getMinutes()).padStart(2, '0');
   const sealStr = `sealed at ${hours}:${mins}`;
 
+  // Populate stamp in expanded letter
+  const expandStampEl = document.getElementById('expand-days-stamp');
+  expandStampEl.innerHTML = stampHTML(daysSince);
+  expandStampEl.classList.add('visible');
+
   // Clear for typewriter
   greetingEl.textContent = '';
   bodyEl.textContent = '';
@@ -379,9 +382,6 @@ function expandPhotobooth() {
       el.style.background = `linear-gradient(135deg, #E8E0D8 0%, #D4C8BC 100%)`;
     }
   });
-
-  document.getElementById('expand-strip-caption').textContent =
-    state.partnerName ? `${state.partnerName} & me` : 'you & me';
 
   // Show overlay
   expandBackdrop.classList.add('active');
@@ -646,28 +646,13 @@ function renderLetterCanvas() {
     y += 8;
   }
 
-  // Sender signature (ink handwriting script with splatter)
+  // Sender signature
   if (state.senderName) {
     y += 20;
-    ctx.save();
-    ctx.translate(LETTER_W - pad, y);
-    ctx.rotate(-0.025); // slight tilt for dynamic feel
     ctx.font = '38px "Mrs Saint Delafield", cursive';
     ctx.fillStyle = INK;
     ctx.textAlign = 'right';
-    // Ink bleed layer
-    ctx.globalAlpha = 0.15;
-    ctx.fillText(`Yours, ${state.senderName}`, 0.8, 0.8);
-    ctx.globalAlpha = 1;
-    ctx.fillText(`Yours, ${state.senderName}`, 0, 0);
-    // Ink splatter dots
-    ctx.globalAlpha = 0.25;
-    const dots = [[6, -8, 1.2], [-12, 5, 0.8], [20, -14, 1], [-30, 2, 1.5], [8, 8, 0.6], [-18, -10, 0.9]];
-    for (const [dx, dy, r] of dots) {
-      ctx.beginPath(); ctx.arc(dx, dy, r, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    ctx.restore();
+    ctx.fillText(`Yours, ${state.senderName}`, LETTER_W - pad, y);
     ctx.textAlign = 'left';
     y += 48;
   }
@@ -790,17 +775,14 @@ function renderLetterCanvas() {
 }
 
 async function renderPhotoboothCanvas() {
-  // 2×6 inch strip at 300dpi = 600×1800 pixels
+  // Photos-only strip
   const DPI = 300;
   const STRIP_W = 2 * DPI;   // 600
-  const STRIP_H = 6 * DPI;   // 1800
-  const PAD = 30;
-  const PHOTO_W = STRIP_W - PAD * 2;  // 540
-  const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 405
-  const GAP = 12;
-  const HEADER_H = 60;
-  const FOOTER_H = 120;
-  const PHOTOS_TOP = HEADER_H;
+  const PAD = 20;
+  const PHOTO_W = STRIP_W - PAD * 2;  // 560
+  const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 420
+  const GAP = 10;
+  const STRIP_H = PAD * 2 + PHOTO_H * 4 + GAP * 3;
 
   const canvas = document.createElement('canvas');
   canvas.width = STRIP_W;
@@ -811,16 +793,8 @@ async function renderPhotoboothCanvas() {
   ctx.fillStyle = CREAM;
   ctx.fillRect(0, 0, STRIP_W, STRIP_H);
 
-  // Header
-  ctx.font = '400 10px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = MUTED;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.letterSpacing = '3px';
-  ctx.fillText('P H O T O   B O O T H', STRIP_W / 2, 24);
-
   // Photos (4 photos, B&W)
-  let y = PHOTOS_TOP;
+  let y = PAD;
   for (let i = 0; i < 4; i++) {
     if (state.photos[i]) {
       try {
@@ -842,27 +816,6 @@ async function renderPhotoboothCanvas() {
     }
     y += PHOTO_H + GAP;
   }
-
-  // Footer: names + logo
-  const footerY = y + 10;
-  ctx.font = '300 14px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = MUTED;
-  ctx.textAlign = 'center';
-  const caption = (state.partnerName && state.senderName)
-    ? `${state.partnerName} & ${state.senderName}`
-    : state.partnerName ? `${state.partnerName} & me` : 'you & me';
-  ctx.fillText(caption, STRIP_W / 2, footerY);
-
-  // Logo
-  ctx.font = 'italic 500 22px "Playfair Display", Georgia, serif';
-  ctx.fillStyle = ACCENT;
-  ctx.fillText('Love Letter', STRIP_W / 2, footerY + 30);
-
-  // Days
-  const daysSince = calculateDaysTogether(state.togetherDate);
-  ctx.font = '300 10px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = MUTED;
-  ctx.fillText(`${daysSince} days of love`, STRIP_W / 2, footerY + 58);
 
   return canvas;
 }
