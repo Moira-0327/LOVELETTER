@@ -206,10 +206,10 @@ function updateSlotUI(index) {
   const preview = slot.querySelector('.photo-preview');
   if (state.photos[index]) {
     preview.src = state.photos[index];
-    slot.classList.add('filled');
+    slot.classList.add('has-photo');
   } else {
     preview.src = '';
-    slot.classList.remove('filled');
+    slot.classList.remove('has-photo');
   }
 }
 

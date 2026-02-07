@@ -241,12 +241,12 @@ html, body {
   border-color: var(--kraft);
 }
 
-.photo-input {
+.photo-input-hidden {
   position: absolute;
-  inset: 0;
+  width: 0;
+  height: 0;
   opacity: 0;
-  cursor: pointer;
-  z-index: 2;
+  pointer-events: none;
 }
 
 .photo-placeholder {
