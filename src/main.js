@@ -246,6 +246,15 @@ function renderResult() {
   // --- Photobooth strip ---
   if (state.hasPhotos) {
     photoboothStrip.style.display = '';
+    // Header: today's date
+    const stripDateStr = `${month.toUpperCase().slice(0, 3)} ${day}, ${today.getFullYear()}`;
+    document.getElementById('strip-date').textContent = stripDateStr;
+    // Footer: sender & receiver names (red)
+    const namesStr = (state.partnerName && state.senderName)
+      ? `${state.senderName} & ${state.partnerName}`
+      : state.partnerName ? `me & ${state.partnerName}` : 'you & me';
+    document.getElementById('strip-caption').textContent = namesStr;
+
     state.photos.forEach((photo, i) => {
       const el = document.getElementById(`strip-photo-${i}`);
       if (photo) {
@@ -372,6 +381,19 @@ function expandLetter() {
 
 function expandPhotobooth() {
   state.expandedPanel = 'photobooth';
+
+  // Header: today's date
+  const today = new Date();
+  const day = today.getDate();
+  const month = MONTHS_EN[today.getMonth()];
+  const expandDateStr = `${month.toUpperCase().slice(0, 3)} ${day}, ${today.getFullYear()}`;
+  document.getElementById('expand-strip-date').textContent = expandDateStr;
+
+  // Footer: sender & receiver names
+  const namesStr = (state.partnerName && state.senderName)
+    ? `${state.senderName} & ${state.partnerName}`
+    : state.partnerName ? `me & ${state.partnerName}` : 'you & me';
+  document.getElementById('expand-strip-caption').textContent = namesStr;
 
   // Fill expand panel photos
   state.photos.forEach((photo, i) => {
@@ -775,14 +797,15 @@ function renderLetterCanvas() {
 }
 
 async function renderPhotoboothCanvas() {
-  // Photos-only strip
   const DPI = 300;
   const STRIP_W = 2 * DPI;   // 600
-  const PAD = 20;
-  const PHOTO_W = STRIP_W - PAD * 2;  // 560
-  const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 420
-  const GAP = 10;
-  const STRIP_H = PAD * 2 + PHOTO_H * 4 + GAP * 3;
+  const PAD = 30;
+  const PHOTO_W = STRIP_W - PAD * 2;  // 540
+  const PHOTO_H = Math.round(PHOTO_W * 3 / 4); // 405
+  const GAP = 12;
+  const HEADER_H = 50;
+  const FOOTER_H = 50;
+  const STRIP_H = HEADER_H + PHOTO_H * 4 + GAP * 3 + FOOTER_H;
 
   const canvas = document.createElement('canvas');
   canvas.width = STRIP_W;
@@ -793,8 +816,17 @@ async function renderPhotoboothCanvas() {
   ctx.fillStyle = CREAM;
   ctx.fillRect(0, 0, STRIP_W, STRIP_H);
 
+  // Header: today's date
+  const now = new Date();
+  const dateStr = `${MONTHS_EN[now.getMonth()].toUpperCase().slice(0, 3)} ${now.getDate()}, ${now.getFullYear()}`;
+  ctx.font = '400 11px "DM Sans", "Helvetica Neue", sans-serif';
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(dateStr, STRIP_W / 2, HEADER_H / 2);
+
   // Photos (4 photos, B&W)
-  let y = PAD;
+  let y = HEADER_H;
   for (let i = 0; i < 4; i++) {
     if (state.photos[i]) {
       try {
@@ -816,6 +848,16 @@ async function renderPhotoboothCanvas() {
     }
     y += PHOTO_H + GAP;
   }
+
+  // Footer: sender & receiver names (red)
+  const namesStr = (state.partnerName && state.senderName)
+    ? `${state.senderName} & ${state.partnerName}`
+    : state.partnerName ? `me & ${state.partnerName}` : 'you & me';
+  ctx.font = '400 12px "DM Sans", "Helvetica Neue", sans-serif';
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(namesStr.toUpperCase(), STRIP_W / 2, y - GAP + FOOTER_H / 2);
 
   return canvas;
 }
