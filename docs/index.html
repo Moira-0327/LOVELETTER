@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=Mrs+Saint+Delafield&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Special+Elite&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/lover-letter/assets/index-CeP9vSK1.js"></script>
-  <link rel="stylesheet" crossorigin href="/lover-letter/assets/index-D5UFiPzS.css">
+  <script type="module" crossorigin src="/lover-letter/assets/index-v61OeNEZ.js"></script>
+  <link rel="stylesheet" crossorigin href="/lover-letter/assets/index-CpH937gX.css">
 </head>
 <body>
 
@@ -41,36 +41,14 @@
 
         <div class="form-group">
           <label>Photo Booth <span class="label-optional">optional</span></label>
-          <p class="label-hint">Upload four photos to create a photo booth strip</p>
-          <div class="photo-upload-grid">
-            <div class="photo-upload-slot" data-index="0">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
+          <p class="label-hint">Select up to 4 photos to create a photo booth strip</p>
+          <div class="photo-upload-area" id="photo-upload-area">
+            <input type="file" accept="image/*" multiple class="photo-input-multi" id="photo-input-multi" />
+            <div class="photo-upload-prompt" id="photo-upload-prompt">
+              <span class="plus-icon">+</span>
+              <span class="upload-text">Tap to select photos</span>
             </div>
-            <div class="photo-upload-slot" data-index="1">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
-            <div class="photo-upload-slot" data-index="2">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
-            <div class="photo-upload-slot" data-index="3">
-              <input type="file" accept="image/*" class="photo-input" />
-              <div class="photo-placeholder">
-                <span class="plus-icon">+</span>
-              </div>
-              <img class="photo-preview" />
-            </div>
+            <div class="photo-preview-grid" id="photo-preview-grid"></div>
           </div>
         </div>
 
