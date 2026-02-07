@@ -269,7 +269,16 @@ function renderResult() {
 }
 
 function stampHTML(days) {
-  return `<div class="days-stamp-inner"><svg class="stamp-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="stamp-text">${days} days of us</span></div>`;
+  return `<div class="days-stamp-inner">
+    <div class="stamp-heart">
+      <svg viewBox="0 0 60 55" fill="none" stroke="currentColor">
+        <path d="M30 50 C30 50, 4 32, 4 17 C4 8, 10 2, 18 2 C23 2, 27 5, 30 10 C33 5, 37 2, 42 2 C50 2, 56 8, 56 17 C56 32, 30 50, 30 50Z" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M30 48 C30 48, 6 31, 6 18 C6 9, 11.5 4, 18.5 4 C23 4, 27 6.5, 30 11 C33 6.5, 37 4, 41.5 4 C48.5 4, 54 9, 54 18 C54 31, 30 48, 30 48Z" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+      </svg>
+      <span class="stamp-love">LOVE</span>
+    </div>
+    <span class="stamp-text">${days} days of us</span>
+  </div>`;
 }
 
 function calculateDaysTogether(startDate) {
@@ -674,22 +683,22 @@ function renderLetterCanvas() {
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter — postage stamp style
+  // Days counter — postage stamp style (matches LOVE stamp reference)
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const sW = 120, sH = 100;
+  const sW = 150, sH = 165;
   const sX = LETTER_W - pad - sW;
   const sY = LETTER_H - pad - sH;
+  const sPad = 12; // cream border width
 
   ctx.save();
-  ctx.globalAlpha = 0.8;
 
-  // Stamp background
-  ctx.fillStyle = 'rgba(192, 57, 43, 0.08)';
+  // Cream outer border
+  ctx.fillStyle = CREAM;
   ctx.fillRect(sX, sY, sW, sH);
 
-  // Perforation circles along edges
+  // Scalloped perforation circles along edges
   ctx.fillStyle = PAPER_COLOR;
-  const step = 10, pr = 3;
+  const step = 16, pr = 5;
   for (let px = sX + step / 2; px < sX + sW; px += step) {
     ctx.beginPath(); ctx.arc(px, sY, pr, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(px, sY + sH, pr, 0, Math.PI * 2); ctx.fill();
@@ -699,32 +708,54 @@ function renderLetterCanvas() {
     ctx.beginPath(); ctx.arc(sX + sW, py, pr, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Heart outline
-  const hx = sX + sW / 2, hy = sY + 38, hs = 0.9;
+  // Pink inner area
+  ctx.fillStyle = ACCENT_MUTED;
+  ctx.fillRect(sX + sPad, sY + sPad, sW - sPad * 2, sH - sPad * 2);
+
+  // Large hand-drawn heart (double stroke for sketch feel)
+  const hx = sX + sW / 2, hy = sY + sPad + (sH - sPad * 2) * 0.48;
+  const hs = 2.8;
   ctx.save();
   ctx.translate(hx, hy);
   ctx.scale(hs, hs);
+  // Outer heart
   ctx.beginPath();
-  ctx.moveTo(0, 8);
-  ctx.bezierCurveTo(-2, 4, -12, -4, -12, -10);
-  ctx.bezierCurveTo(-12, -16, -6, -20, 0, -14);
-  ctx.bezierCurveTo(6, -20, 12, -16, 12, -10);
-  ctx.bezierCurveTo(12, -4, 2, 4, 0, 8);
+  ctx.moveTo(0, 14);
+  ctx.bezierCurveTo(-2, 10, -18, -2, -18, -10);
+  ctx.bezierCurveTo(-18, -18, -10, -22, 0, -14);
+  ctx.bezierCurveTo(10, -22, 18, -18, 18, -10);
+  ctx.bezierCurveTo(18, -2, 2, 10, 0, 14);
   ctx.closePath();
   ctx.strokeStyle = INK;
-  ctx.lineWidth = 1.8;
+  ctx.lineWidth = 1;
   ctx.stroke();
+  // Inner heart (sketch double-line)
+  ctx.beginPath();
+  ctx.moveTo(0, 11);
+  ctx.bezierCurveTo(-2, 8, -15, -1, -15, -8);
+  ctx.bezierCurveTo(-15, -15, -8, -18, 0, -11);
+  ctx.bezierCurveTo(8, -18, 15, -15, 15, -8);
+  ctx.bezierCurveTo(15, -1, 2, 8, 0, 11);
+  ctx.closePath();
+  ctx.lineWidth = 0.5;
+  ctx.globalAlpha = 0.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
   ctx.restore();
 
-  // Text
+  // "LOVE" text inside heart
   ctx.fillStyle = INK;
-  ctx.font = '13px "Special Elite", "Courier New", monospace';
+  ctx.font = '600 18px "Playfair Display", Georgia, serif';
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText(`${daysSince} days of us`, sX + sW / 2, sY + sH - 28);
+  ctx.textBaseline = 'middle';
+  ctx.fillText('LOVE', hx, hy - 4);
+
+  // "xxx days of us" handwritten at bottom
+  ctx.font = '16px "Mrs Saint Delafield", cursive';
+  ctx.fillText(`${daysSince} days of us`, hx, sY + sH - sPad - 12);
+
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.globalAlpha = 1;
   ctx.restore();
 
   // Postmark stamp (top-right, enlarged deep red)
