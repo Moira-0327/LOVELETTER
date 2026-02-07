@@ -885,7 +885,7 @@ async function renderPhotoboothCanvas() {
   ctx.textBaseline = 'middle';
   ctx.fillText(dateStr, STRIP_W / 2, HEADER_H / 2);
 
-  // Photos (4 photos, B&W)
+  // Photos (4 photos, B&W film effect)
   let y = HEADER_H;
   for (let i = 0; i < 4; i++) {
     if (state.photos[i]) {
@@ -895,8 +895,35 @@ async function renderPhotoboothCanvas() {
         tmp.width = PHOTO_W;
         tmp.height = PHOTO_H;
         const tc = tmp.getContext('2d');
-        tc.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
+        tc.filter = 'grayscale(100%) contrast(1.15) brightness(1.0) sepia(8%)';
         drawImageCover(tc, img, 0, 0, PHOTO_W, PHOTO_H);
+
+        // Faded blacks — lift shadows
+        const imgData = tc.getImageData(0, 0, PHOTO_W, PHOTO_H);
+        const px = imgData.data;
+        for (let p = 0; p < px.length; p += 4) {
+          // Lift blacks: remap 0-255 to 20-255
+          px[p]     = 20 + px[p] * 0.92;
+          px[p + 1] = 20 + px[p + 1] * 0.92;
+          px[p + 2] = 20 + px[p + 2] * 0.92;
+          // Film grain noise
+          const noise = (Math.random() - 0.5) * 25;
+          px[p]     = Math.max(0, Math.min(255, px[p] + noise));
+          px[p + 1] = Math.max(0, Math.min(255, px[p + 1] + noise));
+          px[p + 2] = Math.max(0, Math.min(255, px[p + 2] + noise));
+        }
+        tc.putImageData(imgData, 0, 0);
+
+        // Vignette
+        const vg = tc.createRadialGradient(
+          PHOTO_W / 2, PHOTO_H / 2, PHOTO_W * 0.25,
+          PHOTO_W / 2, PHOTO_H / 2, PHOTO_W * 0.7
+        );
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.4)');
+        tc.fillStyle = vg;
+        tc.fillRect(0, 0, PHOTO_W, PHOTO_H);
+
         ctx.drawImage(tmp, PAD, y, PHOTO_W, PHOTO_H);
       } catch (_) {
         ctx.fillStyle = '#F5EDE0';
