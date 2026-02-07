@@ -846,7 +846,7 @@ async function renderPhotoboothCanvas() {
   const now = new Date();
   const dateStr = `${MONTHS_EN[now.getMonth()].toUpperCase().slice(0, 3)} ${now.getDate()}, ${now.getFullYear()}`;
   ctx.font = '400 11px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = INK;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(dateStr, STRIP_W / 2, HEADER_H / 2);
