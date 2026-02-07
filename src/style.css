@@ -12,7 +12,7 @@
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #780000;
+  --ink: #C1121F;
   --ink-light: #f16a73ec;
   --text-dark: #780000;
   --text-muted: #f16a73b7;
@@ -198,22 +198,14 @@ html, body {
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
-<<<<<<< HEAD
-  color: var(--text-dark);
-=======
   color: var(--accent-deep);
->>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
   text-align: left;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
-<<<<<<< HEAD
-  color: var(--text-dark);
-=======
   color: var(--accent-deep);
->>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
 }
 
