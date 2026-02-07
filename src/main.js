@@ -135,6 +135,12 @@ function playTypeClick() {
 
 // ============ INIT ============
 
+// Toggle has-value class on date input for placeholder styling
+const dateInput = document.getElementById('together-date');
+dateInput.addEventListener('change', () => {
+  dateInput.classList.toggle('has-value', !!dateInput.value);
+});
+
 generatePaperGrain();
 
 // Initialize audio context on first user interaction
