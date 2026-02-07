@@ -706,7 +706,7 @@ function renderLetterCanvas() {
   }
 
   const pad = 80;
-  let y = 170;  // below postmark stamp
+  let y = 200;  // below postmark stamp
 
   // Greeting
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
@@ -759,7 +759,7 @@ function renderLetterCanvas() {
   const sealHours = String(now2.getHours()).padStart(2, '0');
   const sealMins = String(now2.getMinutes()).padStart(2, '0');
   const sealText = `SEALED AT ${sealHours}:${sealMins}`;
-  ctx.font = '14px "Special Elite", "Courier New", monospace';
+  ctx.font = '18px "Special Elite", "Courier New", monospace';
   ctx.fillStyle = INK;
   ctx.textAlign = 'right';
   ctx.fillText(sealText, LETTER_W - pad, y);
