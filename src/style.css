@@ -187,14 +187,14 @@ html, body {
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
-  color: #8A7A76;
+  color: var(--text-dark);
   padding: 0;
   text-align: left;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
-  color: #8A7A76;
+  color: var(--text-dark);
   padding: 0;
 }
 
