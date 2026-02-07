@@ -839,14 +839,14 @@ async function renderPhotoboothCanvas() {
   const ctx = canvas.getContext('2d');
 
   // Background
-  ctx.fillStyle = CREAM;
+  ctx.fillStyle = ACCENT_DEEP;
   ctx.fillRect(0, 0, STRIP_W, STRIP_H);
 
   // Header: today's date
   const now = new Date();
   const dateStr = `${MONTHS_EN[now.getMonth()].toUpperCase().slice(0, 3)} ${now.getDate()}, ${now.getFullYear()}`;
   ctx.font = '400 11px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = INK;
+  ctx.fillStyle = '#FDF6F2';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(dateStr, STRIP_W / 2, HEADER_H / 2);
@@ -880,7 +880,7 @@ async function renderPhotoboothCanvas() {
     ? `${state.senderName} & ${state.partnerName}`
     : state.partnerName ? `me & ${state.partnerName}` : 'you & me';
   ctx.font = '400 12px "DM Sans", "Helvetica Neue", sans-serif';
-  ctx.fillStyle = INK;
+  ctx.fillStyle = '#FDF6F2';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(namesStr.toUpperCase(), STRIP_W / 2, y - GAP + FOOTER_H / 2);
