@@ -706,7 +706,7 @@ function renderLetterCanvas() {
   }
 
   const pad = 80;
-  let y = 170;  // below postmark stamp
+  let y = 200;  // below postmark stamp
 
   // Greeting
   const greeting = state.partnerName ? `Dear ${state.partnerName},` : 'Dear you,';
