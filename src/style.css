@@ -175,16 +175,27 @@ html, body {
   resize: none;
 }
 
-/* Match date input font to other inputs — default gray before selection */
+/* Match date input font and alignment to other inputs */
+.form-group input[type="date"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-align: left;
+  padding-left: 0;
+}
+
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
   color: #8A7A76;
+  padding: 0;
+  text-align: left;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
   color: #8A7A76;
+  padding: 0;
 }
 
 .form-group input:focus,
