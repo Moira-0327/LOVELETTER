@@ -512,9 +512,6 @@ html, body {
   opacity: 1;
 }
 
-.postmark {
-  filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='r'><feTurbulence baseFrequency='0.4' numOctaves='2' seed='3'/><feDisplacementMap in='SourceGraphic' scale='1.5'/></filter></svg>#r");
-}
 
 
 /* Typewriter cursor */
