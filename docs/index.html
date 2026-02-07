@@ -693,7 +693,7 @@
       background: var(--cream-dark);
       background-size: cover;
       background-position: center;
-      filter: grayscale(100%) contrast(1.1) brightness(1.05);
+      filter: grayscale(100%) contrast(1.2) brightness(1.05);
       border: 1px solid rgba(0,0,0,0.05);
     }
 
@@ -2002,7 +2002,7 @@ async function renderPhotoboothCanvas() {
         tmp.width = PHOTO_W;
         tmp.height = PHOTO_H;
         const tc = tmp.getContext('2d');
-        tc.filter = 'grayscale(100%) contrast(1.1) brightness(1.05)';
+        tc.filter = 'grayscale(100%) contrast(1.2) brightness(1.05)';
         drawImageCover(tc, img, 0, 0, PHOTO_W, PHOTO_H);
         ctx.drawImage(tmp, PAD, y, PHOTO_W, PHOTO_H);
       } catch (_) {
