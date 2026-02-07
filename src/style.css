@@ -175,8 +175,6 @@ html, body {
   resize: none;
 }
 
-<<<<<<< HEAD
-=======
 /* Match date input font and alignment to other inputs */
 .form-group input[type="date"] {
   -webkit-appearance: none;
@@ -200,7 +198,6 @@ html, body {
   padding: 0;
 }
 
->>>>>>> 87b7898618bd534cc6aec4eee99d2ddc49c25509
 .form-group input:focus,
 .form-group textarea:focus {
   border-bottom-color: var(--accent);
@@ -497,13 +494,8 @@ html, body {
 
 .letter-seal-date {
   font-family: var(--font-typewriter);
-<<<<<<< HEAD
-  font-size: 9px;
-  color: var(--text-deep);
-=======
   font-size: 12px;
   color: var(--ink);
->>>>>>> 87b7898618bd534cc6aec4eee99d2ddc49c25509
   letter-spacing: 2px;
   text-transform: uppercase;
   text-align: right;
@@ -545,11 +537,7 @@ html, body {
 }
 
 .expand-letter-paper .letter-sender {
-<<<<<<< HEAD
-  font-size: 24px;
-=======
   font-size: 14px;
->>>>>>> 87b7898618bd534cc6aec4eee99d2ddc49c25509
   margin-top: 20px;
 }
 
@@ -589,13 +577,8 @@ html, body {
 }
 
 .days-stamp-expanded {
-<<<<<<< HEAD
-  width: 120px;
-  height: 90px;
-=======
   width: 155px;
   height: 85px;
->>>>>>> 87b7898618bd534cc6aec4eee99d2ddc49c25509
   right: 14px;
   bottom: 14px;
 }
