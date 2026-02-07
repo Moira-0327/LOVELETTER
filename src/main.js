@@ -895,8 +895,18 @@ async function renderPhotoboothCanvas() {
         tmp.width = PHOTO_W;
         tmp.height = PHOTO_H;
         const tc = tmp.getContext('2d');
-        tc.filter = 'grayscale(100%) contrast(1.15) brightness(1.0)';
         drawImageCover(tc, img, 0, 0, PHOTO_W, PHOTO_H);
+
+        // Manual B&W conversion (canvas filter not supported in all browsers)
+        const imgData = tc.getImageData(0, 0, PHOTO_W, PHOTO_H);
+        const px = imgData.data;
+        for (let p = 0; p < px.length; p += 4) {
+          const gray = 0.299 * px[p] + 0.587 * px[p + 1] + 0.114 * px[p + 2];
+          // contrast(1.15) + brightness(1.0)
+          const val = Math.max(0, Math.min(255, ((gray - 128) * 1.15 + 128)));
+          px[p] = px[p + 1] = px[p + 2] = val;
+        }
+        tc.putImageData(imgData, 0, 0);
 
         ctx.drawImage(tmp, PAD, y, PHOTO_W, PHOTO_H);
       } catch (_) {
