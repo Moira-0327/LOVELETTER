@@ -790,11 +790,11 @@ html, body {
 }
 
 .expand-letter-paper .letter-greeting {
-  font-size: 18px;
+  font-size: 22px;
 }
 
 .expand-letter-paper .letter-body {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 2;
   overflow: visible;
 }
