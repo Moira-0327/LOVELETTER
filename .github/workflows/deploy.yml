@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/update-input-text-color-pa2eD
+      - main
 
 permissions:
   contents: read
@@ -36,7 +36,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: './dist'
+          path: './docs'
 
       - name: Deploy to GitHub Pages
         id: deployment
