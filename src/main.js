@@ -142,8 +142,8 @@ let audioInitialized = false;
 document.addEventListener('click', () => {
   if (!audioInitialized) {
     try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') {
+      const ctx = initAudio();
+      if (ctx && ctx.state === 'suspended') {
         ctx.resume();
       }
       audioInitialized = true;
