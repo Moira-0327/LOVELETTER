@@ -520,7 +520,11 @@ function delay(ms) {
 
 // ============ IMAGE HELPERS ============
 
-const PAPER_COLOR = '#EAE2D3';
+import paperTextureUrl from './paper-texture.png';
+const paperTextureImg = new Image();
+paperTextureImg.src = paperTextureUrl;
+
+const PAPER_COLOR = '#E2D9CC';
 const CREAM = '#FFF8F0';
 const INK = '#C0392B';
 const MUTED = '#8A7A76';
@@ -629,8 +633,13 @@ function renderLetterCanvas() {
   const ctx = canvas.getContext('2d');
   ctx.scale(SCALE, SCALE);
 
-  // Paper background
-  ctx.fillStyle = PAPER_COLOR;
+  // Paper background — texture tile or fallback color
+  if (paperTextureImg.complete && paperTextureImg.naturalWidth) {
+    const pat = ctx.createPattern(paperTextureImg, 'repeat');
+    ctx.fillStyle = pat;
+  } else {
+    ctx.fillStyle = PAPER_COLOR;
+  }
   ctx.fillRect(0, 0, LETTER_W, LETTER_H);
 
   // Subtle age vignette
