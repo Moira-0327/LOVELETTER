@@ -290,16 +290,17 @@ function renderResult() {
 }
 
 function stampHTML(days) {
-  return `<div class="days-stamp-inner">
-    <div class="stamp-heart">
-      <svg viewBox="0 0 60 55" fill="none" stroke="currentColor">
-        <path d="M30 50 C30 50, 4 32, 4 17 C4 8, 10 2, 18 2 C23 2, 27 5, 30 10 C33 5, 37 2, 42 2 C50 2, 56 8, 56 17 C56 32, 30 50, 30 50Z" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M30 48 C30 48, 6 31, 6 18 C6 9, 11.5 4, 18.5 4 C23 4, 27 6.5, 30 11 C33 6.5, 37 4, 41.5 4 C48.5 4, 54 9, 54 18 C54 31, 30 48, 30 48Z" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
-      </svg>
-      <span class="stamp-love">LOVE</span>
-    </div>
-    <span class="stamp-text">${days} days of us</span>
-  </div>`;
+  return `<svg class="oval-stamp-svg" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="80" cy="60" rx="72" ry="52" stroke="currentColor" stroke-width="2.5"/>
+    <ellipse cx="80" cy="60" rx="62" ry="43" stroke="currentColor" stroke-width="1"/>
+    <path id="stamp-top-arc" d="M 28,55 A 62,43 0 0,1 132,55" fill="none"/>
+    <text><textPath href="#stamp-top-arc" startOffset="50%" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" letter-spacing="3" fill="currentColor">${days} DAYS</textPath></text>
+    <path id="stamp-bot-arc" d="M 28,65 A 62,43 0 0,0 132,65" fill="none"/>
+    <text><textPath href="#stamp-bot-arc" startOffset="50%" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" letter-spacing="3" fill="currentColor">OF US</textPath></text>
+    <line x1="25" y1="60" x2="55" y2="60" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="105" y1="60" x2="135" y2="60" stroke="currentColor" stroke-width="1.2"/>
+    <text x="80" y="64" text-anchor="middle" font-family="'Playfair Display',Georgia,serif" font-size="16" font-weight="600" letter-spacing="2" fill="currentColor">LOVE</text>
+  </svg>`;
 }
 
 function calculateDaysTogether(startDate) {
@@ -707,77 +708,77 @@ function renderLetterCanvas() {
   ctx.fillText(sealText, LETTER_W - pad, y);
   ctx.textAlign = 'left';
 
-  // Days counter — postage stamp style (matches LOVE stamp reference)
+  // Days counter — oval library stamp style
   const daysSince = calculateDaysTogether(state.togetherDate);
-  const sW = 150, sH = 165;
-  const sX = LETTER_W - pad - sW;
-  const sY = LETTER_H - pad - sH;
-  const sPad = 12; // cream border width
+  const ovalRx = 85, ovalRy = 62;
+  const ovalCx = LETTER_W - pad - ovalRx - 5;
+  const ovalCy = LETTER_H - pad - ovalRy - 5;
 
   ctx.save();
+  ctx.globalAlpha = 0.7;
+  ctx.strokeStyle = ACCENT;
+  ctx.fillStyle = ACCENT;
 
-  // Cream outer border
-  ctx.fillStyle = CREAM;
-  ctx.fillRect(sX, sY, sW, sH);
-
-  // Scalloped perforation circles along edges
-  ctx.fillStyle = PAPER_COLOR;
-  const step = 16, pr = 5;
-  for (let px = sX + step / 2; px < sX + sW; px += step) {
-    ctx.beginPath(); ctx.arc(px, sY, pr, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(px, sY + sH, pr, 0, Math.PI * 2); ctx.fill();
-  }
-  for (let py = sY + step / 2; py < sY + sH; py += step) {
-    ctx.beginPath(); ctx.arc(sX, py, pr, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(sX + sW, py, pr, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // Pink inner area
-  ctx.fillStyle = ACCENT_MUTED;
-  ctx.fillRect(sX + sPad, sY + sPad, sW - sPad * 2, sH - sPad * 2);
-
-  // Large hand-drawn heart (double stroke for sketch feel)
-  const hx = sX + sW / 2, hy = sY + sPad + (sH - sPad * 2) * 0.48;
-  const hs = 2.8;
-  ctx.save();
-  ctx.translate(hx, hy);
-  ctx.scale(hs, hs);
-  // Outer heart
-  ctx.beginPath();
-  ctx.moveTo(0, 14);
-  ctx.bezierCurveTo(-2, 10, -18, -2, -18, -10);
-  ctx.bezierCurveTo(-18, -18, -10, -22, 0, -14);
-  ctx.bezierCurveTo(10, -22, 18, -18, 18, -10);
-  ctx.bezierCurveTo(18, -2, 2, 10, 0, 14);
-  ctx.closePath();
-  ctx.strokeStyle = INK;
+  // Outer ellipse
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.ellipse(ovalCx, ovalCy, ovalRx, ovalRy, 0, 0, Math.PI * 2); ctx.stroke();
+  // Inner ellipse
   ctx.lineWidth = 1;
-  ctx.stroke();
-  // Inner heart (sketch double-line)
-  ctx.beginPath();
-  ctx.moveTo(0, 11);
-  ctx.bezierCurveTo(-2, 8, -15, -1, -15, -8);
-  ctx.bezierCurveTo(-15, -15, -8, -18, 0, -11);
-  ctx.bezierCurveTo(8, -18, 15, -15, 15, -8);
-  ctx.bezierCurveTo(15, -1, 2, 8, 0, 11);
-  ctx.closePath();
-  ctx.lineWidth = 0.5;
-  ctx.globalAlpha = 0.5;
-  ctx.stroke();
-  ctx.globalAlpha = 1;
+  ctx.beginPath(); ctx.ellipse(ovalCx, ovalCy, ovalRx - 10, ovalRy - 9, 0, 0, Math.PI * 2); ctx.stroke();
+
+  // Curved text along top: "xxx DAYS"
+  const topText = `${daysSince} DAYS`;
+  ctx.font = '500 13px "DM Sans", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.save();
+  ctx.translate(ovalCx, ovalCy);
+  const topArcR = ovalRy - 20;
+  const topCharSpread = 0.09;
+  const topStartAngle = -Math.PI / 2 - (topText.length - 1) * topCharSpread / 2;
+  for (let i = 0; i < topText.length; i++) {
+    const angle = topStartAngle + i * topCharSpread;
+    const charX = (ovalRx - 20) * Math.cos(angle);
+    const charY = topArcR * Math.sin(angle);
+    ctx.save();
+    ctx.translate(charX, charY);
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.fillText(topText[i], 0, 0);
+    ctx.restore();
+  }
   ctx.restore();
 
-  // "LOVE" text inside heart
-  ctx.fillStyle = INK;
+  // Curved text along bottom: "OF US"
+  const botText = 'OF US';
+  ctx.save();
+  ctx.translate(ovalCx, ovalCy);
+  const botArcR = ovalRy - 20;
+  const botCharSpread = 0.11;
+  const botStartAngle = Math.PI / 2 + (botText.length - 1) * botCharSpread / 2;
+  for (let i = 0; i < botText.length; i++) {
+    const angle = botStartAngle - i * botCharSpread;
+    const charX = (ovalRx - 20) * Math.cos(angle);
+    const charY = botArcR * Math.sin(angle);
+    ctx.save();
+    ctx.translate(charX, charY);
+    ctx.rotate(angle - Math.PI / 2);
+    ctx.fillText(botText[i], 0, 0);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // Horizontal lines flanking center
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(ovalCx - ovalRx + 18, ovalCy); ctx.lineTo(ovalCx - 28, ovalCy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ovalCx + 28, ovalCy); ctx.lineTo(ovalCx + ovalRx - 18, ovalCy); ctx.stroke();
+
+  // "LOVE" centered
   ctx.font = '600 18px "Playfair Display", Georgia, serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('LOVE', hx, hy - 4);
+  ctx.fillText('LOVE', ovalCx, ovalCy);
 
-  // "xxx days of us" handwritten at bottom
-  ctx.font = '16px "Mrs Saint Delafield", cursive';
-  ctx.fillText(`${daysSince} days of us`, hx, sY + sH - sPad - 12);
-
+  ctx.globalAlpha = 1;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
   ctx.restore();

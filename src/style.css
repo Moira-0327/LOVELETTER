@@ -534,119 +534,35 @@ html, body {
   opacity: 1;
 }
 
-/* ============ DAYS STAMP — Postage Stamp Style ============ */
+/* ============ DAYS STAMP — Oval Library Stamp Style ============ */
 
 .days-stamp {
-  --scallop-r: 3px;
-  --scallop-s: 9px;
   position: absolute;
   z-index: 4;
-  right: 10px;
-  bottom: 10px;
-  width: 70px;
-  height: 76px;
-  padding: 6px;
-  background: var(--cream);
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(-4deg);
-  box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
+  right: 8px;
+  bottom: 8px;
+  width: 90px;
+  height: 68px;
+  color: var(--accent);
+  transform: rotate(-6deg);
   opacity: 0;
   transition: opacity 0.6s ease;
-
-  -webkit-mask:
-    radial-gradient(circle var(--scallop-r) at calc(var(--scallop-s) / 2) 0, transparent 98%, #000) 0 0 / var(--scallop-s) 51% repeat-x,
-    radial-gradient(circle var(--scallop-r) at calc(var(--scallop-s) / 2) 100%, transparent 98%, #000) 0 100% / var(--scallop-s) 51% repeat-x,
-    radial-gradient(circle var(--scallop-r) at 0 calc(var(--scallop-s) / 2), transparent 98%, #000) 0 0 / 51% var(--scallop-s) repeat-y,
-    radial-gradient(circle var(--scallop-r) at 100% calc(var(--scallop-s) / 2), transparent 98%, #000) 100% 0 / 51% var(--scallop-s) repeat-y;
-  mask:
-    radial-gradient(circle var(--scallop-r) at calc(var(--scallop-s) / 2) 0, transparent 98%, #000) 0 0 / var(--scallop-s) 51% repeat-x,
-    radial-gradient(circle var(--scallop-r) at calc(var(--scallop-s) / 2) 100%, transparent 98%, #000) 0 100% / var(--scallop-s) 51% repeat-x,
-    radial-gradient(circle var(--scallop-r) at 0 calc(var(--scallop-s) / 2), transparent 98%, #000) 0 0 / 51% var(--scallop-s) repeat-y,
-    radial-gradient(circle var(--scallop-r) at 100% calc(var(--scallop-s) / 2), transparent 98%, #000) 100% 0 / 51% var(--scallop-s) repeat-y;
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
 }
 
 .days-stamp.visible {
-  opacity: 1;
+  opacity: 0.75;
 }
 
 .days-stamp-expanded {
-  width: 100px;
-  height: 108px;
-  padding: 8px;
-  right: 16px;
-  bottom: 16px;
-  --scallop-r: 4px;
-  --scallop-s: 11px;
+  width: 120px;
+  height: 90px;
+  right: 14px;
+  bottom: 14px;
 }
 
-.days-stamp-expanded .stamp-heart {
-  width: 52px;
-  height: 48px;
-}
-
-.days-stamp-expanded .stamp-love {
-  font-size: 11px;
-}
-
-.days-stamp-expanded .stamp-text {
-  font-size: 9px;
-}
-
-.days-stamp-inner {
+.oval-stamp-svg {
   width: 100%;
   height: 100%;
-  background: var(--accent-muted);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 6px 4px 4px;
-  position: relative;
-}
-
-.stamp-heart {
-  width: 36px;
-  height: 33px;
-  color: var(--ink);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stamp-heart svg {
-  width: 100%;
-  height: 100%;
-}
-
-.stamp-love {
-  position: absolute;
-  font-family: var(--font-serif);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  color: var(--ink);
-  text-align: center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -42%);
-}
-
-.stamp-text {
-  font-family: var(--font-script, 'Mrs Saint Delafield', cursive);
-  font-size: 7px;
-  letter-spacing: 0.3px;
-  text-align: center;
-  color: var(--ink);
-  margin-top: 1px;
-  line-height: 1;
 }
 
 /* ============ PHOTOBOOTH STRIP (flat-lay, tilted on top of letter) ============ */
