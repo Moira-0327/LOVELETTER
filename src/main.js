@@ -573,8 +573,14 @@ const LETTER_W = 850;
 const LETTER_H = 1100;
 const SCALE = 3;
 
+<<<<<<< HEAD
 // SAVE — downloads letter + photobooth as separate files
 document.getElementById('btn-save').addEventListener('click', async (e) => {
+=======
+// Save button in flat-lay (saves composite)
+document.getElementById('save-letter').addEventListener('click', async (e) => {
+  e.preventDefault();
+>>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
   e.stopPropagation();
   const letterCanvas = renderLetterCanvas();
   await downloadCanvas(letterCanvas, 'love-letter.png');
@@ -585,7 +591,12 @@ document.getElementById('btn-save').addEventListener('click', async (e) => {
 });
 
 // Save in expanded letter
+<<<<<<< HEAD
 document.getElementById('expand-save-letter').addEventListener('click', async (e) => {
+=======
+document.getElementById('expand-save-letter').addEventListener('click', (e) => {
+  e.preventDefault();
+>>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
   e.stopPropagation();
   const canvas = renderLetterCanvas();
   await downloadCanvas(canvas, 'love-letter.png');
@@ -593,6 +604,7 @@ document.getElementById('expand-save-letter').addEventListener('click', async (e
 
 // Save in expanded photobooth
 document.getElementById('expand-save-photobooth').addEventListener('click', async (e) => {
+  e.preventDefault();
   e.stopPropagation();
   const canvas = await renderPhotoboothCanvas();
   await downloadCanvas(canvas, 'photobooth.png');
@@ -864,7 +876,12 @@ async function renderPhotoboothCanvas() {
 
 // ============ SHARE — website URL only ============
 
+<<<<<<< HEAD
 document.getElementById('btn-share').addEventListener('click', async (e) => {
+=======
+document.getElementById('share-letter').addEventListener('click', (e) => {
+  e.preventDefault();
+>>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
   e.stopPropagation();
   const toast = document.getElementById('share-toast');
   const siteUrl = window.location.origin + window.location.pathname;
