@@ -198,33 +198,25 @@ html, body {
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
-<<<<<<< HEAD
-  color: var(--text-dark);
-=======
   color: var(--accent-deep);
->>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
   text-align: left;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
-<<<<<<< HEAD
-  color: var(--text-dark);
-=======
   color: var(--accent-deep);
->>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-text {
-  color: var(--text-dark);
+  color: var(--accent-deep);
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-month-field,
 .form-group input[type="date"]::-webkit-datetime-edit-day-field,
 .form-group input[type="date"]::-webkit-datetime-edit-year-field {
-  color: var(--text-dark);
+  color: var(--accent-deep);
 }
 
 /* Date input placeholder fields (when empty) */
