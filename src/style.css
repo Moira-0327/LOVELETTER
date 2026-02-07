@@ -198,6 +198,16 @@ html, body {
   padding: 0;
 }
 
+.form-group input[type="date"]::-webkit-datetime-edit-text {
+  color: var(--text-dark);
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]::-webkit-datetime-edit-year-field {
+  color: var(--text-dark);
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
   border-bottom-color: var(--accent);
