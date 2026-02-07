@@ -580,7 +580,10 @@ document.getElementById('btn-save').addEventListener('click', async (e) => {
 // Save button in flat-lay (saves composite)
 document.getElementById('save-letter').addEventListener('click', async (e) => {
   e.preventDefault();
+<<<<<<< HEAD
 >>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
+=======
+>>>>>>> 223c068fd4f72990cc355cb2eb7e374f0a2311ed
   e.stopPropagation();
   const letterCanvas = renderLetterCanvas();
   await downloadCanvas(letterCanvas, 'love-letter.png');
@@ -596,7 +599,10 @@ document.getElementById('expand-save-letter').addEventListener('click', async (e
 =======
 document.getElementById('expand-save-letter').addEventListener('click', (e) => {
   e.preventDefault();
+<<<<<<< HEAD
 >>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
+=======
+>>>>>>> 223c068fd4f72990cc355cb2eb7e374f0a2311ed
   e.stopPropagation();
   const canvas = renderLetterCanvas();
   await downloadCanvas(canvas, 'love-letter.png');
@@ -881,7 +887,10 @@ document.getElementById('btn-share').addEventListener('click', async (e) => {
 =======
 document.getElementById('share-letter').addEventListener('click', (e) => {
   e.preventDefault();
+<<<<<<< HEAD
 >>>>>>> e587a57 (Fix seal button auto-refresh issue with multiple safeguards)
+=======
+>>>>>>> 223c068fd4f72990cc355cb2eb7e374f0a2311ed
   e.stopPropagation();
   const toast = document.getElementById('share-toast');
   const siteUrl = window.location.origin + window.location.pathname;
