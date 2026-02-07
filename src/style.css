@@ -12,7 +12,7 @@
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #C1121F;
+  --ink: #780000;
   --ink-light: #f16a73ec;
   --text-dark: #780000;
   --text-muted: #f16a73b7;
@@ -175,6 +175,12 @@ html, body {
   resize: none;
 }
 
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
 /* Match date input font and alignment to other inputs */
 .form-group input[type="date"] {
   -webkit-appearance: none;
@@ -184,18 +190,49 @@ html, body {
   padding-left: 0;
 }
 
+/* Date input placeholder styling (when empty) */
+.form-group input[type="date"]:not(:valid) {
+  color: #999999;
+}
+
 .form-group input[type="date"]::-webkit-datetime-edit {
   font-family: var(--font-typewriter);
   font-size: 15px;
+<<<<<<< HEAD
+  color: var(--text-dark);
+=======
   color: var(--accent-deep);
+>>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
   text-align: left;
 }
 
 .form-group input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-family: var(--font-typewriter);
+<<<<<<< HEAD
+  color: var(--text-dark);
+=======
   color: var(--accent-deep);
+>>>>>>> c9a71adad5493b7407b2c5eb9bfb27d93f960306
   padding: 0;
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-text {
+  color: var(--text-dark);
+}
+
+.form-group input[type="date"]::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]::-webkit-datetime-edit-year-field {
+  color: var(--text-dark);
+}
+
+/* Date input placeholder fields (when empty) */
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-text,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-month-field,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-day-field,
+.form-group input[type="date"]:not(:valid)::-webkit-datetime-edit-year-field {
+  color: #999999;
 }
 
 .form-group input:focus,
