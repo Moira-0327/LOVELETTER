@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
-  <rect width="100%" height="100%" fill="#F8F4F2"/>
-  <g transform="translate(120,80)">
-    <rect x="0" y="0" width="560" height="440" rx="10" fill="#efe1da" stroke="#dfc6b9"/>
-    <circle cx="220" cy="180" r="100" fill="#d9b6b8" opacity="0.9"/>
-    <circle cx="360" cy="260" r="60" fill="#c9a8b0" opacity="0.85"/>
-    <text x="280" y="220" font-family="DM Sans, Arial" font-size="36" text-anchor="middle" fill="#7a2e2e">Photo</text>
-  </g>
-</svg>

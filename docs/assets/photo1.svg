@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
-  <rect width="100%" height="100%" fill="#E8E0D8"/>
-  <g transform="translate(120,80)">
-    <rect x="0" y="0" width="560" height="440" rx="12" fill="#ddd4c9" stroke="#cbb8a2"/>
-    <rect x="80" y="60" width="400" height="300" fill="#c4a882" opacity="0.9"/>
-    <text x="280" y="220" font-family="DM Sans, Arial" font-size="36" text-anchor="middle" fill="#783833">Photo</text>
-  </g>
-</svg>
