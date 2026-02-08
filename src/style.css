@@ -12,7 +12,7 @@
   --cream-dark: #F0E8DE;
   --kraft: #C4A882;
   --kraft-light: #D4BFA0;
-  --ink: #C1121F;
+  --ink: #C0392B;
   --ink-light: #f16a73ec;
   --text-dark: #780000;
   --text-muted: #f16a73b7;
@@ -489,7 +489,7 @@ html, body {
 .letter-greeting {
   font-family: var(--font-typewriter);
   font-size: 14px;
-  color: var(--accent-deep);
+  color: var(--ink);
   line-height: 1.4;
   min-height: 1.4em;
 }
@@ -497,21 +497,14 @@ html, body {
 .letter-body {
   font-family: var(--font-typewriter);
   font-size: 12px;
-  color: var(--accent-deep);
+  color: var(--ink);
   line-height: 1.8;
   white-space: pre-wrap;
   min-height: 40px;
   overflow: hidden;
 }
 
-/* Ink texture — heavier bleed for handwritten feel */
-.letter-greeting,
-.letter-body {
-  text-shadow:
-    0 0 1px currentColor,
-    0.3px 0.3px 0.5px rgba(192, 57, 43, 0.2);
-  -webkit-text-stroke: 0.2px currentColor;
-}
+/* Ink texture removed for consistency with download version */
 
 .setup-title {
   text-shadow:
@@ -529,7 +522,6 @@ html, body {
   text-transform: uppercase;
   text-align: right;
   margin-top: 6px;
-  text-shadow: 0 0 0.6px currentColor;
   opacity: 0;
   transition: opacity 0.6s ease;
 }
