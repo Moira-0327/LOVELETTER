@@ -49,7 +49,50 @@ npm run build
 Preview the production build locally:
 ```bash
 npm run preview
+# or use the preview script
+./preview.sh
 ```
+
+### Deploy
+
+Deploy to GitHub Pages:
+
+#### Option 1: Using deploy script (Recommended)
+```bash
+./deploy.sh
+```
+This script will:
+- Clean old build files
+- Install dependencies if needed
+- Build the project
+- Show you the next steps for pushing to GitHub
+
+#### Option 2: Using npm command
+```bash
+npm run deploy
+```
+
+#### Option 3: Quick deploy (build + commit + push)
+```bash
+npm run deploy:quick
+```
+
+#### Manual deployment
+```bash
+# 1. Build the project
+npm run build
+
+# 2. Commit and push
+git add .
+git commit -m "Deploy Love Letter"
+git push origin claude/love-letter-web-deploy-iCE8b
+
+# 3. GitHub Actions will automatically deploy to GitHub Pages
+```
+
+## Deployment
+
+The project is configured to automatically deploy to GitHub Pages when you push to the `main` branch (or your feature branch if configured). The built files are in the `docs/` folder, which GitHub Pages uses as the source.
 
 ## Project Structure
 
